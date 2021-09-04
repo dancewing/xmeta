@@ -1,0 +1,53 @@
+{
+  "cSpell.words": [
+    "Amplication",
+    "Authorizable",
+    "Datagrid",
+    "Dropzone",
+    "Formik",
+    "IBLOCK",
+    "Octokit",
+    "Queryable",
+    "Repos",
+    "Signup",
+    "UNREQUIRED",
+    "Xarrow",
+    "camelcase",
+    "checkmark",
+    "curveness",
+    "deepdash",
+    "dtos",
+    "linkcode",
+    "nestjs",
+    "rmwc",
+    "scrollbar",
+    "scrollbars",
+    "teleporter",
+    "uncontained",
+    "unelevated",
+    "unmark",
+    "upsert",
+    "xarrows",
+    "xsmall"
+  ],
+  "eslint.workingDirectories": [
+    {
+      "pattern": "./packages/*"
+    }
+  ],
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true
+  },
+  "terraform.languageServer": {},
+  "editor.formatOnSave": true,
+  "cSpell.ignoreWords": ["exshql"],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[prisma]": {
+    "editor.defaultFormatter": null
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": null
+  }
+}

@@ -1,0 +1,56 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach NestJS WS",
+      "port": 9229,
+      "restart": true,
+      "stopOnEntry": false,
+      "protocol": "inspector"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/amplication-client"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File (Server)",
+      "program": "${workspaceFolder}/packages/amplication-server/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}"],
+      "cwd": "${workspaceFolder}/packages/amplication-server",
+      "console": "internalConsole",
+      "disableOptimisticBPs": true,
+      "windows": {
+        "program": "${workspaceFolder}/packages/amplication-server/node_modules/jest/bin/jest"
+      }
+    },
+    {
+      "name": "Generate Test Data Service",
+      "request": "launch",
+      "runtimeArgs": ["run-script", "generate-test-data-service"],
+      "runtimeExecutable": "npm",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "pwa-node",
+      "cwd": "${workspaceFolder}/packages/amplication-data-service-generator",
+      "console": "internalConsole"
+    },
+    {
+      "name": "Debug Test Data Service",
+      "request": "launch",
+      "runtimeArgs": ["run-script", "start", "--", "--debug"],
+      "runtimeExecutable": "npm",
+      "cwd": "${workspaceFolder}/packages/amplication-data-service-generator/generated",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    }
+  ]
+}

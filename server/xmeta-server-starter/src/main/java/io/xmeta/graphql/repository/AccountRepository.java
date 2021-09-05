@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.AccountEntity;
 
+import java.util.Optional;
+
 /**
  * @Description
  * @Author  Jeff
@@ -12,5 +14,7 @@ import io.xmeta.graphql.domain.AccountEntity;
 
 @Repository
 public interface AccountRepository extends JpaRepository<AccountEntity, String> {
+
+    Optional<AccountEntity> findOneByEmailIgnoreCase(String email);
 
 }

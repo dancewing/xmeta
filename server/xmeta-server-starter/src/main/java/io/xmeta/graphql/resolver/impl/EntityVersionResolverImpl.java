@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class EntityVersionResolverImpl implements EntityVersionResolver {
     @Override
-    public List<EntityField> fields(EntityVersion entityVersion, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public List<EntityField> fields(EntityVersion entityVersion, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 }

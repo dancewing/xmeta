@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * @Description
@@ -27,7 +27,7 @@ public class ReleaseEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "version_")
 	private String version;

@@ -1,6 +1,7 @@
 package io.xmeta.graphql.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.AppEntity;
 
@@ -11,6 +12,6 @@ import io.xmeta.graphql.domain.AppEntity;
  */
 
 @Repository
-public interface AppRepository extends JpaRepository<AppEntity, String> {
+public interface AppRepository extends JpaRepository<AppEntity, String>, JpaSpecificationExecutor<AppEntity> {
 
 }

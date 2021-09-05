@@ -2,164 +2,179 @@ package io.xmeta.graphql.resolver.impl;
 
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.resolver.MetaQueryResolver;
+import io.xmeta.graphql.service.AccountService;
+import io.xmeta.graphql.service.AppService;
+import io.xmeta.graphql.service.EntityService;
+import io.xmeta.graphql.service.WorkspaceService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
+@AllArgsConstructor
 public class MetaQueryResolverImpl implements MetaQueryResolver {
+
+    private final AccountService accountService;
+
+    private final AppService appService;
+
+    private final EntityService entityService;
+
+    private final WorkspaceService workspaceService;
+
     @Override
-    public Account account() throws Exception {
+    public Account account() {
         return null;
     }
 
     @Override
-    public List<Workspace> workspaces() throws Exception {
+    public List<Workspace> workspaces() {
         return null;
     }
 
     @Override
-    public Workspace workspace(WhereUniqueInput where) throws Exception {
+    public Workspace workspace(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public Workspace currentWorkspace() throws Exception {
+    public Workspace currentWorkspace() {
+        return this.workspaceService.currentWorkspace();
+    }
+
+    @Override
+    public Entity entity(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public Entity entity(WhereUniqueInput where) throws Exception {
+    public List<Entity> entities(EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
+        return this.entityService.entities(where, orderBy, skip, take);
+    }
+
+    @Override
+    public List<Block> blocks(BlockWhereInput where, BlockOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 
     @Override
-    public List<Entity> entities(EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public Block block(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public List<Block> blocks(BlockWhereInput where, BlockOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public AppRole appRole(WhereUniqueInput where, Double version) {
         return null;
     }
 
     @Override
-    public Block block(WhereUniqueInput where) throws Exception {
+    public List<AppRole> appRoles(AppRoleWhereInput where, AppRoleOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 
     @Override
-    public AppRole appRole(WhereUniqueInput where, Double version) throws Exception {
+    public AppSettings appSettings(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public List<AppRole> appRoles(AppRoleWhereInput where, AppRoleOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public Action action(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public AppSettings appSettings(WhereUniqueInput where) throws Exception {
+    public List<Deployment> deployments(DeploymentWhereInput where, DeploymentOrderByInput orderBy, Integer take, Integer skip) {
         return null;
     }
 
     @Override
-    public List<Build> builds(BuildWhereInput where, BuildOrderByInput orderBy, Integer take, Integer skip) throws Exception {
+    public Deployment deployment(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public Build build(WhereUniqueInput where) throws Exception {
+    public App app(WhereUniqueInput where) {
+        return this.appService.app(where);
+    }
+
+    @Override
+    public List<App> apps(AppWhereInput where, AppOrderByInput orderBy, Integer skip, Integer take) {
+        return this.appService.apps(where, orderBy, skip, take);
+    }
+
+    @Override
+    public List<PendingChange> pendingChanges(PendingChangesFindInput where) {
         return null;
     }
 
     @Override
-    public Action action(WhereUniqueInput where) throws Exception {
+    public List<GithubRepo> appAvailableGithubRepos(AvailableGithubReposFindInput where) {
         return null;
     }
 
     @Override
-    public List<Deployment> deployments(DeploymentWhereInput where, DeploymentOrderByInput orderBy, Integer take, Integer skip) throws Exception {
+    public AppValidationResult appValidateBeforeCommit(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public Deployment deployment(WhereUniqueInput where) throws Exception {
+    public Commit commit(CommitWhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public App app(WhereUniqueInput where) throws Exception {
+    public List<Commit> commits(CommitWhereInput where, CommitOrderByInput orderBy, CommitWhereUniqueInput cursor, Integer take, Integer skip) {
         return null;
     }
 
     @Override
-    public List<App> apps(AppWhereInput where, AppOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public User me() {
         return null;
     }
 
     @Override
-    public List<PendingChange> pendingChanges(PendingChangesFindInput where) throws Exception {
+    public List<ApiToken> userApiTokens() {
         return null;
     }
 
     @Override
-    public List<GithubRepo> appAvailableGithubRepos(AvailableGithubReposFindInput where) throws Exception {
+    public ConnectorRestApi ConnectorRestApi(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public AppValidationResult appValidateBeforeCommit(WhereUniqueInput where) throws Exception {
+    public List<ConnectorRestApi> ConnectorRestApis(ConnectorRestApiWhereInput where, ConnectorRestApiOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 
     @Override
-    public Commit commit(CommitWhereUniqueInput where) throws Exception {
+    public ConnectorRestApiCall ConnectorRestApiCall(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public List<Commit> commits(CommitWhereInput where, CommitOrderByInput orderBy, CommitWhereUniqueInput cursor, Integer take, Integer skip) throws Exception {
+    public List<ConnectorRestApiCall> ConnectorRestApiCalls(ConnectorRestApiCallWhereInput where, ConnectorRestApiCallOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 
     @Override
-    public User me() throws Exception {
+    public EntityPage EntityPage(WhereUniqueInput where) {
         return null;
     }
 
     @Override
-    public List<ApiToken> userApiTokens() throws Exception {
+    public List<EntityPage> EntityPages(EntityPageWhereInput where, EntityPageOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 
     @Override
-    public ConnectorRestApi ConnectorRestApi(WhereUniqueInput where) throws Exception {
+    public List<Build> builds(BuildWhereInput where, BuildOrderByInput orderBy, Integer take, Integer skip) {
         return null;
     }
 
     @Override
-    public List<ConnectorRestApi> ConnectorRestApis(ConnectorRestApiWhereInput where, ConnectorRestApiOrderByInput orderBy, Integer skip, Integer take) throws Exception {
-        return null;
-    }
-
-    @Override
-    public ConnectorRestApiCall ConnectorRestApiCall(WhereUniqueInput where) throws Exception {
-        return null;
-    }
-
-    @Override
-    public List<ConnectorRestApiCall> ConnectorRestApiCalls(ConnectorRestApiCallWhereInput where, ConnectorRestApiCallOrderByInput orderBy, Integer skip, Integer take) throws Exception {
-        return null;
-    }
-
-    @Override
-    public EntityPage EntityPage(WhereUniqueInput where) throws Exception {
-        return null;
-    }
-
-    @Override
-    public List<EntityPage> EntityPages(EntityPageWhereInput where, EntityPageOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public Build build(WhereUniqueInput where) {
         return null;
     }
 }

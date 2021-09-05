@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class BuildResolverImpl implements BuildResolver {
     @Override
-    public List<Deployment> deployments(Build build, DeploymentWhereInput where, DeploymentOrderByInput orderBy, Integer take, Integer skip) throws Exception {
+    public List<Deployment> deployments(Build build, DeploymentWhereInput where, DeploymentOrderByInput orderBy, Integer take, Integer skip) {
         return null;
     }
 }

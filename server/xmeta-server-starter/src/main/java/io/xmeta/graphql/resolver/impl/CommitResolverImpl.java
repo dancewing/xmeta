@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class CommitResolverImpl implements CommitResolver {
     @Override
-    public List<Build> builds(Commit commit, BuildWhereInput where, BuildOrderByInput orderBy, Integer take, Integer skip) throws Exception {
+    public List<Build> builds(Commit commit, BuildWhereInput where, BuildOrderByInput orderBy, Integer take, Integer skip) {
         return null;
     }
 }

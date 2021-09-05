@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * @Description
@@ -27,10 +27,10 @@ public class AppEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updatedAt")
-	private Date updatedAt;
+	private ZonedDateTime updatedAt;
 
 	@Column(name = "workspaceId")
 	private String workspaceId;
@@ -48,7 +48,7 @@ public class AppEntity extends BaseEntity {
 	private String githubToken;
 
 	@Column(name = "githubTokenCreatedDate")
-	private Date githubTokenCreatedDate;
+	private ZonedDateTime githubTokenCreatedDate;
 
 	@Column(name = "githubSyncEnabled")
 	private Boolean githubSyncEnabled;
@@ -60,12 +60,12 @@ public class AppEntity extends BaseEntity {
 	private String githubBranch;
 
 	@Column(name = "githubLastSync")
-	private Date githubLastSync;
+	private ZonedDateTime githubLastSync;
 
 	@Column(name = "githubLastMessage")
 	private String githubLastMessage;
 
 	@Column(name = "deletedAt")
-	private Date deletedAt;
+	private ZonedDateTime deletedAt;
 
 }

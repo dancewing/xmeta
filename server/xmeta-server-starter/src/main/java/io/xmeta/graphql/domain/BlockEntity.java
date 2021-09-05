@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * @Description
@@ -27,10 +27,10 @@ public class BlockEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updatedAt")
-	private Date updatedAt;
+	private ZonedDateTime updatedAt;
 
 	@Column(name = "appId")
 	private String appId;
@@ -51,9 +51,9 @@ public class BlockEntity extends BaseEntity {
 	private String lockedByUserId;
 
 	@Column(name = "lockedAt")
-	private Date lockedAt;
+	private ZonedDateTime lockedAt;
 
 	@Column(name = "deletedAt")
-	private Date deletedAt;
+	private ZonedDateTime deletedAt;
 
 }

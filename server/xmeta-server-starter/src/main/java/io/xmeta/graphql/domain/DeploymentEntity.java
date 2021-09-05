@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * @Description
@@ -27,7 +27,7 @@ public class DeploymentEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "userId")
 	private String userId;
@@ -51,6 +51,6 @@ public class DeploymentEntity extends BaseEntity {
 	private String statusQuery;
 
 	@Column(name = "statusUpdatedAt")
-	private Date statusUpdatedAt;
+	private ZonedDateTime statusUpdatedAt;
 
 }

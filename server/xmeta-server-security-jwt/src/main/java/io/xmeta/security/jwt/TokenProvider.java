@@ -1,11 +1,9 @@
 package io.xmeta.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.xmeta.security.AuthUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,7 +45,7 @@ public class TokenProvider {
     public void init() {
         byte[] keyBytes;
         String secret = this.jwtProperties.getSecret();
-        if (!StringUtils.hasText(secret)) {
+        if (StringUtils.hasText(secret)) {
             log.warn("Warning: the JWT key used is not Base64-encoded. " +
                     "We recommend using the `jhipster.security.authentication.jwt.base64-secret` key for optimum security.");
             keyBytes = secret.getBytes(StandardCharsets.UTF_8);
@@ -73,12 +71,18 @@ public class TokenProvider {
             validity = new Date(now + this.tokenValidityInMilliseconds);
         }
 
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
-                .signWith(key, SignatureAlgorithm.HS512)
-                .setExpiration(validity)
-                .compact();
+                .claim(AUTHORITIES_KEY, authorities);
+        if (authentication.getPrincipal() instanceof AuthUser) {
+            AuthUser authUser = (AuthUser) authentication.getPrincipal();
+            builder.claim("account_id", authUser.getId());
+            builder.claim("user_id", authUser.getUserId());
+            builder.claim("workspace_id", authUser.getWorkspaceId());
+        }
+        builder.signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(validity);
+        return builder.compact();
     }
 
     public Authentication getAuthentication(String token) {
@@ -93,8 +97,12 @@ public class TokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
-
+        String accountId = claims.get("account_id", String.class);
+        String userId = claims.get("user_id", String.class);
+        String workspaceId = claims.get("workspace_id", String.class);
+        AuthUser principal = new AuthUser(accountId, claims.getSubject(), "", authorities);
+        principal.setUserId(userId);
+        principal.setWorkspaceId(workspaceId);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 

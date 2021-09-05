@@ -126,6 +126,12 @@
             <version>0.26.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-jpamodelgen</artifactId>
+            <version>5.4.32.Final</version>
+        </dependency>
+
     </dependencies>
 
 	<build>
@@ -153,6 +159,11 @@
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>1.4.1.Final</version>
+                        </annotationProcessorPath>
+                        <annotationProcessorPath>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>5.4.32.Final</version>
                         </annotationProcessorPath>
                     </annotationProcessorPaths>
                 </configuration>
@@ -202,8 +213,9 @@
                             <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
                             <apiRootInterfaceStrategy>INTERFACE_PER_SCHEMA</apiRootInterfaceStrategy>
                             <apiNamePrefixStrategy>FILE_NAME_AS_PREFIX</apiNamePrefixStrategy>
+                            <generateApisWithThrowsException>false</generateApisWithThrowsException>
                             <customTypesMapping>
-                                <DateTime>java.util.Date</DateTime>
+                                <DateTime>java.time.ZonedDateTime</DateTime>
                                 <Price.amount>java.math.BigDecimal</Price.amount>
                             </customTypesMapping>
                             <parentInterfaces>

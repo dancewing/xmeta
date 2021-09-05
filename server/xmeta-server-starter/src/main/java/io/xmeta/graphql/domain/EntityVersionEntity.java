@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,10 +27,10 @@ public class EntityVersionEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updatedAt")
-	private Date updatedAt;
+	private ZonedDateTime updatedAt;
 
 	@Column(name = "entityId")
 	private String entityId;

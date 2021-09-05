@@ -7,7 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * @Description
@@ -27,7 +27,7 @@ public class ActionStepEntity extends BaseEntity {
 	private String id;
 
 	@Column(name = "createdAt")
-	private Date createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "message")
 	private String message;
@@ -36,7 +36,7 @@ public class ActionStepEntity extends BaseEntity {
 	private String status;
 
 	@Column(name = "completedAt")
-	private Date completedAt;
+	private ZonedDateTime completedAt;
 
 	@Column(name = "actionId")
 	private String actionId;

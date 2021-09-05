@@ -2,7 +2,7 @@ package io.xmeta.security.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "xmetadata.security.jwt", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "xmeta.security.jwt", ignoreUnknownFields = false)
 public class JwtProperties {
     private String secret;
 

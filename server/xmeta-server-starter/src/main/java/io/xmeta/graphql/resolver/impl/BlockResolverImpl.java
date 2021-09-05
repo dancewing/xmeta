@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class BlockResolverImpl implements BlockResolver {
     @Override
-    public List<BlockVersion> versions(Block block, BlockVersionWhereInput where, BlockVersionOrderByInput orderBy, Integer skip, Integer take) throws Exception {
+    public List<BlockVersion> versions(Block block, BlockVersionWhereInput where, BlockVersionOrderByInput orderBy, Integer skip, Integer take) {
         return null;
     }
 }

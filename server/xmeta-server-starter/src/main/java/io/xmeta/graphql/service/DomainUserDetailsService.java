@@ -1,0 +1,75 @@
+package io.xmeta.graphql.service;
+
+import io.xmeta.graphql.domain.AccountEntity;
+import io.xmeta.graphql.domain.UserEntity;
+import io.xmeta.graphql.repository.AccountRepository;
+import io.xmeta.graphql.repository.UserRepository;
+import io.xmeta.graphql.repository.UserRoleRepository;
+import io.xmeta.graphql.util.EmailValidator;
+import io.xmeta.security.AuthUser;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Component("userDetailsService")
+@Slf4j
+public class DomainUserDetailsService implements UserDetailsService {
+
+    private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    public DomainUserDetailsService(AccountRepository accountRepository, UserRepository userRepository, UserRoleRepository userRoleRepository) {
+        this.accountRepository = accountRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
+
+    @Override
+    @Transactional
+    public UserDetails loadUserByUsername(final String login) {
+        log.debug("Authenticating {}", login);
+        if (EmailValidator.isValid(login)) {
+            return accountRepository.findOneByEmailIgnoreCase(login)
+                    .map(user -> createSpringSecurityUser(login, user))
+                    .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
+        }
+
+        return null;
+
+//        String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
+//        return userRepository.findOneByUsername(lowercaseLogin)
+//                .map(user -> createSpringSecurityUser(lowercaseLogin, user))
+//                .orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
+
+    }
+
+    private AuthUser createSpringSecurityUser(String lowercaseLogin, AccountEntity account) {
+//        if (account.getIsActive() != null && !account.getIsActive()) {
+//            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+//        }
+        Optional<UserEntity> userEntity = this.userRepository.findByAccountId(account.getId());
+        if (!userEntity.isPresent()) {
+            throw new RuntimeException("");
+        }
+        List<String> roles = this.userRoleRepository.findRoles(account.getId());
+        List<GrantedAuthority> grantedAuthorities = roles.stream()
+                .map(authority -> new SimpleGrantedAuthority(authority))
+                .collect(Collectors.toList());
+        AuthUser user = new AuthUser(account.getId(), account.getEmail(),
+                account.getPassword(),
+                grantedAuthorities);
+        user.setUserId(userEntity.get().getId());
+        user.setWorkspaceId(userEntity.get().getWorkspaceId());
+        return user;
+    }
+}

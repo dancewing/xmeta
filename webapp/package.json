@@ -2,6 +2,7 @@
   "name": "amplication",
   "scripts": {
     "build": "lerna run --ignore server-template --ignore admin-template --sort --include-dependencies build",
+    "start:client": "lerna run --scope @amplication/client start",
     "test": "lerna run --parallel --ignore server-template --ignore admin-template test",
     "test:e2e": "lerna run --parallel test:e2e",
     "check-format": "lerna run --parallel check-format",

@@ -5,12 +5,12 @@
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>davinci-webapp</artifactId>
+    <artifactId>xmeta-webapp</artifactId>
     <packaging>jar</packaging>
 
     <parent>
-        <groupId>edp.davinci</groupId>
-        <artifactId>davinci-parent</artifactId>
+        <groupId>io.xmeta</groupId>
+        <artifactId>xmeta-parent</artifactId>
         <version>0.3.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>

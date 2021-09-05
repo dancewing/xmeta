@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>xmeta-server-starter</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>io.xmeta</groupId>
+        <artifactId>xmeta-server</artifactId>
+        <version>0.3.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <skipTests>true</skipTests>
+        <graphql.spring.version>11.1.0</graphql.spring.version>
+    </properties>
+
+	<dependencies>
+
+        <dependency>
+            <groupId>io.xmeta</groupId>
+            <artifactId>xmeta-server-security-jwt</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+        </dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphql-java-kickstart</groupId>
+            <artifactId>graphql-spring-boot-starter</artifactId>
+            <version>${graphql.spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.6.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>guava</artifactId>
+                    <groupId>com.google.guava</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.6.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.22</version>
+        </dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.66</version>
+		</dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.4.2.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.zalando</groupId>
+            <artifactId>problem-spring-web</artifactId>
+            <version>0.26.2</version>
+        </dependency>
+
+    </dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <showDeprecation>true</showDeprecation>
+                    <annotationProcessorPaths>
+                        <annotationProcessorPath>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.12</version>
+                        </annotationProcessorPath>
+                        <annotationProcessorPath>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.4.1.Final</version>
+                        </annotationProcessorPath>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources/graphql</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.github.kobylynskyi</groupId>
+                <artifactId>graphql-codegen-maven-plugin</artifactId>
+                <version>5.2.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <!-- all config options:
+                            https://github.com/kobylynskyi/graphql-java-codegen/blob/master/docs/codegen-options.md
+                            -->
+                            <graphqlSchemaPaths>
+                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/meta.graphqls</graphqlSchemaPath>
+<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/auth.graphqls</graphqlSchemaPath>-->
+<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/organization.graphqls</graphqlSchemaPath>-->
+<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/project.graphqls</graphqlSchemaPath>-->
+<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/user.graphqls</graphqlSchemaPath>-->
+                            </graphqlSchemaPaths>
+                            <outputDir>${project.build.directory}/generated-sources/graphql</outputDir>
+                            <modelPackageName>io.xmeta.graphql.model</modelPackageName>
+                            <apiPackageName>io.xmeta.graphql.resolver</apiPackageName>
+                            <generateBuilder>false</generateBuilder>
+                            <addGeneratedAnnotation>false</addGeneratedAnnotation>
+                            <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
+                            <apiRootInterfaceStrategy>INTERFACE_PER_SCHEMA</apiRootInterfaceStrategy>
+                            <apiNamePrefixStrategy>FILE_NAME_AS_PREFIX</apiNamePrefixStrategy>
+                            <customTypesMapping>
+                                <DateTime>java.util.Date</DateTime>
+                                <Price.amount>java.math.BigDecimal</Price.amount>
+                            </customTypesMapping>
+                            <parentInterfaces>
+                                <queryResolver>graphql.kickstart.tools.GraphQLQueryResolver</queryResolver>
+                                <mutationResolver>graphql.kickstart.tools.GraphQLMutationResolver</mutationResolver>
+                                <subscriptionResolver>graphql.kickstart.tools.GraphQLSubscriptionResolver
+                                </subscriptionResolver>
+                                <resolver><![CDATA[graphql.kickstart.tools.GraphQLResolver<{{TYPE}}>]]></resolver>
+                            </parentInterfaces>
+                            <customAnnotationsMapping>
+                                <EpochMillis>
+                                    <annotation>com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.example.json.EpochMillisScalarDeserializer.class)</annotation>
+                                </EpochMillis>
+                            </customAnnotationsMapping>
+                            <modelNameSuffix></modelNameSuffix>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+	</build>
+
+
+</project>

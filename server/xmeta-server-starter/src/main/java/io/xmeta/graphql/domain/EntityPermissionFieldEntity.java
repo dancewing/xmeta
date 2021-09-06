@@ -24,19 +24,26 @@ public class EntityPermissionFieldEntity extends BaseEntity {
 	@Column(name = "id", length = 64)
 	private String id;
 
-	@Column(name = "permissionId")
-	private String permissionId;
+	@ManyToOne
+	private EntityPermissionEntity permission;
 
-	@Column(name = "fieldPermanentId")
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "fieldPermanentId", referencedColumnName = "permanentId"),
+			@JoinColumn(name = "entityVersionId", referencedColumnName = "entityVersionId"),
+	})
+	private EntityFieldEntity field;
+
+	@Column(name = "fieldPermanentId", insertable = false, updatable = false)
 	private String fieldPermanentId;
 
-	@Column(name = "entityVersionId")
+	@Column(name = "entityVersionId", insertable = false, updatable = false)
 	private String entityVersionId;
 
 	@ManyToMany
 	@JoinTable(name = "EntityPermissionFieldToPermissionRole",
 			joinColumns = @JoinColumn(name = "field_id", referencedColumnName = "id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-	private Set<EntityPermissionRoleEntity> roles = new HashSet<>();
+	private Set<EntityPermissionRoleEntity> permissionRoles = new HashSet<>();
 
 }

@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,14 +34,14 @@ public class EntityVersionEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "entityId", insertable = false, updatable = false)
+	@Column(name = "entity_id", insertable = false, updatable = false)
 	private String entityId;
 
 	@ManyToOne
 	private EntityEntity entity;
 
 	@Column(name = "versionNumber")
-	private Long versionNumber;
+	private Integer versionNumber;
 
 	@Column(name = "name")
 	private String name;
@@ -53,14 +55,19 @@ public class EntityVersionEntity extends BaseEntity {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "commitId")
-	private String commitId;
+	@ManyToOne
+	private CommitEntity commit;
 
 	@Column(name = "deleted")
 	private Boolean deleted;
 
 	@ManyToMany(mappedBy = "entityVersions")
 	@JsonIgnore
-	private Set<BuildEntity> builds = new HashSet<>();
+	private List<BuildEntity> builds = new ArrayList<>();
 
+	@OneToMany(mappedBy = "entityVersion")
+	private List<EntityFieldEntity> fields = new ArrayList<>();
+
+	@OneToMany(mappedBy = "entityVersion")
+	private List<EntityPermissionEntity> permissions = new ArrayList<>();
 }

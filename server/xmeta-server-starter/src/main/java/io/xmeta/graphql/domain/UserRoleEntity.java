@@ -31,7 +31,7 @@ public class UserRoleEntity extends BaseEntity {
 	@ManyToOne
 	private UserEntity user;
 
-	@Column(name = "role")
+	@Column(name = "role_")
 	private String role;
 
 }

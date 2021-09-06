@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -22,13 +24,21 @@ public class EntityPermissionEntity extends BaseEntity {
 	@Column(name = "id", length = 64)
 	private String id;
 
-	@Column(name = "entityVersionId")
-	private String entityVersionId;
-
 	@Column(name = "action")
 	private String action;
 
 	@Column(name = "type")
 	private String type;
+
+	@ManyToOne
+	private EntityVersionEntity entityVersion;
+
+	@OneToMany(mappedBy = "permission")
+	private List<EntityPermissionFieldEntity> permissionFields = new ArrayList<>();
+
+	@OneToMany
+	private List<EntityPermissionRoleEntity> permissionRoles = new ArrayList<>();
+
+
 
 }

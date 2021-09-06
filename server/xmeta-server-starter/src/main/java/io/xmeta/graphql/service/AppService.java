@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import io.xmeta.graphql.domain.AppEntity;
 import io.xmeta.graphql.domain.AppEntity_;
 import io.xmeta.graphql.domain.AppRoleEntity;
+import io.xmeta.graphql.domain.WorkspaceEntity;
 import io.xmeta.graphql.mapper.AppMapper;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.AppRepository;
@@ -40,14 +41,20 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     private final AppMapper appMapper;
     private final EntityService entityService;
     private final EnvironmentService environmentService;
+    private final BlockService blockService;
+    private final CommitService commitService;
+    private final EntityVersionService entityVersionService;
 
-    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService) {
+    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService, BlockService blockService, CommitService commitService, EntityVersionService entityVersionService) {
         super(appRepository);
         this.appRepository = appRepository;
         this.appRoleRepository = appRoleRepository;
         this.appMapper = appMapper;
         this.entityService = entityService;
         this.environmentService = environmentService;
+        this.blockService = blockService;
+        this.commitService = commitService;
+        this.entityVersionService = entityVersionService;
     }
 
     public App app(WhereUniqueInput where) {
@@ -81,10 +88,14 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     @Transactional
     public App createApp(AppCreateInput data) {
         AuthUserDetail authUserDetail = SecurityUtils.getAuthUser();
+
+        WorkspaceEntity workspaceEntity = new WorkspaceEntity();
+        workspaceEntity.setId(authUserDetail.getWorkspaceId());
+
         AppEntity appEntity = new AppEntity();
         appEntity.setCreatedAt(ZonedDateTime.now());
         appEntity.setUpdatedAt(ZonedDateTime.now());
-        appEntity.setWorkspaceId(authUserDetail.getWorkspaceId());
+        appEntity.setWorkspace(workspaceEntity);
         appEntity.setName(data.getName());
         appEntity.setDescription(data.getDescription());
         appEntity.setColor(data.getColor());
@@ -147,9 +158,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                                 authUserDetail.getUserId());
                     });
                 }
-                // create relation
-
-
+                // create relation //TODO
             });
             this.commit(new CommitCreateInput(data.getCommitMessage(), new WhereParentIdInput(new WhereUniqueInput(app.getId()))));
         }
@@ -158,8 +167,19 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     }
 
     private void commit(CommitCreateInput commitCreateInput) {
-        // CHECK IF APP EXISTS
+        // CHECK IF APP and  EXISTS
         AuthUserDetail authUserDetail = SecurityUtils.getAuthUser();
+        String appId = commitCreateInput.getApp().getConnect().getId();
+        String userId = authUserDetail.getUserId();
+
+        List<PendingChange> changedEntities = this.entityService.getChangedEntities(appId, userId);
+        List<PendingChange> changedBlocks = this.entityService.getChangedEntities(appId, userId);
+
+        Commit commit = this.commitService.commit(commitCreateInput);
+
+        changedEntities.forEach(pendingChange -> {
+            this.entityVersionService.createVersion(pendingChange.getResourceId(), commit.getId());
+        });
 
     }
 
@@ -176,11 +196,24 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     public App updateApp(AppUpdateInput data, WhereUniqueInput where) {
         AppEntity appEntity = this.appRepository.getById(where.getId());
         appEntity.setUpdatedAt(ZonedDateTime.now());
-        appEntity.setWorkspaceId("");
         appEntity.setName(data.getName());
         appEntity.setDescription(data.getDescription());
         appEntity.setColor(data.getColor());
         this.appRepository.save(appEntity);
         return this.appMapper.toDto(appEntity);
+    }
+
+    public List<PendingChange> pendingChanges(PendingChangesFindInput where) {
+        AppEntity appEntity = this.appRepository.getById(where.getApp().getId());
+        if (appEntity == null) {
+            throw new RuntimeException("");
+        }
+        String appId = where.getApp().getId();
+        String userId = SecurityUtils.getAuthUser().getUserId();
+        List<PendingChange> pendingChanges = this.entityService.getChangedEntities(appId, userId);
+
+        pendingChanges.addAll(this.blockService.getChangedBlocks(appId, userId));
+
+        return pendingChanges;
     }
 }

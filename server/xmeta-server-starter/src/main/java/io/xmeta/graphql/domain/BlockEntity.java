@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -43,13 +45,20 @@ public class BlockEntity extends BaseEntity {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "lockedByUserId")
-	private String lockedByUserId;
+	@ManyToOne
+	private UserEntity lockedByUser;
 
 	@Column(name = "lockedAt")
 	private ZonedDateTime lockedAt;
 
 	@Column(name = "deletedAt")
 	private ZonedDateTime deletedAt;
+
+	@OneToMany(mappedBy = "parentBlock")
+	private List<BlockEntity> blocks = new ArrayList<>();;
+
+	@OneToMany(mappedBy = "block")
+	@OrderBy("versionNumber desc")
+	private List<BlockVersionEntity> versions = new ArrayList<>();
 
 }

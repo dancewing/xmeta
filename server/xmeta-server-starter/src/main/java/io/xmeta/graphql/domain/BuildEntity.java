@@ -29,14 +29,11 @@ public class BuildEntity extends BaseEntity {
 	@Column(name = "createdAt")
 	private ZonedDateTime createdAt;
 
-	@Column(name = "app_Id", insertable = false, updatable = false)
-	private String appId;
-
 	@ManyToOne
 	private AppEntity app;
 
-	@Column(name = "userId")
-	private String userId;
+	@ManyToOne
+	private UserEntity createdBy;
 
 	@Column(name = "version")
 	private String version;
@@ -44,13 +41,11 @@ public class BuildEntity extends BaseEntity {
 	@Column(name = "message")
 	private String message;
 
-	@Column(name = "action_id", insertable = false, updatable = false)
-	private String actionId;
-
 	@ManyToOne
 	private ActionEntity action;
 
 	@Column(name = "images")
+	@Lob
 	private String images;
 
 	@Column(name = "containerStatusQuery")
@@ -58,9 +53,6 @@ public class BuildEntity extends BaseEntity {
 
 	@Column(name = "containerStatusUpdatedAt")
 	private ZonedDateTime containerStatusUpdatedAt;
-
-	@Column(name = "commit_id", insertable = false, updatable = false)
-	private String commitId;
 
 	@ManyToOne
 	private CommitEntity commit;

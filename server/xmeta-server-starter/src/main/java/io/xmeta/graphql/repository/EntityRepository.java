@@ -21,4 +21,6 @@ public interface EntityRepository extends JpaRepository<EntityEntity, String>, J
     @Query("from EntityEntity et where et.name =:name and et.app.id = :appId")
     List<EntityEntity> findEntityByNames(@Param("name") String name, @Param("appId") String appId);
 
+    @Query("from EntityEntity b where b.lockedByUser.id = :userId and b.app.id = :appId")
+    List<EntityEntity> findChangedEntities(@Param("appId") String appId, @Param("userId") String userId);
 }

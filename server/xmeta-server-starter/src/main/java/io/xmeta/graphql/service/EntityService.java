@@ -7,6 +7,7 @@ import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
 import io.xmeta.graphql.util.Inflector;
+import io.xmeta.graphql.util.SoftDelete;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
@@ -107,23 +108,23 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         EntityVersionEntity entityVersionEntity = new EntityVersionEntity();
         entityVersionEntity.setCreatedAt(ZonedDateTime.now());
         entityVersionEntity.setUpdatedAt(ZonedDateTime.now());
-        entityVersionEntity.setEntityId(entityEntity.getId());
-        entityVersionEntity.setVersionNumber(0L);
+        entityVersionEntity.setEntity(entityEntity);
+        entityVersionEntity.setVersionNumber(0);
         entityVersionEntity.setName(data.getName());
         entityVersionEntity.setDisplayName(data.getDisplayName());
         entityVersionEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityVersionEntity.setDescription(null);
-        entityVersionEntity.setCommitId(null);
+        entityVersionEntity.setCommit(null);
         entityVersionEntity.setDeleted(null);
         //entityVersionEntity.setBuilds(Sets.newHashSet());
         this.entityVersionRepository.saveAndFlush(entityVersionEntity);
 
         //create default permissions;
-        this.entityPermissionService.createEntityPermission(EnumEntityAction.Create.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
-        this.entityPermissionService.createEntityPermission(EnumEntityAction.Update.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
-        this.entityPermissionService.createEntityPermission(EnumEntityAction.View.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
-        this.entityPermissionService.createEntityPermission(EnumEntityAction.Delete.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
-        this.entityPermissionService.createEntityPermission(EnumEntityAction.Search.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Create.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Update.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.View.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Delete.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Search.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
 
         //create default entity fields
 
@@ -169,6 +170,38 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     public List<PendingChange> getChangedEntities(String appId, String userId) {
         List<PendingChange> pendingChanges = new ArrayList<>();
+        List<EntityEntity> changedEntities = this.entityRepository.findChangedEntities(appId, userId);
+        changedEntities.forEach(entityEntity -> {
+
+            List<EntityVersionEntity> versions = entityEntity.getVersions();
+            if (versions.size()==0) {
+                throw new RuntimeException("no entity versions");
+            }
+            Entity entity = this.entityMapper.toDto(entityEntity);
+
+            EntityVersionEntity lastVersion = versions.get(0);
+
+            EnumPendingChangeAction action = entityEntity.getDeletedAt() != null
+                    ? EnumPendingChangeAction.Delete
+                    : versions.size() > 1
+                    ? EnumPendingChangeAction.Update
+                    : EnumPendingChangeAction.Create;
+
+            if (action == EnumPendingChangeAction.Delete) {
+                entity.setName(SoftDelete.revertDeletedItemName(entity.getName(), entity.getId()));
+                entity.setDisplayName(SoftDelete.revertDeletedItemName(entity.getDisplayName(), entity.getId()));
+                entity.setPluralDisplayName(SoftDelete.revertDeletedItemName(entity.getPluralDisplayName(), entity.getId()));
+            }
+
+            PendingChange pendingChange = new PendingChange();
+            pendingChange.setAction(action);
+            pendingChange.setResourceType(EnumPendingChangeResourceType.Entity);
+            pendingChange.setResourceId(entity.getId());
+            pendingChange.setResource(entity);
+            pendingChange.setVersionNumber(lastVersion.getVersionNumber() + 1);
+
+            pendingChanges.add(pendingChange);
+        });
 
         return pendingChanges;
     }

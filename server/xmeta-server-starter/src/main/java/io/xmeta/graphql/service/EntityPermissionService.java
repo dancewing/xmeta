@@ -1,5 +1,6 @@
 package io.xmeta.graphql.service;
 
+import io.xmeta.graphql.domain.EntityVersionEntity;
 import org.springframework.stereotype.Service;
 import io.xmeta.graphql.domain.EntityPermissionEntity;
 import io.xmeta.graphql.repository.EntityPermissionRepository;
@@ -23,9 +24,9 @@ public class EntityPermissionService extends BaseService<EntityPermissionReposit
     }
 
     @Transactional
-    public void createEntityPermission(String action, String type, String entityVersionId) {
+    public void createEntityPermission(String action, String type, EntityVersionEntity entityVersionEntity) {
         EntityPermissionEntity entityPermission = new EntityPermissionEntity();
-        entityPermission.setEntityVersionId(entityVersionId);
+        entityPermission.setEntityVersion(entityVersionEntity);
         entityPermission.setAction(action);
         entityPermission.setType(type);
         this.permissionRepository.save(entityPermission);

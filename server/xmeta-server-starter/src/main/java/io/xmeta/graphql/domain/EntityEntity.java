@@ -55,7 +55,8 @@ public class EntityEntity extends BaseEntity {
 	@Column(name = "deletedAt")
 	private ZonedDateTime deletedAt;
 
-
-//	private List<EntityPermissionEntity>  permissions = new ArrayList<>();
+	@OneToMany(mappedBy = "entity")
+	@OrderBy("versionNumber desc")
+	private List<EntityVersionEntity> versions = new ArrayList<>();
 
 }

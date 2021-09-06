@@ -1,6 +1,8 @@
 package io.xmeta.graphql.repository;
 
+import io.xmeta.graphql.domain.AppEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.CommitEntity;
 
@@ -11,6 +13,6 @@ import io.xmeta.graphql.domain.CommitEntity;
  */
 
 @Repository
-public interface CommitRepository extends JpaRepository<CommitEntity, String> {
+public interface CommitRepository extends JpaRepository<CommitEntity, String>, JpaSpecificationExecutor<CommitEntity> {
 
 }

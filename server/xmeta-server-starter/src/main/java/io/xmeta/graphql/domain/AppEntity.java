@@ -32,8 +32,8 @@ public class AppEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "workspaceId")
-	private String workspaceId;
+	@ManyToOne
+	private WorkspaceEntity workspace;
 
 	@Column(name = "name")
 	private String name;

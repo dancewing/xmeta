@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.BlockVersionEntity;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author  Jeff
@@ -12,5 +14,4 @@ import io.xmeta.graphql.domain.BlockVersionEntity;
 
 @Repository
 public interface BlockVersionRepository extends JpaRepository<BlockVersionEntity, String> {
-
 }

@@ -61,4 +61,6 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
     public List<Predicate> createPredicates(Object where, Root<T> root, CriteriaBuilder criteriaBuilder) {
         return Collections.emptyList();
     }
+
+
 }

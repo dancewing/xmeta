@@ -3,11 +3,10 @@ package io.xmeta.graphql.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -33,5 +32,11 @@ public class WorkspaceEntity extends BaseEntity {
 
 	@Column(name = "name")
 	private String name;
+
+	@OneToMany(mappedBy = "workspace")
+	private List<UserEntity> users = new ArrayList<>();
+
+	@OneToMany(mappedBy = "workspace")
+	private List<AppEntity> apps = new ArrayList<>();
 
 }

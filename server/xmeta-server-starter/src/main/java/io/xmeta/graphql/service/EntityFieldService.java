@@ -2,15 +2,15 @@ package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityFieldMapper;
-import io.xmeta.graphql.model.*;
+import io.xmeta.graphql.model.EntityField;
+import io.xmeta.graphql.model.EntityFieldCreateByDisplayNameInput;
+import io.xmeta.graphql.model.EntityFieldCreateInput;
+import io.xmeta.graphql.model.EnumDataType;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
 import io.xmeta.graphql.util.Inflector;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,6 @@ import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -66,17 +65,19 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         this.entityFieldRepository.save(fieldEntity);
 
+        EntityEntity entityEntity = new EntityEntity();
+        entityEntity.setId(entityId);
+
         EntityVersionEntity entityVersionEntity = new EntityVersionEntity();
         entityVersionEntity.setCreatedAt(ZonedDateTime.now());
         entityVersionEntity.setUpdatedAt(ZonedDateTime.now());
-        entityVersionEntity.setEntityId(entityId);
-        entityVersionEntity.setVersionNumber(0L);
+        entityVersionEntity.setEntity(entityEntity);
+        entityVersionEntity.setVersionNumber(0);
         entityVersionEntity.setName(entityField.getName());
         entityVersionEntity.setDisplayName(entityField.getDisplayName());
        // TODO
        // entityVersionEntity.setPluralDisplayName(entityField.get);
         entityVersionEntity.setDescription(entityField.getDescription());
-        // entityVersionEntity.setCommitId("");
         entityVersionEntity.setDeleted(null);
         this.entityVersionRepository.save(entityVersionEntity);
 
@@ -140,13 +141,20 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                                 ? entity.getName()
                                 : entity.getPluralDisplayName(), false);
                 if (isFieldNameAvailable(relatedFieldName, relatedEntity.getId())) {
-                    builder.setName(name).setDataType(EnumDataType.Lookup)
+                    //TODO relation 类型需要重新处理
+                    builder.setName(name)
+                            .setDataType(EnumDataType.Lookup)
                             .setProperties("");
+                    return builder.build();
                 }
 
             }
         }
-        return null;
+
+        builder.setName(name).setDataType(dataType==null ? EnumDataType.SingleLineText: dataType)
+                .setProperties("");
+
+        return builder.build();
     }
 
     private boolean isFieldNameAvailable(String name, String entityId) {

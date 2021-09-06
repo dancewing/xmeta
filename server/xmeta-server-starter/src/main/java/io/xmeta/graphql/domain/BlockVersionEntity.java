@@ -36,7 +36,7 @@ public class BlockVersionEntity extends BaseEntity {
 	private BlockEntity block;
 
 	@Column(name = "versionNumber")
-	private Long versionNumber;
+	private Integer versionNumber;
 
 	@Column(name = "inputParameters")
 	private String inputParameters;
@@ -62,8 +62,8 @@ public class BlockVersionEntity extends BaseEntity {
 
 	@ManyToMany
 	@JoinTable(name = "BlockVersionToBuild",
-			joinColumns = @JoinColumn(name = "A", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "B", referencedColumnName = "id"))
+			joinColumns = @JoinColumn(name = "block_id", referencedColumnName = "id"),
+			inverseJoinColumns = @JoinColumn(name = "build_id", referencedColumnName = "id"))
 	private Set<BuildEntity> builds = new HashSet<>();
 
 }

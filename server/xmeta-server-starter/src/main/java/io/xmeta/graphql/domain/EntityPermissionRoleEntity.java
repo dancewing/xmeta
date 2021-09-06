@@ -41,10 +41,10 @@ public class EntityPermissionRoleEntity extends BaseEntity {
 			@JoinColumn(name = "entityVersionId", referencedColumnName = "entityVersionId"),
 			@JoinColumn(name = "action", referencedColumnName = "action")
 	})
-	private EntityPermissionEntity permission;
+	private EntityPermissionEntity entityPermission;
 
-	@ManyToMany(mappedBy = "roles")
+	@ManyToMany(mappedBy = "permissionRoles")
 	@JsonIgnore
-	private Set<EntityPermissionFieldEntity> fields = new HashSet<>();
+	private Set<EntityPermissionFieldEntity> permissionFields = new HashSet<>();
 
 }

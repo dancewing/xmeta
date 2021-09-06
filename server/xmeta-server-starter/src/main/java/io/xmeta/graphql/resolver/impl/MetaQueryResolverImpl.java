@@ -2,10 +2,7 @@ package io.xmeta.graphql.resolver.impl;
 
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.resolver.MetaQueryResolver;
-import io.xmeta.graphql.service.AccountService;
-import io.xmeta.graphql.service.AppService;
-import io.xmeta.graphql.service.EntityService;
-import io.xmeta.graphql.service.WorkspaceService;
+import io.xmeta.graphql.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +19,8 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
     private final EntityService entityService;
 
     private final WorkspaceService workspaceService;
+
+    private final CommitService commitService;
 
     @Override
     public Account account() {
@@ -105,7 +104,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public List<PendingChange> pendingChanges(PendingChangesFindInput where) {
-        return null;
+        return this.appService.pendingChanges(where);
     }
 
     @Override
@@ -125,7 +124,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public List<Commit> commits(CommitWhereInput where, CommitOrderByInput orderBy, CommitWhereUniqueInput cursor, Integer take, Integer skip) {
-        return null;
+        return this.commitService.commits(where, orderBy, cursor, take, skip);
     }
 
     @Override

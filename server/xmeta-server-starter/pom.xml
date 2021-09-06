@@ -208,7 +208,6 @@
                             <outputDir>${project.build.directory}/generated-sources/graphql</outputDir>
                             <modelPackageName>io.xmeta.graphql.model</modelPackageName>
                             <apiPackageName>io.xmeta.graphql.resolver</apiPackageName>
-                            <generateBuilder>false</generateBuilder>
                             <addGeneratedAnnotation>false</addGeneratedAnnotation>
                             <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
                             <apiRootInterfaceStrategy>INTERFACE_PER_SCHEMA</apiRootInterfaceStrategy>

@@ -1,5 +1,6 @@
 package io.xmeta.graphql.domain;
 
+import io.xmeta.graphql.model.Commit;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +23,7 @@ public class BlockVersionEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -31,8 +32,8 @@ public class BlockVersionEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "blockId")
-	private String blockId;
+	@ManyToOne
+	private BlockEntity block;
 
 	@Column(name = "versionNumber")
 	private Long versionNumber;
@@ -44,6 +45,7 @@ public class BlockVersionEntity extends BaseEntity {
 	private String outputParameters;
 
 	@Column(name = "settings")
+	@Lob
 	private String settings;
 
 	@Column(name = "displayName")
@@ -52,14 +54,14 @@ public class BlockVersionEntity extends BaseEntity {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "commitId")
-	private String commitId;
+	@ManyToOne
+	private CommitEntity commit;
 
 	@Column(name = "deleted")
 	private Boolean deleted;
 
 	@ManyToMany
-	@JoinTable(name = "_BlockVersionToBuild",
+	@JoinTable(name = "BlockVersionToBuild",
 			joinColumns = @JoinColumn(name = "A", referencedColumnName = "id"),
 			inverseJoinColumns = @JoinColumn(name = "B", referencedColumnName = "id"))
 	private Set<BuildEntity> builds = new HashSet<>();

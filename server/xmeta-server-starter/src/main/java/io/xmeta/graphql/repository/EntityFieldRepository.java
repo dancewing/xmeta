@@ -1,8 +1,9 @@
 package io.xmeta.graphql.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.EntityFieldEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 /**
  * @Description
@@ -11,6 +12,5 @@ import io.xmeta.graphql.domain.EntityFieldEntity;
  */
 
 @Repository
-public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, String> {
-
+public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, String>, JpaSpecificationExecutor<EntityFieldEntity> {
 }

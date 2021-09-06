@@ -3,10 +3,7 @@ package io.xmeta.graphql.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /**
@@ -23,7 +20,7 @@ public class EnvironmentEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -32,7 +29,7 @@ public class EnvironmentEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "appId")
+	@Column(name = "app_Id", insertable = false, updatable = false)
 	private String appId;
 
 	@Column(name = "name")
@@ -43,5 +40,8 @@ public class EnvironmentEntity extends BaseEntity {
 
 	@Column(name = "address")
 	private String address;
+
+	@ManyToOne
+	private AppEntity app;
 
 }

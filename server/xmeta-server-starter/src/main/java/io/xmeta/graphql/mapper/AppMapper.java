@@ -7,4 +7,6 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = {})
 public interface AppMapper extends BaseMapper<App, AppEntity> {
     App toDto(AppEntity entity);
+
+    AppEntity toEntity(App dto);
 }

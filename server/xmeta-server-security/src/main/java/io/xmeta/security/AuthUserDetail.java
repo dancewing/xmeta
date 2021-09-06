@@ -4,27 +4,26 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-public class AuthUser extends org.springframework.security.core.userdetails.User {
-    private String id;
-
+public class AuthUserDetail extends org.springframework.security.core.userdetails.User {
+    private String accountId;
     private String userId;
     private String workspaceId;
 
-    public AuthUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public AuthUserDetail(String accountId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
-        this.id = id;
+        this.accountId = accountId;
     }
 
-    public AuthUser(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public AuthUserDetail(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
     }
 
-    public AuthUser(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public AuthUserDetail(String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
     }
 
-    public String getId() {
-        return id;
+    public String getAccountId() {
+        return accountId;
     }
 
     public String getUserId() {

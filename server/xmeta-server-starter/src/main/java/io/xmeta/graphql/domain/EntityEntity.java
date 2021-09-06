@@ -3,11 +3,10 @@ package io.xmeta.graphql.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -23,7 +22,7 @@ public class EntityEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -32,8 +31,8 @@ public class EntityEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "appId")
-	private String appId;
+	@ManyToOne
+	private AppEntity app;
 
 	@Column(name = "name")
 	private String name;
@@ -47,13 +46,16 @@ public class EntityEntity extends BaseEntity {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "lockedByUserId")
-	private String lockedByUserId;
+	@ManyToOne
+	private UserEntity lockedByUser;
 
 	@Column(name = "lockedAt")
 	private ZonedDateTime lockedAt;
 
 	@Column(name = "deletedAt")
 	private ZonedDateTime deletedAt;
+
+
+//	private List<EntityPermissionEntity>  permissions = new ArrayList<>();
 
 }

@@ -23,7 +23,7 @@ public class EntityVersionEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -32,8 +32,11 @@ public class EntityVersionEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "entityId")
+	@Column(name = "entityId", insertable = false, updatable = false)
 	private String entityId;
+
+	@ManyToOne
+	private EntityEntity entity;
 
 	@Column(name = "versionNumber")
 	private Long versionNumber;

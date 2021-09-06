@@ -6,7 +6,7 @@ import io.xmeta.graphql.repository.AccountRepository;
 import io.xmeta.graphql.repository.UserRepository;
 import io.xmeta.graphql.repository.UserRoleRepository;
 import io.xmeta.graphql.util.EmailValidator;
-import io.xmeta.security.AuthUser;
+import io.xmeta.security.AuthUserDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -40,7 +40,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         log.debug("Authenticating {}", login);
         if (EmailValidator.isValid(login)) {
             return accountRepository.findOneByEmailIgnoreCase(login)
-                    .map(user -> createSpringSecurityUser(login, user))
+                    .map(account -> createSpringSecurityUser(login, account))
                     .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
         }
 
@@ -53,23 +53,24 @@ public class DomainUserDetailsService implements UserDetailsService {
 
     }
 
-    private AuthUser createSpringSecurityUser(String lowercaseLogin, AccountEntity account) {
+    private AuthUserDetail createSpringSecurityUser(String lowercaseLogin, AccountEntity account) {
 //        if (account.getIsActive() != null && !account.getIsActive()) {
 //            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
 //        }
         Optional<UserEntity> userEntity = this.userRepository.findByAccountId(account.getId());
         if (!userEntity.isPresent()) {
+            log.error("can't find user by account: {}", account.getId());
             throw new RuntimeException("");
         }
         List<String> roles = this.userRoleRepository.findRoles(account.getId());
         List<GrantedAuthority> grantedAuthorities = roles.stream()
                 .map(authority -> new SimpleGrantedAuthority(authority))
                 .collect(Collectors.toList());
-        AuthUser user = new AuthUser(account.getId(), account.getEmail(),
+        AuthUserDetail user = new AuthUserDetail(account.getId(), account.getEmail(),
                 account.getPassword(),
                 grantedAuthorities);
         user.setUserId(userEntity.get().getId());
-        user.setWorkspaceId(userEntity.get().getWorkspaceId());
+        user.setWorkspaceId(userEntity.get().getWorkspace().getId());
         return user;
     }
 }

@@ -1,8 +1,9 @@
 package io.xmeta.graphql.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.BuildEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 /**
  * @Description
@@ -11,6 +12,6 @@ import io.xmeta.graphql.domain.BuildEntity;
  */
 
 @Repository
-public interface BuildRepository extends JpaRepository<BuildEntity, String> {
+public interface BuildRepository extends JpaRepository<BuildEntity, String>, JpaSpecificationExecutor<BuildEntity> {
 
 }

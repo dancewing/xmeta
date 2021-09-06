@@ -21,9 +21,8 @@ import java.time.ZonedDateTime;
 @Table ( name ="Workspace" )
 public class WorkspaceEntity extends BaseEntity {
 
-
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")

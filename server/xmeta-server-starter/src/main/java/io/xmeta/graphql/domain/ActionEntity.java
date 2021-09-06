@@ -1,13 +1,13 @@
 package io.xmeta.graphql.domain;
 
+import io.xmeta.graphql.model.ActionStep;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -23,10 +23,13 @@ public class ActionEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
 	private ZonedDateTime createdAt;
+
+	@OneToMany(mappedBy = "action")
+	private List<ActionStepEntity> steps = new ArrayList<>();
 
 }

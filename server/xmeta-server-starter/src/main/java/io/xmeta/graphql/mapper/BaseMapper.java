@@ -4,6 +4,8 @@ import org.hibernate.collection.spi.PersistentCollection;
 import org.mapstruct.BeforeMapping;
 import org.mapstruct.TargetType;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -20,6 +22,13 @@ public interface BaseMapper<D, E> {
     default Date toDate(ZonedDateTime zonedDateTime) {
         if (zonedDateTime!=null){
             return Date.from(zonedDateTime.toInstant());
+        }
+        return null;
+    }
+
+    default ZonedDateTime toDateTime(Date date) {
+        if (date!=null){
+            return ZonedDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
         }
         return null;
     }

@@ -1,16 +1,14 @@
 package io.xmeta.graphql.service;
 
-import io.xmeta.graphql.domain.AppEntity;
-import io.xmeta.graphql.domain.EntityEntity;
-import io.xmeta.graphql.domain.EntityFieldEntity;
-import io.xmeta.graphql.domain.EntityVersionEntity;
+import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityMapper;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
 import io.xmeta.graphql.util.Inflector;
-import io.xmeta.security.AuthUser;
+import io.xmeta.security.AuthUserDetail;
+import io.xmeta.security.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,13 +37,27 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
     private final EntityFieldRepository entityFieldRepository;
     private final EntityVersionRepository entityVersionRepository;
     private final EntityMapper entityMapper;
+    private final EntityPermissionService entityPermissionService;
+    private final EntityFieldService entityFieldService;
 
-    public EntityService(EntityRepository entityRepository, EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityMapper entityMapper) {
+    public EntityService(EntityRepository entityRepository, EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityMapper entityMapper, EntityPermissionService entityPermissionService, EntityFieldService entityFieldService) {
         super(entityRepository);
         this.entityRepository = entityRepository;
         this.entityFieldRepository = entityFieldRepository;
         this.entityVersionRepository = entityVersionRepository;
         this.entityMapper = entityMapper;
+        this.entityPermissionService = entityPermissionService;
+        this.entityFieldService = entityFieldService;
+    }
+
+    @Transactional
+    public void createDefaultEntities(String appId, String userId) {
+        List<AppCreateWithEntitiesEntityInput> entities = new ArrayList<>();
+        AppCreateWithEntitiesEntityInput entitiesEntityInput = new AppCreateWithEntitiesEntityInput();
+//        entitiesEntityInput.setName("");
+//        entitiesEntityInput.setFields(Lists.newArrayList());
+//        entitiesEntityInput.setRelationsToEntityIndex(Lists.newArrayList());
+
     }
 
     public List<Entity> entities(EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
@@ -71,67 +82,104 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
     }
 
     @Transactional
-    public void createEntities(AuthUser authUser, AppEntity appEntity, List<AppCreateWithEntitiesEntityInput> entities) {
-        if (entities == null) {
-            return;
-        }
-        entities.stream().forEach(appCreateWithEntitiesEntityInput -> {
-            String displayName = StringUtils.trim(appCreateWithEntitiesEntityInput.getName());
+    public Entity createOneEntity(EntityCreateInput data) {
+        //The entity name and plural display name cannot be the same.
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        UserEntity user = new UserEntity();
+        user.setId(authUser.getUserId());
 
-            String pluralDisplayName = Inflector.getInstance().pluralize(displayName);
-            String singularDisplayName = Inflector.getInstance().singularize(displayName);
-            String name = Inflector.getInstance().lowerCamelCase(singularDisplayName);
+        EntityEntity entityEntity = new EntityEntity();
+        entityEntity.setCreatedAt(ZonedDateTime.now());
+        entityEntity.setUpdatedAt(ZonedDateTime.now());
+        AppEntity appEntity = new AppEntity();
+        appEntity.setId(data.getApp().getConnect().getId());
+        entityEntity.setApp(appEntity);
+        entityEntity.setName(data.getName());
+        entityEntity.setDisplayName(data.getDisplayName());
+        entityEntity.setPluralDisplayName(data.getPluralDisplayName());
+        entityEntity.setDescription(null);
+        entityEntity.setLockedByUser(user);
+        entityEntity.setLockedAt(ZonedDateTime.now());
+        //   entityEntity.setDeletedAt(ZonedDateTime.now());
+        this.entityRepository.saveAndFlush(entityEntity);
 
-            EntityEntity entityEntity = new EntityEntity();
-            entityEntity.setCreatedAt(ZonedDateTime.now());
-            entityEntity.setUpdatedAt(ZonedDateTime.now());
-            entityEntity.setAppId(appEntity.getId());
-            entityEntity.setName(name);
-            entityEntity.setDisplayName(displayName);
-            entityEntity.setPluralDisplayName(pluralDisplayName);
-            entityEntity.setDescription(null);
-            entityEntity.setLockedByUserId(authUser.getUserId());
-            entityEntity.setLockedAt(ZonedDateTime.now());
-            //   entityEntity.setDeletedAt(ZonedDateTime.now());
-            this.entityRepository.save(entityEntity);
+        //create Version
+        EntityVersionEntity entityVersionEntity = new EntityVersionEntity();
+        entityVersionEntity.setCreatedAt(ZonedDateTime.now());
+        entityVersionEntity.setUpdatedAt(ZonedDateTime.now());
+        entityVersionEntity.setEntityId(entityEntity.getId());
+        entityVersionEntity.setVersionNumber(0L);
+        entityVersionEntity.setName(data.getName());
+        entityVersionEntity.setDisplayName(data.getDisplayName());
+        entityVersionEntity.setPluralDisplayName(data.getPluralDisplayName());
+        entityVersionEntity.setDescription(null);
+        entityVersionEntity.setCommitId(null);
+        entityVersionEntity.setDeleted(null);
+        //entityVersionEntity.setBuilds(Sets.newHashSet());
+        this.entityVersionRepository.saveAndFlush(entityVersionEntity);
 
-            //create Version
+        //create default permissions;
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Create.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Update.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.View.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Delete.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
+        this.entityPermissionService.createEntityPermission(EnumEntityAction.Search.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity.getId());
 
-            EntityVersionEntity entityVersionEntity = new EntityVersionEntity();
-            entityVersionEntity.setCreatedAt(ZonedDateTime.now());
-            entityVersionEntity.setUpdatedAt(ZonedDateTime.now());
-            entityVersionEntity.setEntityId(entityEntity.getId());
-            entityVersionEntity.setVersionNumber(1L);
-            entityVersionEntity.setName(name);
-            entityVersionEntity.setDisplayName(displayName);
-            entityVersionEntity.setPluralDisplayName(pluralDisplayName);
-            entityVersionEntity.setDescription(null);
-            entityVersionEntity.setCommitId(null);
-            entityVersionEntity.setDeleted(null);
-            //entityVersionEntity.setBuilds(Sets.newHashSet());
-            this.entityVersionRepository.save(entityVersionEntity);
+        //create default entity fields
 
-            List<AppCreateWithEntitiesFieldInput> fields = appCreateWithEntitiesEntityInput.getFields();
-            if (fields != null) {
-                fields.stream().forEach(appCreateWithEntitiesFieldInput -> {
-                    EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
-                    entityFieldEntity.setCreatedAt(ZonedDateTime.now());
-                    entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
-                    entityFieldEntity.setEntityVersionId(entityVersionEntity.getId());
-                    entityFieldEntity.setPermanentId("");
-                    entityFieldEntity.setName(appCreateWithEntitiesFieldInput.getName());
-                    entityFieldEntity.setDisplayName("");
-                    entityFieldEntity.setDataType(appCreateWithEntitiesFieldInput.getDataType().name());
-                    entityFieldEntity.setProperties(null);
-                    entityFieldEntity.setRequired(false);
-                    entityFieldEntity.setSearchable(false);
-                    entityFieldEntity.setDescription(null);
-                    entityFieldEntity.setPosition(0L);
-                    entityFieldEntity.setUnique(false);
-                    this.entityFieldRepository.save(entityFieldEntity);
+        //@format off
+        this.entityFieldService.create(EntityField.builder()
+                        .setDataType(EnumDataType.Id)
+                        .setName("id")
+                        .setDisplayName("ID")
+                        .setDescription("An automatically created unique identifier of the entity")
+                        .setUnique(false)
+                        .setRequired(true)
+                        .setSearchable(true)
+                        .setProperties("")
+                        .build(), entityEntity.getId(),
+                entityVersionEntity);
 
-                });
-            }
-        });
+        this.entityFieldService.create(EntityField.builder()
+                        .setDataType(EnumDataType.CreatedAt)
+                        .setName("createdAt")
+                        .setDisplayName("Created At")
+                        .setDescription("An automatically created field of the time the entity created at")
+                        .setUnique(false)
+                        .setRequired(true)
+                        .setSearchable(false)
+                        .setProperties("")
+                        .build(), entityEntity.getId(),
+                entityVersionEntity);
+
+        this.entityFieldService.create(EntityField.builder()
+                        .setDataType(EnumDataType.UpdatedAt)
+                        .setName("updatedAt")
+                        .setDisplayName("Updated At")
+                        .setDescription("An automatically created field of the last time the entity updated at")
+                        .setUnique(false)
+                        .setRequired(true)
+                        .setSearchable(false)
+                        .setProperties("")
+                        .build(), entityEntity.getId(),
+                entityVersionEntity);
+
+        return this.entityMapper.toDto(entityEntity);
+    }
+
+    public List<PendingChange> getChangedEntities(String appId, String userId) {
+        List<PendingChange> pendingChanges = new ArrayList<>();
+
+        return pendingChanges;
+    }
+
+    @Transactional
+    public void createFieldByDisplayName(Entity entity, String displayName, EnumDataType dataType, String userId) {
+        EntityFieldCreateByDisplayNameInput.Builder builder = new EntityFieldCreateByDisplayNameInput.Builder();
+        WhereParentIdInput.Builder entityBuilder = WhereParentIdInput.builder();
+        entityBuilder.setConnect(WhereUniqueInput.builder().setId(entity.getId()).build());
+        builder.setDisplayName(displayName).setDataType(dataType).setEntity(entityBuilder.build());
+
+        this.entityFieldService.createEntityFieldByDisplayName(builder.build());
     }
 }

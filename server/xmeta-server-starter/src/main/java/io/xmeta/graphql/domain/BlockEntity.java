@@ -3,10 +3,7 @@ package io.xmeta.graphql.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /**
@@ -21,9 +18,8 @@ import java.time.ZonedDateTime;
 @Table ( name ="Block" )
 public class BlockEntity extends BaseEntity {
 
-
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -32,11 +28,11 @@ public class BlockEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "appId")
-	private String appId;
+	@ManyToOne
+	private AppEntity app;
 
-	@Column(name = "parentBlockId")
-	private String parentBlockId;
+	@ManyToOne
+	private BlockEntity parentBlock;
 
 	@Column(name = "blockType")
 	private String blockType;

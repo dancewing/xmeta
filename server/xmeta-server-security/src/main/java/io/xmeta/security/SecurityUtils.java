@@ -4,7 +4,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,11 +27,11 @@ public final class SecurityUtils {
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
     }
 
-    public static AuthUser getAuthUser() {
+    public static AuthUserDetail getAuthUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
-        if (authentication.getPrincipal() instanceof AuthUser) {
-            return (AuthUser)authentication.getPrincipal();
+        if (authentication.getPrincipal() instanceof AuthUserDetail) {
+            return (AuthUserDetail)authentication.getPrincipal();
         } else {
             throw new RuntimeException("");
         }
@@ -41,8 +40,8 @@ public final class SecurityUtils {
     private static String extractPrincipal(Authentication authentication) {
         if (authentication == null) {
             return null;
-        } else if (authentication.getPrincipal() instanceof AuthUser) {
-            AuthUser springSecurityUser = (AuthUser) authentication.getPrincipal();
+        } else if (authentication.getPrincipal() instanceof AuthUserDetail) {
+            AuthUserDetail springSecurityUser = (AuthUserDetail) authentication.getPrincipal();
             return springSecurityUser.getUsername();
         } else if (authentication.getPrincipal() instanceof String) {
             return (String) authentication.getPrincipal();

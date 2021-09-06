@@ -3,10 +3,7 @@ package io.xmeta.graphql.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /**
@@ -21,9 +18,8 @@ import java.time.ZonedDateTime;
 @Table ( name ="UserRole" )
 public class UserRoleEntity extends BaseEntity {
 
-
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "createdAt")
@@ -32,8 +28,8 @@ public class UserRoleEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "userId")
-	private String userId;
+	@ManyToOne
+	private UserEntity user;
 
 	@Column(name = "role")
 	private String role;

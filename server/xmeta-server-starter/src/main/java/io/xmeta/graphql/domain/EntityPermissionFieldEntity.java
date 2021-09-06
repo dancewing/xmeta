@@ -21,7 +21,7 @@ public class EntityPermissionFieldEntity extends BaseEntity {
 
 
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "permissionId")
@@ -34,9 +34,9 @@ public class EntityPermissionFieldEntity extends BaseEntity {
 	private String entityVersionId;
 
 	@ManyToMany
-	@JoinTable(name = "_EntityPermissionFieldToEntityPermissionRole",
-			joinColumns = @JoinColumn(name = "A", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "B", referencedColumnName = "id"))
+	@JoinTable(name = "EntityPermissionFieldToPermissionRole",
+			joinColumns = @JoinColumn(name = "field_id", referencedColumnName = "id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<EntityPermissionRoleEntity> roles = new HashSet<>();
 
 }

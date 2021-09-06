@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class BaseService <R extends JpaRepository<T, ID>, T extends BaseEntity, ID extends Serializable>
@@ -58,6 +59,6 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
     }
 
     public List<Predicate> createPredicates(Object where, Root<T> root, CriteriaBuilder criteriaBuilder) {
-        return null;
+        return Collections.emptyList();
     }
 }

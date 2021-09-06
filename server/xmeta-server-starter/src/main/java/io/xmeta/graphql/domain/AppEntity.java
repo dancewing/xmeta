@@ -1,13 +1,13 @@
 package io.xmeta.graphql.domain;
 
+import io.xmeta.graphql.model.Environment;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description
@@ -67,5 +67,8 @@ public class AppEntity extends BaseEntity {
 
 	@Column(name = "deletedAt")
 	private ZonedDateTime deletedAt;
+
+	@OneToMany(mappedBy = "app")
+	private List<EnvironmentEntity> environments = new ArrayList<>();
 
 }

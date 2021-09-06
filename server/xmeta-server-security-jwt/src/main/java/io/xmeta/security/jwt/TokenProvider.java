@@ -3,14 +3,13 @@ package io.xmeta.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.xmeta.security.AuthUser;
+import io.xmeta.security.AuthUserDetail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -74,11 +73,11 @@ public class TokenProvider {
         JwtBuilder builder = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim(AUTHORITIES_KEY, authorities);
-        if (authentication.getPrincipal() instanceof AuthUser) {
-            AuthUser authUser = (AuthUser) authentication.getPrincipal();
-            builder.claim("account_id", authUser.getId());
-            builder.claim("user_id", authUser.getUserId());
-            builder.claim("workspace_id", authUser.getWorkspaceId());
+        if (authentication.getPrincipal() instanceof AuthUserDetail) {
+            AuthUserDetail authUserDetail = (AuthUserDetail) authentication.getPrincipal();
+            builder.claim("account_id", authUserDetail.getAccountId());
+            builder.claim("user_id", authUserDetail.getUserId());
+            builder.claim("workspace_id", authUserDetail.getWorkspaceId());
         }
         builder.signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity);
@@ -100,7 +99,7 @@ public class TokenProvider {
         String accountId = claims.get("account_id", String.class);
         String userId = claims.get("user_id", String.class);
         String workspaceId = claims.get("workspace_id", String.class);
-        AuthUser principal = new AuthUser(accountId, claims.getSubject(), "", authorities);
+        AuthUserDetail principal = new AuthUserDetail(accountId, claims.getSubject(), "", authorities);
         principal.setUserId(userId);
         principal.setWorkspaceId(workspaceId);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);

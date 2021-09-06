@@ -1,12 +1,10 @@
 package io.xmeta.graphql.domain;
 
+import io.xmeta.graphql.model.EntityVersion;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @Description
@@ -20,9 +18,8 @@ import javax.persistence.Table;
 @Table ( name ="EntityPermission" )
 public class EntityPermissionEntity extends BaseEntity {
 
-
    	@Id
-	@Column(name = "id")
+	@Column(name = "id", length = 64)
 	private String id;
 
 	@Column(name = "entityVersionId")

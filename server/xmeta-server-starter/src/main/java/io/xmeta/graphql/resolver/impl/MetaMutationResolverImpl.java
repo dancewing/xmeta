@@ -2,9 +2,9 @@ package io.xmeta.graphql.resolver.impl;
 
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.resolver.MetaMutationResolver;
-import io.xmeta.graphql.service.AccountService;
-import io.xmeta.graphql.service.AppService;
+import io.xmeta.graphql.service.*;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,6 +14,16 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
     private final AccountService accountService;
 
     private final AppService appService;
+
+    private final CommitService commitService;
+
+    private final AuthService authService;
+
+    private final WorkspaceService workspaceService;
+
+    private final EntityService entityService;
+
+    private final EntityFieldService entityFieldService;
 
     @Override
     public Account updateAccount(UpdateAccountInput data) {
@@ -32,7 +42,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Workspace createWorkspace(WorkspaceCreateInput data) {
-        return null;
+        return this.workspaceService.createWorkspace(data);
     }
 
     @Override
@@ -42,7 +52,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Entity createOneEntity(EntityCreateInput data) {
-        return null;
+        return this.entityService.createOneEntity(data);
     }
 
     @Override
@@ -87,12 +97,12 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
-        return null;
+        return this.entityFieldService.createEntityField(data, relatedFieldDisplayName, relatedFieldDisplayName);
     }
 
     @Override
     public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
-        return null;
+        return this.entityFieldService.createEntityFieldByDisplayName(data);
     }
 
     @Override
@@ -147,17 +157,17 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public App deleteApp(WhereUniqueInput where) {
-        return null;
+        return this.appService.deleteApp(where);
     }
 
     @Override
     public App updateApp(AppUpdateInput data, WhereUniqueInput where) {
-        return null;
+        return this.appService.updateApp(data, where);
     }
 
     @Override
     public Commit commit(CommitCreateInput data) {
-        return null;
+        return this.commitService.commit(data);
     }
 
     @Override
@@ -192,12 +202,13 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Auth signup(SignupInput data) {
-        return this.accountService.signup(data);
+        data.setEmail(StringUtils.lowerCase(data.getEmail()));
+        return this.authService.signup(data);
     }
 
     @Override
     public Auth login(LoginInput data) {
-        return this.accountService.login(data);
+        return this.authService.login(data);
     }
 
     @Override

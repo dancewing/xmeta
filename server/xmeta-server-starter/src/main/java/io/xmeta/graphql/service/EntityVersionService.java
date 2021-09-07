@@ -1,25 +1,27 @@
 package io.xmeta.graphql.service;
-import java.time.ZonedDateTime;
-import io.xmeta.graphql.domain.EntityEntity;
-import io.xmeta.graphql.domain.CommitEntity;
 
+import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityVersionMapper;
 import io.xmeta.graphql.model.Entity;
 import io.xmeta.graphql.model.EntityVersion;
 import io.xmeta.graphql.model.EntityVersionOrderByInput;
 import io.xmeta.graphql.model.EntityVersionWhereInput;
 import io.xmeta.graphql.repository.*;
+import io.xmeta.graphql.util.PredicateBuilder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import io.xmeta.graphql.domain.EntityVersionEntity;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -54,8 +56,9 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         Specification<EntityVersionEntity> specification = Specification.where(null);
         Specification<EntityVersionEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (where != null) {
-                predicates.addAll(createPredicates(where, root, criteriaBuilder));
+            if (entity!=null && entity.getId()!=null){
+                Join<Object, Object> join = root.join(EntityVersionEntity_.ENTITY, JoinType.LEFT);
+                predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(EntityEntity_.ID), entity.getId()));
             }
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
@@ -117,8 +120,97 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
 
             this.entityFieldRepository.deleteByEntityVersionId(targetVersionId);
             this.entityPermissionRepository.deleteByEntityVersionId(targetVersionId);
+
         }
 
-        return null;
+        //update the target version with its fields, and the its parent entity
+        targetVersion.setName(sourceVersion.getName());
+        targetVersion.setDisplayName(sourceVersion.getDisplayName());
+        targetVersion.setPluralDisplayName(sourceVersion.getPluralDisplayName());
+        targetVersion.setDescription(sourceVersion.getDescription());
+        this.entityVersionRepository.save(targetVersion);
+
+        //create new entity fields from source;
+        List<EntityFieldEntity> fields = sourceVersion.getFields();
+
+        for (EntityFieldEntity entityFieldEntity: fields) {
+            EntityFieldEntity newField = new EntityFieldEntity();
+            //Copy Value
+            newField.setCreatedAt(ZonedDateTime.now());
+            newField.setUpdatedAt(ZonedDateTime.now());
+            newField.setEntityVersion(targetVersion);
+            newField.setName(entityFieldEntity.getName());
+            newField.setDisplayName(entityFieldEntity.getDisplayName());
+            newField.setDataType(entityFieldEntity.getDataType());
+            newField.setProperties(entityFieldEntity.getProperties());
+            newField.setRequired(entityFieldEntity.getRequired());
+            newField.setSearchable(entityFieldEntity.getSearchable());
+            newField.setDescription(entityFieldEntity.getDescription());
+            newField.setPosition(entityFieldEntity.getPosition());
+            newField.setUnique(entityFieldEntity.getUnique());
+
+            this.entityFieldRepository.save(newField);
+        }
+
+        //when the source target is flagged as deleted (commit on DELETE action), do not update the parent entity
+        if (sourceVersion.getDeleted()==null || sourceVersion.getDeleted()) {
+            EntityEntity entityEntity = targetVersion.getEntity();
+            entityEntity.setName(sourceVersion.getName());
+            entityEntity.setDisplayName(sourceVersion.getDisplayName());
+            entityEntity.setPluralDisplayName(sourceVersion.getPluralDisplayName());
+            entityEntity.setDescription(sourceVersion.getDescription());
+            entityEntity.setDeletedAt(null);
+            this.entityRepository.save(entityEntity);
+        }
+
+        //update permission
+        for (EntityPermissionEntity entityPermissionEntity: sourceVersion.getPermissions()) {
+            EntityPermissionEntity permissionEntity = new EntityPermissionEntity();
+            permissionEntity.setAction(entityPermissionEntity.getAction());
+            permissionEntity.setType(entityPermissionEntity.getType());
+            permissionEntity.setEntityVersion(targetVersion);
+            this.entityPermissionRepository.save(permissionEntity);
+
+            entityPermissionEntity.getPermissionRoles().forEach(entityPermissionRoleEntity -> {
+                EntityPermissionRoleEntity permissionRoleEntity = new EntityPermissionRoleEntity();
+                permissionRoleEntity.setAppRole(entityPermissionRoleEntity.getAppRole());
+                permissionRoleEntity.setEntityPermission(permissionEntity);
+                this.entityPermissionRoleRepository.save(permissionRoleEntity);
+            });
+        }
+        this.entityPermissionRoleRepository.flush();
+        //update permission field
+        for (EntityPermissionEntity permissionEntity: sourceVersion.getPermissions()) {
+            List<EntityPermissionEntity> entityPermissionEntities = this.entityPermissionRepository.getEntitiesByActionAndVersion(permissionEntity.getAction(),
+                    targetVersionId);
+
+            for (EntityPermissionEntity updEntityPermission : entityPermissionEntities) {
+                List<EntityPermissionFieldEntity> permissionFields = permissionEntity.getPermissionFields();
+                for (EntityPermissionFieldEntity permissionField: permissionFields) {
+                    EntityPermissionFieldEntity newPermissionFieldEntity = new EntityPermissionFieldEntity();
+                    newPermissionFieldEntity.setEntityVersionId(targetVersionId);
+                    newPermissionFieldEntity.setFieldPermanentId(permissionField.getFieldPermanentId());
+                    newPermissionFieldEntity.setPermission(updEntityPermission);
+                    //TODO bug here.
+                    this.entityPermissionFieldRepository.save(newPermissionFieldEntity);
+
+                    Set<EntityPermissionRoleEntity> permissionRoles = permissionField.getPermissionRoles();
+                    for (EntityPermissionRoleEntity permissionRole : permissionRoles) {
+                        EntityPermissionRoleEntity newPermissionRole = new EntityPermissionRoleEntity();
+                        newPermissionRole.setEntityVersionId(targetVersionId);
+                        newPermissionRole.setAction(permissionRole.getAction());
+                        newPermissionRole.setAppRole(permissionRole.getAppRole());
+                        newPermissionRole.setEntityPermission(updEntityPermission);
+                        this.entityPermissionRoleRepository.save(newPermissionRole);
+                    }
+                }
+            }
+
+        }
+
+        targetVersion = this.entityVersionRepository.getById(targetVersionId);
+
+
+        return this.entityVersionMapper.toDto(targetVersion);
     }
 }

@@ -2,15 +2,17 @@ package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityFieldMapper;
-import io.xmeta.graphql.model.EntityField;
-import io.xmeta.graphql.model.EntityFieldCreateByDisplayNameInput;
-import io.xmeta.graphql.model.EntityFieldCreateInput;
-import io.xmeta.graphql.model.EnumDataType;
+import io.xmeta.graphql.mix.CreateOneEntityField;
+import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
 import io.xmeta.graphql.util.Inflector;
+import io.xmeta.graphql.util.PredicateBuilder;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -46,6 +49,16 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         this.entityRepository = entityRepository;
     }
 
+    public List<EntityField> fields(Entity entity, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
+        return this.entityFieldMapper.toDto(this.getFields(entity.getId(), null));
+    }
+
+    public List<EntityField> fields(EntityVersion entityVersion, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
+        return this.entityFieldMapper.toDto(this.getVersionFields(entityVersion.getEntityId(),
+                entityVersion.getVersionNumber(), null));
+    }
+
+
     @Transactional
     public EntityField create(EntityField entityField, String entityId, EntityVersionEntity entityVersion) {
         EntityFieldEntity fieldEntity = new EntityFieldEntity();
@@ -63,35 +76,55 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setPosition(entityField.getPosition());
         fieldEntity.setUnique(entityField.getUnique());
 
-        this.entityFieldRepository.save(fieldEntity);
-
         EntityEntity entityEntity = new EntityEntity();
         entityEntity.setId(entityId);
 
-        EntityVersionEntity entityVersionEntity = new EntityVersionEntity();
-        entityVersionEntity.setCreatedAt(ZonedDateTime.now());
-        entityVersionEntity.setUpdatedAt(ZonedDateTime.now());
-        entityVersionEntity.setEntity(entityEntity);
-        entityVersionEntity.setVersionNumber(0);
-        entityVersionEntity.setName(entityField.getName());
-        entityVersionEntity.setDisplayName(entityField.getDisplayName());
-       // TODO
-       // entityVersionEntity.setPluralDisplayName(entityField.get);
-        entityVersionEntity.setDescription(entityField.getDescription());
-        entityVersionEntity.setDeleted(null);
-        this.entityVersionRepository.save(entityVersionEntity);
+        this.entityFieldRepository.save(fieldEntity);
 
         return this.entityFieldMapper.toDto(fieldEntity);
     }
 
     public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
+        CreateOneEntityField createOneEntityField = new CreateOneEntityField();
+        createOneEntityField.setData(data);
+        createOneEntityField.setRelatedFieldName(relatedFieldName);
+        createOneEntityField.setRelatedFieldDisplayName(relatedFieldDisplayName);
+        return this.createField(createOneEntityField);
+    }
+
+    public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
+        // validate the entity
+
+        EntityEntity entityEntity = this.entityRepository.getById(data.getEntity().getConnect().getId());
+
+        EntityFieldCreateInput createInput = this.createFieldCreateInputByDisplayName(data);
+
+        CreateOneEntityField createOneEntityField = new CreateOneEntityField();
+        createOneEntityField.setData(createInput);
+        if (createInput.getDataType() == EnumDataType.Lookup) {
+            boolean allowMultipleSelection = false;
+            //TODO allowMultipleSelection, 从properties 属性中获取
+
+            createOneEntityField.setRelatedFieldName(Inflector.getInstance().camelCase(
+                    !allowMultipleSelection ? entityEntity.getPluralDisplayName() : entityEntity.getName()
+            ,false));
+
+            createOneEntityField.setRelatedFieldDisplayName(!allowMultipleSelection
+                    ? entityEntity.getPluralDisplayName()
+                    : entityEntity.getDisplayName());
+        }
+        return this.createField(createOneEntityField);
+    }
+
+    public EntityField createField(CreateOneEntityField createOneEntityField){
+
         return null;
     }
 
-    // 创建一个供存储用的EntityField
-    public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
+    // 创建一个供存储用的EntityField 设置 name， dataType, properties
+    public EntityFieldCreateInput createFieldCreateInputByDisplayName(EntityFieldCreateByDisplayNameInput data) {
 
-        EntityField.Builder builder = EntityField.builder();
+        EntityFieldCreateInput.Builder builder = EntityFieldCreateInput.builder();
 
         String entityId = data.getEntity().getConnect().getId();
 
@@ -163,17 +196,17 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
     }
 
     private List<EntityFieldEntity> getFields(String entityId, EntityField entityField) {
-        return getVersionFields(entityId, 0L, entityField);
+        return getVersionFields(entityId, 0, entityField);
     }
 
 
-    public List<EntityFieldEntity> getVersionFields(String entityId, Long versionNumber, EntityField entityField) {
+    public List<EntityFieldEntity> getVersionFields(String entityId, Integer versionNumber, EntityField entityField) {
         Specification<EntityFieldEntity> specification = Specification.where(null);
         Specification<EntityFieldEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             Predicate predicate = null;
 
-            if (StringUtils.isNotEmpty(entityField.getName())) {
+            if (entityField !=null && StringUtils.isNotEmpty(entityField.getName())) {
                 predicate = criteriaBuilder.equal(root.get(EntityFieldEntity_.NAME), entityField.getName());
                 predicates.add(predicate);
             }

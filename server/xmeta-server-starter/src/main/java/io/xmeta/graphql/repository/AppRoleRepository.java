@@ -1,8 +1,9 @@
 package io.xmeta.graphql.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.AppRoleEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 
 /**
  * @Description
@@ -11,6 +12,6 @@ import io.xmeta.graphql.domain.AppRoleEntity;
  */
 
 @Repository
-public interface AppRoleRepository extends JpaRepository<AppRoleEntity, String> {
+public interface AppRoleRepository extends JpaRepository<AppRoleEntity, String>, JpaSpecificationExecutor<AppRoleEntity> {
 
 }

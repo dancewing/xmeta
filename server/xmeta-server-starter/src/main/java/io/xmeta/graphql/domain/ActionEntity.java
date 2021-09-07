@@ -26,7 +26,7 @@ public class ActionEntity extends BaseEntity {
 	@Column(name = "id", length = 64)
 	private String id;
 
-	@Column(name = "createdAt")
+	@Column
 	private ZonedDateTime createdAt;
 
 	@OneToMany(mappedBy = "action")

@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import io.xmeta.graphql.domain.EntityPermissionEntity;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author  Jeff
@@ -16,7 +18,11 @@ import io.xmeta.graphql.domain.EntityPermissionEntity;
 @Repository
 public interface EntityPermissionRepository extends JpaRepository<EntityPermissionEntity, String> {
 
-    @Query("delete from EntityPermissionEntity epe where epe.entityVersionId  = :entityVersionId")
+    @Query("delete from EntityPermissionEntity epe where epe.entityVersion.id  = :entityVersionId")
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void deleteByEntityVersionId(@Param("entityVersionId") String entityVersionId);
+
+    @Query("from EntityPermissionEntity upe where upe.action = :action and upe.entityVersion.id = :entityVersionId")
+    List<EntityPermissionEntity> getEntitiesByActionAndVersion(@Param("action") String action, @Param(
+            "entityVersionId") String entityVersionId );
 }

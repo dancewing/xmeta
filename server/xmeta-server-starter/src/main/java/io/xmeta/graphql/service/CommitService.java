@@ -53,7 +53,7 @@ public class CommitService extends BaseService<CommitRepository, CommitEntity, S
         commit.setUser(user);
         commit.setMessage(data.getMessage());
         commit.setCreatedAt(ZonedDateTime.now());
-        this.commitRepository.save(commit);
+        this.commitRepository.saveAndFlush(commit);
         return this.commitMapper.toDto(commit);
     }
 
@@ -66,8 +66,6 @@ public class CommitService extends BaseService<CommitRepository, CommitEntity, S
                     Join<Object, Object> join = root.join(CommitEntity_.APP, JoinType.LEFT);
                     predicates.add(criteriaBuilder.equal(join.get(AppEntity_.ID), where.getApp().getId()));
                 }
-
-                predicates.addAll(createPredicates(where, root, criteriaBuilder));
             }
 
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();

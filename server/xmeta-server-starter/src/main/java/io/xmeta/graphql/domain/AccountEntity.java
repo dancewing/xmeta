@@ -22,19 +22,19 @@ public class AccountEntity extends BaseEntity {
 	@Column(name = "id", length = 64)
 	private String id;
 
-	@Column(name = "createdAt")
+	@Column
 	private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
+	@Column
 	private ZonedDateTime updatedAt;
 
-	@Column(name = "email")
+	@Column
 	private String email;
 
-	@Column(name = "firstName")
+	@Column
 	private String firstName;
 
-	@Column(name = "lastName")
+	@Column
 	private String lastName;
 
 	@Column(name = "password")
@@ -43,7 +43,7 @@ public class AccountEntity extends BaseEntity {
 	@ManyToOne
 	private UserEntity currentUser;
 
-	@Column(name = "githubId")
+	@Column
 	private String githubId;
 
 }

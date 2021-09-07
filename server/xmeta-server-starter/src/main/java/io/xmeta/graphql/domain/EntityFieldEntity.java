@@ -29,9 +29,6 @@ public class EntityFieldEntity extends BaseEntity {
 	@Column(name = "updatedAt")
 	private ZonedDateTime updatedAt;
 
-//	@Column(name = "entityVersionId")
-//	private String entityVersionId;
-
 	@ManyToOne
 	private EntityVersionEntity entityVersion;
 

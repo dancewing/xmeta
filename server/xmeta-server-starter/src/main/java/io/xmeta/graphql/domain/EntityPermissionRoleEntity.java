@@ -38,7 +38,7 @@ public class EntityPermissionRoleEntity extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumns({
-			@JoinColumn(name = "entityVersionId", referencedColumnName = "entityVersionId"),
+			@JoinColumn(name = "entityVersionId", referencedColumnName = "entity_version_id"),
 			@JoinColumn(name = "action", referencedColumnName = "action")
 	})
 	private EntityPermissionEntity entityPermission;

@@ -1,6 +1,8 @@
 package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.model.*;
+import io.xmeta.security.AuthUserDetail;
+import io.xmeta.security.SecurityUtils;
 import io.xmeta.security.jwt.TokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ public class AuthService {
     private final AccountService accountService;
     private final WorkspaceService workspaceService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final UserService userService;
 
     @Transactional
     public Auth signup(SignupInput data) {
@@ -62,6 +65,14 @@ public class AuthService {
             return new Auth(createToken(data.getEmail(), data.getPassword(), true));
         } catch (Exception ex) {
 
+        }
+        return null;
+    }
+
+    public User currentUser() {
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        if (authUser != null) {
+            return this.userService.getUser(authUser.getUserId());
         }
         return null;
     }

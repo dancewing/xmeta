@@ -6,18 +6,21 @@ import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
-import io.xmeta.graphql.util.Inflector;
+import io.xmeta.graphql.util.PredicateBuilder;
 import io.xmeta.graphql.util.SoftDelete;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
-import org.apache.commons.lang.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.provider.HibernateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class EntityService extends BaseService<EntityRepository, EntityEntity, String> {
 
     private final EntityRepository entityRepository;
@@ -61,12 +65,13 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     }
 
-    public List<Entity> entities(EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
+    public List<Entity> entities(App app, EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
         Specification<EntityEntity> specification = Specification.where(null);
         Specification<EntityEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (where != null) {
-                predicates.addAll(createPredicates(where, root, criteriaBuilder));
+            if (app!=null && app.getId()!=null){
+                Join<Object, Object> join = root.join(EntityEntity_.APP, JoinType.LEFT);
+                predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(AppEntity_.ID), app.getId()));
             }
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
@@ -82,6 +87,10 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         return result.stream().map(this.entityMapper::toDto).collect(Collectors.toList());
     }
 
+    public List<Entity> entities(EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
+        return this.entities(null, where, orderBy, skip, take);
+    }
+
     @Transactional
     public Entity createOneEntity(EntityCreateInput data) {
         //The entity name and plural display name cannot be the same.
@@ -92,6 +101,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         EntityEntity entityEntity = new EntityEntity();
         entityEntity.setCreatedAt(ZonedDateTime.now());
         entityEntity.setUpdatedAt(ZonedDateTime.now());
+
         AppEntity appEntity = new AppEntity();
         appEntity.setId(data.getApp().getConnect().getId());
         entityEntity.setApp(appEntity);
@@ -118,6 +128,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityVersionEntity.setDeleted(null);
         //entityVersionEntity.setBuilds(Sets.newHashSet());
         this.entityVersionRepository.saveAndFlush(entityVersionEntity);
+
+        log.info("entity versions : {}", entityEntity.getVersions().size());
+        log.info("entity versions : {}", this.entityRepository.getById(entityEntity.getId()).getVersions().size());
+        log.info("entity versions : {}", this.entityVersionRepository.findEntityDescVersions(entityEntity.getId()).size());
+
 
         //create default permissions;
         this.entityPermissionService.createEntityPermission(EnumEntityAction.Create.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
@@ -168,13 +183,16 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         return this.entityMapper.toDto(entityEntity);
     }
 
+    @Transactional(readOnly = true)
     public List<PendingChange> getChangedEntities(String appId, String userId) {
         List<PendingChange> pendingChanges = new ArrayList<>();
         List<EntityEntity> changedEntities = this.entityRepository.findChangedEntities(appId, userId);
         changedEntities.forEach(entityEntity -> {
 
             List<EntityVersionEntity> versions = entityEntity.getVersions();
-            if (versions.size()==0) {
+
+            if (versions.size() == 0) {
+                log.error("no entity versions {}, {}", entityEntity.getId(), entityEntity.getName());
                 throw new RuntimeException("no entity versions");
             }
             Entity entity = this.entityMapper.toDto(entityEntity);
@@ -206,13 +224,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         return pendingChanges;
     }
 
-    @Transactional
-    public void createFieldByDisplayName(Entity entity, String displayName, EnumDataType dataType, String userId) {
-        EntityFieldCreateByDisplayNameInput.Builder builder = new EntityFieldCreateByDisplayNameInput.Builder();
-        WhereParentIdInput.Builder entityBuilder = WhereParentIdInput.builder();
-        entityBuilder.setConnect(WhereUniqueInput.builder().setId(entity.getId()).build());
-        builder.setDisplayName(displayName).setDataType(dataType).setEntity(entityBuilder.build());
-
-        this.entityFieldService.createEntityFieldByDisplayName(builder.build());
+    public Entity getEntity(String entityId) {
+        return this.entityMapper.toDto(this.entityRepository.getById(entityId));
     }
 }

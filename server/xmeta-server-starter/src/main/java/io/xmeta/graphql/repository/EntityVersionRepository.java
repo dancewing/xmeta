@@ -22,4 +22,7 @@ public interface EntityVersionRepository extends JpaRepository<EntityVersionEnti
     @Query("from EntityVersionEntity ev where ev.entity.id = :entityId order by ev.versionNumber asc")
     List<EntityVersionEntity> findEntityVersions(@Param("entityId") String entityId);
 
+    @Query("from EntityVersionEntity ev where ev.entity.id = :entityId order by ev.versionNumber desc")
+    List<EntityVersionEntity> findEntityDescVersions(@Param("entityId") String entityId);
+
 }

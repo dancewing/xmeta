@@ -30,7 +30,7 @@ public class EntityPermissionFieldEntity extends BaseEntity {
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "fieldPermanentId", referencedColumnName = "permanentId"),
-			@JoinColumn(name = "entityVersionId", referencedColumnName = "entityVersionId"),
+			@JoinColumn(name = "entityVersionId", referencedColumnName = "entity_version_id"),
 	})
 	private EntityFieldEntity field;
 

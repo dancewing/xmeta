@@ -13,7 +13,7 @@ spring:
   data:
     jpa:
       repositories:
-        bootstrap-mode: default
+        bootstrap-mode: deferred
   jpa:
     open-in-view: false
     properties:

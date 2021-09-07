@@ -1,5 +1,4 @@
 package io.xmeta.graphql.service;
-import java.time.ZonedDateTime;
 
 import io.xmeta.graphql.domain.AppEntity;
 import io.xmeta.graphql.domain.AppEntity_;
@@ -22,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Predicate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +45,9 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     private final BlockService blockService;
     private final CommitService commitService;
     private final EntityVersionService entityVersionService;
+    private final EntityFieldService entityFieldService;
 
-    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService, BlockService blockService, CommitService commitService, EntityVersionService entityVersionService) {
+    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService, BlockService blockService, CommitService commitService, EntityVersionService entityVersionService, EntityFieldService entityFieldService) {
         super(appRepository);
         this.appRepository = appRepository;
         this.appRoleRepository = appRoleRepository;
@@ -55,6 +57,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         this.blockService = blockService;
         this.commitService = commitService;
         this.entityVersionService = entityVersionService;
+        this.entityFieldService = entityFieldService;
     }
 
     public App app(WhereUniqueInput where) {
@@ -65,9 +68,6 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         Specification<AppEntity> specification = Specification.where(null);
         Specification<AppEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (where != null) {
-                predicates.addAll(createPredicates(where, root, criteriaBuilder));
-            }
             // 过滤非删除app
             predicates.add(criteriaBuilder.isNull(root.get(AppEntity_.DELETED_AT)));
 
@@ -149,18 +149,22 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                 builder.setDisplayName(displayName);
                 builder.setPluralDisplayName(pluralDisplayName);
                 Entity newEntity = this.entityService.createOneEntity(builder.build());
+
                 List<AppCreateWithEntitiesFieldInput> fields = appCreateWithEntitiesEntityInput.getFields();
-                if (fields!=null && fields.size()>0) {
+                if (fields != null && fields.size() > 0) {
                     fields.forEach(appCreateWithEntitiesFieldInput -> {
-                        this.entityService.createFieldByDisplayName(newEntity,
+                        this.entityFieldService.createEntityFieldByDisplayName(createFieldByDisplayName(newEntity,
                                 appCreateWithEntitiesFieldInput.getName(),
                                 appCreateWithEntitiesFieldInput.getDataType(),
-                                authUserDetail.getUserId());
+                                authUserDetail.getUserId()));
                     });
                 }
                 // create relation //TODO
             });
-            this.commit(new CommitCreateInput(data.getCommitMessage(), new WhereParentIdInput(new WhereUniqueInput(app.getId()))));
+            //flush all changes
+            this.appRepository.flush();
+            this.clear();
+            this.commit(new CommitCreateInput(data.getCommitMessage(),new WhereParentIdInput(new WhereUniqueInput(app.getId()))));
         }
 
         return app;
@@ -215,5 +219,21 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         pendingChanges.addAll(this.blockService.getChangedBlocks(appId, userId));
 
         return pendingChanges;
+    }
+
+    public AppValidationResult appValidateBeforeCommit(WhereUniqueInput where) {
+        AppValidationResult validationResult = new AppValidationResult();
+        validationResult.setIsValid(true);
+        validationResult.setMessages(Collections.emptyList());
+        return validationResult;
+    }
+
+    private EntityFieldCreateByDisplayNameInput createFieldByDisplayName(Entity entity, String displayName,
+                                                                   EnumDataType dataType, String userId) {
+        EntityFieldCreateByDisplayNameInput.Builder builder = new EntityFieldCreateByDisplayNameInput.Builder();
+        WhereParentIdInput.Builder entityBuilder = WhereParentIdInput.builder();
+        entityBuilder.setConnect(WhereUniqueInput.builder().setId(entity.getId()).build());
+        builder.setDisplayName(displayName).setDataType(dataType).setEntity(entityBuilder.build());
+        return builder.build();
     }
 }

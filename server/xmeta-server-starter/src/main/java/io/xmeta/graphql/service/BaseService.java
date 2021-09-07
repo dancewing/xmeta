@@ -1,12 +1,17 @@
 package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.BaseEntity;
+import io.xmeta.graphql.model.SortOrder;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +20,9 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
         implements CrudService<T, ID> {
 
     private final R repository;
+
+    @PersistenceContext
+    private EntityManager em;
 
     public BaseService(R repository) {
         this.repository = repository;
@@ -55,12 +63,29 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
     }
 
     public Sort createSort(Object orderBy) {
+        if (orderBy == null) return Sort.unsorted();
+        PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(orderBy);
+        for (PropertyDescriptor descriptor : propertyDescriptors) {
+            String name = descriptor.getName();
+            Object propertyValue = null;
+            try {
+                propertyValue = PropertyUtils.getIndexedProperty(orderBy, name);
+            } catch (Exception ex) {
+            }
+            if (propertyValue instanceof SortOrder) {
+                SortOrder order = (SortOrder) propertyValue;
+                if (order == SortOrder.Asc) {
+                    return Sort.by(Sort.Order.asc(name));
+                } else {
+                    return Sort.by(Sort.Order.desc(name));
+                }
+            }
+        }
         return Sort.unsorted();
     }
 
-    public List<Predicate> createPredicates(Object where, Root<T> root, CriteriaBuilder criteriaBuilder) {
-        return Collections.emptyList();
+    public void clear(){
+        this.em.clear();
     }
-
 
 }

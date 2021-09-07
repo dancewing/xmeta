@@ -16,11 +16,17 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     private final AppService appService;
 
+    private final AppRoleService appRoleService;
+
     private final EntityService entityService;
 
     private final WorkspaceService workspaceService;
 
     private final CommitService commitService;
+
+    private final AuthService authService;
+
+    private final BuildService buildService;
 
     @Override
     public Account account() {
@@ -44,7 +50,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public Entity entity(WhereUniqueInput where) {
-        return null;
+        return this.entityService.getEntity(where.getId());
     }
 
     @Override
@@ -69,7 +75,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public List<AppRole> appRoles(AppRoleWhereInput where, AppRoleOrderByInput orderBy, Integer skip, Integer take) {
-        return null;
+        return this.appRoleService.appRoles(where, orderBy, skip, take);
     }
 
     @Override
@@ -114,7 +120,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public AppValidationResult appValidateBeforeCommit(WhereUniqueInput where) {
-        return null;
+        return this.appService.appValidateBeforeCommit(where);
     }
 
     @Override
@@ -129,7 +135,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public User me() {
-        return null;
+        return this.authService.currentUser();
     }
 
     @Override
@@ -169,7 +175,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public List<Build> builds(BuildWhereInput where, BuildOrderByInput orderBy, Integer take, Integer skip) {
-        return null;
+        return this.buildService.builds(null, null, where, orderBy, take, skip);
     }
 
     @Override

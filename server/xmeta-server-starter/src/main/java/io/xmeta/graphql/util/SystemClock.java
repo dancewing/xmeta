@@ -41,6 +41,31 @@ public class SystemClock {
     }
 
     /**
+     * 单例实例
+     *
+     * @return 单例实例
+     */
+    private static SystemClock instance() {
+        return InstanceHolder.INSTANCE;
+    }
+
+    /**
+     * @return 当前时间
+     */
+    public static long now() {
+        return instance().currentTimeMillis();
+    }
+
+    //------------------------------------------------------------------------ static
+
+    /**
+     * @return 当前时间字符串表现形式
+     */
+    public static String nowDate() {
+        return new Timestamp(instance().currentTimeMillis()).toString();
+    }
+
+    /**
      * 开启计时器线程
      */
     private void scheduleClockUpdating() {
@@ -67,8 +92,6 @@ public class SystemClock {
         return now;
     }
 
-    //------------------------------------------------------------------------ static
-
     /**
      * 单例
      *
@@ -76,28 +99,5 @@ public class SystemClock {
      */
     private static class InstanceHolder {
         public static final SystemClock INSTANCE = new SystemClock(1);
-    }
-
-    /**
-     * 单例实例
-     *
-     * @return 单例实例
-     */
-    private static SystemClock instance() {
-        return InstanceHolder.INSTANCE;
-    }
-
-    /**
-     * @return 当前时间
-     */
-    public static long now() {
-        return instance().currentTimeMillis();
-    }
-
-    /**
-     * @return 当前时间字符串表现形式
-     */
-    public static String nowDate() {
-        return new Timestamp(instance().currentTimeMillis()).toString();
     }
 }

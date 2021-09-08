@@ -11,6 +11,6 @@ public interface EntityPermissionRoleMapper extends BaseMapper<EntityPermissionR
     EntityPermissionRoleEntity toEntity(EntityPermissionRole dto);
 
     @Mapping(target = "appRoleId", source = "appRole.id")
-    //@Mapping(target = "entityPermission", source = "permission")
+        //@Mapping(target = "entityPermission", source = "permission")
     EntityPermissionRole toDto(EntityPermissionRoleEntity entity);
 }

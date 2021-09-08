@@ -1,6 +1,5 @@
 package io.xmeta.graphql.domain;
 
-import io.xmeta.graphql.model.Commit;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,59 +10,61 @@ import java.util.Set;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="BlockVersion" )
+@Table(name = "Block_Version", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"block_id", "version_number"})
+})
 public class BlockVersionEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @Column(name = "updatedAt")
+    private ZonedDateTime updatedAt;
 
-	@ManyToOne
-	private BlockEntity block;
+    @ManyToOne
+    private BlockEntity block;
 
-	@Column(name = "versionNumber")
-	private Integer versionNumber;
+    @Column(name = "version_Number")
+    private Integer versionNumber;
 
-	@Column(name = "inputParameters")
-	private String inputParameters;
+    @Column(name = "inputParameters")
+    private String inputParameters;
 
-	@Column(name = "outputParameters")
-	private String outputParameters;
+    @Column(name = "outputParameters")
+    private String outputParameters;
 
-	@Column(name = "settings")
-	@Lob
-	private String settings;
+    @Column(name = "settings")
+    @Lob
+    private byte[] settings;
 
-	@Column(name = "displayName")
-	private String displayName;
+    @Column(name = "displayName")
+    private String displayName;
 
-	@Column(name = "description")
-	private String description;
+    @Column(name = "description")
+    private String description;
 
-	@ManyToOne
-	private CommitEntity commit;
+    @ManyToOne
+    private CommitEntity commit;
 
-	@Column(name = "deleted")
-	private Boolean deleted;
+    @Column(name = "deleted")
+    private Boolean deleted;
 
-	@ManyToMany
-	@JoinTable(name = "BlockVersionToBuild",
-			joinColumns = @JoinColumn(name = "block_id", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "build_id", referencedColumnName = "id"))
-	private Set<BuildEntity> builds = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "BlockVersionToBuild",
+            joinColumns = @JoinColumn(name = "block_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "build_id", referencedColumnName = "id"))
+    private Set<BuildEntity> builds = new HashSet<>();
 
 }

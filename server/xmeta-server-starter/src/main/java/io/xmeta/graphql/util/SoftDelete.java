@@ -8,6 +8,6 @@ public final class SoftDelete {
     }
 
     public static String revertDeletedItemName(String value, String id) {
-        return StringUtils.replace(value, "__" + id + "_" , "");
+        return StringUtils.replace(value, "__" + id + "_", "");
     }
 }

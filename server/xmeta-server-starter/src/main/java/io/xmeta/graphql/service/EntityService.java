@@ -1,11 +1,13 @@
 package io.xmeta.graphql.service;
 
+import io.xmeta.graphql.constants.EntityConst;
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityMapper;
+import io.xmeta.graphql.mix.CreateOneEntityField;
 import io.xmeta.graphql.model.*;
-import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
+import io.xmeta.graphql.util.Maps;
 import io.xmeta.graphql.util.PredicateBuilder;
 import io.xmeta.graphql.util.SoftDelete;
 import io.xmeta.security.AuthUserDetail;
@@ -15,16 +17,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.provider.HibernateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -39,50 +43,76 @@ import java.util.stream.Collectors;
 public class EntityService extends BaseService<EntityRepository, EntityEntity, String> {
 
     private final EntityRepository entityRepository;
-    private final EntityFieldRepository entityFieldRepository;
     private final EntityVersionRepository entityVersionRepository;
     private final EntityMapper entityMapper;
     private final EntityPermissionService entityPermissionService;
     private final EntityFieldService entityFieldService;
+    private final Validator validator;
+    private final LockService lockService;
 
-    public EntityService(EntityRepository entityRepository, EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityMapper entityMapper, EntityPermissionService entityPermissionService, EntityFieldService entityFieldService) {
+    public EntityService(EntityRepository entityRepository, EntityVersionRepository entityVersionRepository, EntityMapper entityMapper, EntityPermissionService entityPermissionService, EntityFieldService entityFieldService, Validator validator, LockService lockService) {
         super(entityRepository);
         this.entityRepository = entityRepository;
-        this.entityFieldRepository = entityFieldRepository;
         this.entityVersionRepository = entityVersionRepository;
         this.entityMapper = entityMapper;
         this.entityPermissionService = entityPermissionService;
         this.entityFieldService = entityFieldService;
+        this.validator = validator;
+        this.lockService = lockService;
     }
 
     @Transactional
     public void createDefaultEntities(String appId, String userId) {
-        List<AppCreateWithEntitiesEntityInput> entities = new ArrayList<>();
-        AppCreateWithEntitiesEntityInput entitiesEntityInput = new AppCreateWithEntitiesEntityInput();
-//        entitiesEntityInput.setName("");
-//        entitiesEntityInput.setFields(Lists.newArrayList());
-//        entitiesEntityInput.setRelationsToEntityIndex(Lists.newArrayList());
 
+        AppEntity appEntity = new AppEntity();
+        appEntity.setId(appId);
+
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+
+        WhereParentIdInput app = WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(appId).build()).build();
+        List<EntityConst.EntityTemplate> defaultEntities = EntityConst.getDefaultEntities();
+        for (EntityConst.EntityTemplate entityTemplate : defaultEntities) {
+            entityTemplate.setApp(app);
+            Entity entity = this.createOneEntity(entityTemplate);
+            if (entityTemplate.getFields() != null) {
+                for (EntityFieldCreateInput field : entityTemplate.getFields()) {
+                    CreateOneEntityField createOneEntityField = new CreateOneEntityField();
+                    field.setEntity(WhereParentIdInput.builder()
+                            .setConnect(WhereUniqueInput.builder().setId(entity.getId()).build())
+                            .build());
+                    createOneEntityField.setData(field);
+                    this.entityFieldService.createField(createOneEntityField);
+                }
+            }
+        }
     }
 
     public List<Entity> entities(App app, EntityWhereInput where, EntityOrderByInput orderBy, Integer skip, Integer take) {
         Specification<EntityEntity> specification = Specification.where(null);
         Specification<EntityEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (app!=null && app.getId()!=null){
+            if (app != null && app.getId() != null) {
                 Join<Object, Object> join = root.join(EntityEntity_.APP, JoinType.LEFT);
                 predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(AppEntity_.ID), app.getId()));
+            }
+            if (where != null) {
+                if (where.getApp() != null && where.getApp().getId() != null) {
+                    Join<Object, Object> join = root.join(EntityEntity_.APP, JoinType.LEFT);
+                    predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(AppEntity_.ID), where.getApp().getId()));
+                }
             }
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<EntityEntity> result = null;
-        if (skip != null && take != null) {
+        if (skip == null) skip = 0;
+        if (take != null) {
             Pageable pageable = PageRequest.of(skip, take, sort);
             result = this.entityRepository.findAll(specification, pageable).getContent();
         } else {
-            result = this.entityRepository.findAll(sort);
+            result = this.entityRepository.findAll(specification, sort);
         }
         return result.stream().map(this.entityMapper::toDto).collect(Collectors.toList());
     }
@@ -93,6 +123,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     @Transactional
     public Entity createOneEntity(EntityCreateInput data) {
+        Set<ConstraintViolation<EntityCreateInput>> constraintViolations = validator.validate(data);
+        if (constraintViolations.size() > 0) {
+            throw new RuntimeException("");
+        }
+
         //The entity name and plural display name cannot be the same.
         AuthUserDetail authUser = SecurityUtils.getAuthUser();
         UserEntity user = new UserEntity();
@@ -129,11 +164,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         //entityVersionEntity.setBuilds(Sets.newHashSet());
         this.entityVersionRepository.saveAndFlush(entityVersionEntity);
 
-        log.info("entity versions : {}", entityEntity.getVersions().size());
-        log.info("entity versions : {}", this.entityRepository.getById(entityEntity.getId()).getVersions().size());
-        log.info("entity versions : {}", this.entityVersionRepository.findEntityDescVersions(entityEntity.getId()).size());
-
-
         //create default permissions;
         this.entityPermissionService.createEntityPermission(EnumEntityAction.Create.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
         this.entityPermissionService.createEntityPermission(EnumEntityAction.Update.name(), EnumEntityPermissionType.AllRoles.name(), entityVersionEntity);
@@ -144,7 +174,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         //create default entity fields
 
         //@format off
-        this.entityFieldService.create(EntityField.builder()
+        this.entityFieldService.createDefaultField(EntityField.builder()
                         .setDataType(EnumDataType.Id)
                         .setName("id")
                         .setDisplayName("ID")
@@ -152,11 +182,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(true)
-                        .setProperties("")
+                        .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
 
-        this.entityFieldService.create(EntityField.builder()
+        this.entityFieldService.createDefaultField(EntityField.builder()
                         .setDataType(EnumDataType.CreatedAt)
                         .setName("createdAt")
                         .setDisplayName("Created At")
@@ -164,11 +194,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(false)
-                        .setProperties("")
+                        .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
 
-        this.entityFieldService.create(EntityField.builder()
+        this.entityFieldService.createDefaultField(EntityField.builder()
                         .setDataType(EnumDataType.UpdatedAt)
                         .setName("updatedAt")
                         .setDisplayName("Updated At")
@@ -176,7 +206,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(false)
-                        .setProperties("")
+                        .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
 
@@ -226,5 +256,57 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     public Entity getEntity(String entityId) {
         return this.entityMapper.toDto(this.entityRepository.getById(entityId));
+    }
+
+    @Transactional
+    public Entity updateEntity(EntityUpdateInput data, WhereUniqueInput where) {
+        EntityEntity entityEntity = this.lockService.acquireEntityLock(where.getId());
+        entityEntity.setName(data.getName());
+        entityEntity.setDisplayName(data.getDisplayName());
+        entityEntity.setPluralDisplayName(data.getPluralDisplayName());
+        entityEntity.setDescription(data.getDescription());
+
+        this.entityRepository.save(entityEntity);
+
+        EntityVersionEntity versionEntity = this.entityVersionRepository.findEntityVersion(where.getId(), 0);
+        if (versionEntity == null) {
+            throw new RuntimeException();
+        } else {
+            versionEntity.setName(data.getName());
+            versionEntity.setDisplayName(data.getDisplayName());
+            versionEntity.setPluralDisplayName(data.getPluralDisplayName());
+            versionEntity.setDescription(data.getDescription());
+            this.entityVersionRepository.save(versionEntity);
+        }
+        return this.entityMapper.toDto(entityEntity);
+    }
+
+    @Transactional
+    public Entity deleteEntity(WhereUniqueInput where) {
+        EntityEntity entityEntity = this.lockService.acquireEntityLock(where.getId());
+
+        entityEntity.setName(SoftDelete.prepareDeletedItemName(entityEntity.getName(), entityEntity.getId()));
+        entityEntity.setDisplayName(SoftDelete.prepareDeletedItemName(entityEntity.getDisplayName(), entityEntity.getId()));
+        entityEntity.setPluralDisplayName(SoftDelete.prepareDeletedItemName(entityEntity.getPluralDisplayName(), entityEntity.getId()));
+
+        this.entityRepository.save(entityEntity);
+
+        EntityVersionEntity versionEntity = this.entityVersionRepository.findEntityVersion(where.getId(), 0);
+        if (versionEntity == null) {
+            throw new RuntimeException();
+        } else {
+            versionEntity.setDeleted(true);
+            this.entityVersionRepository.save(versionEntity);
+        }
+        return this.entityMapper.toDto(entityEntity);
+    }
+
+    @Transactional
+    public void releaseLock(String entityId) {
+        this.entityRepository.releaseLock(entityId);
+    }
+
+    public Entity lockEntity(WhereUniqueInput where) {
+        return this.entityMapper.toDto(this.lockService.acquireEntityLock(where.getId()));
     }
 }

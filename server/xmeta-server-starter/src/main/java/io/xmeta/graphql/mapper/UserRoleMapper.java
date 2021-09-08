@@ -21,7 +21,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole, UserRoleEntity> {
     }
 
     default String toRole(Role role) {
-        if (role!=null)
+        if (role != null)
             return role.name();
         return "";
     }

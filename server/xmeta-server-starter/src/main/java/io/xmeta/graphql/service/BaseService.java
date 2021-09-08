@@ -8,15 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
 
-public abstract class BaseService <R extends JpaRepository<T, ID>, T extends BaseEntity, ID extends Serializable>
+public abstract class BaseService<R extends JpaRepository<T, ID>, T extends BaseEntity, ID extends Serializable>
         implements CrudService<T, ID> {
 
     private final R repository;
@@ -69,7 +64,7 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
             String name = descriptor.getName();
             Object propertyValue = null;
             try {
-                propertyValue = PropertyUtils.getIndexedProperty(orderBy, name);
+                propertyValue = PropertyUtils.getProperty(orderBy, name);
             } catch (Exception ex) {
             }
             if (propertyValue instanceof SortOrder) {
@@ -84,7 +79,7 @@ public abstract class BaseService <R extends JpaRepository<T, ID>, T extends Bas
         return Sort.unsorted();
     }
 
-    public void clear(){
+    public void clear() {
         this.em.clear();
     }
 

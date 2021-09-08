@@ -8,34 +8,35 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="ActionLog" )
+@Table(name = "ActionLog")
 public class ActionLogEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "message")
-	private String message;
+    @Column(name = "message")
+    private String message;
 
-	@Column(name = "meta")
-	private String meta;
+    @Column(name = "meta")
+    @Lob
+    private byte[] meta;
 
-	@Column(name = "level")
-	private String level;
+    @Column(name = "level")
+    private String level;
 
-	@ManyToOne
-	private ActionStepEntity step;
+    @ManyToOne
+    private ActionStepEntity step;
 
 }

@@ -8,31 +8,31 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Commit" )
+@Table(name = "Commit")
 public class CommitEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@ManyToOne
-	private AppEntity app;
+    @ManyToOne
+    private AppEntity app;
 
-	@ManyToOne
-	private UserEntity user;
+    @ManyToOne
+    private UserEntity user;
 
-	@Column(name = "message")
-	private String message;
+    @Column(name = "message")
+    private String message;
 
 }

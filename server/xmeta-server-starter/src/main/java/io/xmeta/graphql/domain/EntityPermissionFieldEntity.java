@@ -9,41 +9,43 @@ import java.util.Set;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="EntityPermissionField" )
+@Table(name = "Entity_Permission_Field", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"permission_id", "field_permanent_id"})
+})
 public class EntityPermissionFieldEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@ManyToOne
-	private EntityPermissionEntity permission;
+    @ManyToOne
+    private EntityPermissionEntity permission;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "fieldPermanentId", referencedColumnName = "permanentId"),
-			@JoinColumn(name = "entityVersionId", referencedColumnName = "entity_version_id"),
-	})
-	private EntityFieldEntity field;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "field_permanent_id", referencedColumnName = "permanent_id"),
+            @JoinColumn(name = "entity_version_id", referencedColumnName = "entity_version_id"),
+    })
+    private EntityFieldEntity field;
 
-	@Column(name = "fieldPermanentId", insertable = false, updatable = false)
-	private String fieldPermanentId;
+    @Column(name = "field_permanent_id", insertable = false, updatable = false)
+    private String fieldPermanentId;
 
-	@Column(name = "entityVersionId", insertable = false, updatable = false)
-	private String entityVersionId;
+    @Column(name = "entity_version_id", insertable = false, updatable = false)
+    private String entityVersionId;
 
-	@ManyToMany
-	@JoinTable(name = "EntityPermissionFieldToPermissionRole",
-			joinColumns = @JoinColumn(name = "field_id", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-	private Set<EntityPermissionRoleEntity> permissionRoles = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "entity_permission_field_role",
+            joinColumns = @JoinColumn(name = "field_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<EntityPermissionRoleEntity> permissionRoles = new HashSet<>();
 
 }

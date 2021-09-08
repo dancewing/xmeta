@@ -86,6 +86,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.22</version>
@@ -241,6 +246,7 @@
                             <generateApisWithThrowsException>false</generateApisWithThrowsException>
                             <customTypesMapping>
                                 <DateTime>java.time.ZonedDateTime</DateTime>
+                                <JSON>java.util.Map&lt;String, Object&gt;</JSON>
                                 <Price.amount>java.math.BigDecimal</Price.amount>
                             </customTypesMapping>
                             <parentInterfaces>

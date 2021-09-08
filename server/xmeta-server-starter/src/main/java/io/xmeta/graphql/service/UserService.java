@@ -1,15 +1,15 @@
 package io.xmeta.graphql.service;
 
+import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.mapper.UserMapper;
 import io.xmeta.graphql.model.User;
-import org.springframework.stereotype.Service;
-import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.repository.UserRepository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 

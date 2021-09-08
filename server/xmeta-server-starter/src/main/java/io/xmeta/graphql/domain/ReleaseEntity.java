@@ -11,31 +11,31 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Release_" )
+@Table(name = "Release_")
 public class ReleaseEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "version_")
-	private String version;
+    @Column(name = "version_")
+    private String version;
 
-	@Column(name = "description_")
-	private String description;
+    @Column(name = "description_")
+    private String description;
 
-	@Column(name = "commitId")
-	private String commitId;
+    @Column(name = "commitId")
+    private String commitId;
 
 }

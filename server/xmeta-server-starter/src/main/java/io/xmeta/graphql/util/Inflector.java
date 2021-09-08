@@ -15,74 +15,52 @@ import java.util.regex.Pattern;
 public class Inflector {
 
     protected static final Inflector INSTANCE = new Inflector();
-
-    public static final Inflector getInstance() {
-        return INSTANCE;
-    }
-
-    protected class Rule {
-
-        protected final String expression;
-        protected final Pattern expressionPattern;
-        protected final String replacement;
-
-        protected Rule( String expression,
-                        String replacement ) {
-            this.expression = expression;
-            this.replacement = replacement != null ? replacement : "";
-            this.expressionPattern = Pattern.compile(this.expression, Pattern.CASE_INSENSITIVE);
-        }
-
-        /**
-         * Apply the rule against the input string, returning the modified string or null if the rule didn't apply (and no
-         * modifications were made)
-         *
-         * @param input the input string
-         * @return the modified string if this rule applied, or null if the input was not modified by this rule
-         */
-        protected String apply( String input ) {
-            Matcher matcher = this.expressionPattern.matcher(input);
-            if (!matcher.find()) return null;
-            return matcher.replaceAll(this.replacement);
-        }
-
-        @Override
-        public int hashCode() {
-            return expression.hashCode();
-        }
-
-        @Override
-        public boolean equals( Object obj ) {
-            if (obj == this) return true;
-            if (obj != null && obj.getClass() == this.getClass()) {
-                final Rule that = (Rule)obj;
-                if (this.expression.equalsIgnoreCase(that.expression)) return true;
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return expression + ", " + replacement;
-        }
-    }
-
-    private LinkedList<Rule> plurals = new LinkedList<Rule>();
-    private LinkedList<Rule> singulars = new LinkedList<Rule>();
     /**
      * The lowercase words that are to be excluded and not processed. This map can be modified by the users via
      * {@link #getUncountables()}.
      */
     private final Set<String> uncountables = new HashSet<String>();
-
+    private LinkedList<Rule> plurals = new LinkedList<Rule>();
+    private LinkedList<Rule> singulars = new LinkedList<Rule>();
     public Inflector() {
         initialize();
     }
-
-    protected Inflector( Inflector original ) {
+    protected Inflector(Inflector original) {
         this.plurals.addAll(original.plurals);
         this.singulars.addAll(original.singulars);
         this.uncountables.addAll(original.uncountables);
+    }
+
+    public static final Inflector getInstance() {
+        return INSTANCE;
+    }
+
+    /**
+     * Utility method to replace all occurrences given by the specific backreference with its uppercased form, and remove all
+     * other backreferences.
+     * <p>
+     * The Java {@link Pattern regular expression processing} does not use the preprocessing directives <code>\l</code>,
+     * <code>&#92;u</code>, <code>\L</code>, and <code>\U</code>. If so, such directives could be used in the replacement string
+     * to uppercase or lowercase the backreferences. For example, <code>\L1</code> would lowercase the first backreference, and
+     * <code>&#92;u3</code> would uppercase the 3rd backreference.
+     * </p>
+     *
+     * @param input
+     * @param regex
+     * @param groupNumberToUppercase
+     * @return the input string with the appropriate characters converted to upper-case
+     */
+    protected static String replaceAllWithUppercase(String input,
+                                                    String regex,
+                                                    int groupNumberToUppercase) {
+        Pattern underscoreAndDotPattern = Pattern.compile(regex);
+        Matcher matcher = underscoreAndDotPattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(sb, matcher.group(groupNumberToUppercase).toUpperCase());
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     @Override
@@ -117,7 +95,7 @@ public class Inflector {
      * @return the pluralized form of the word, or the word itself if it could not be pluralized
      * @see #singularize(Object)
      */
-    public String pluralize( Object word ) {
+    public String pluralize(Object word) {
         if (word == null) return null;
         String wordStr = word.toString().trim();
         if (wordStr.length() == 0) return wordStr;
@@ -129,8 +107,8 @@ public class Inflector {
         return wordStr;
     }
 
-    public String pluralize( Object word,
-                             int count ) {
+    public String pluralize(Object word,
+                            int count) {
         if (word == null) return null;
         if (count == 1 || count == -1) {
             return word.toString();
@@ -161,7 +139,7 @@ public class Inflector {
      * @return the pluralized form of the word, or the word itself if it could not be pluralized
      * @see #pluralize(Object)
      */
-    public String singularize( Object word ) {
+    public String singularize(Object word) {
         if (word == null) return null;
         String wordStr = word.toString().trim();
         if (wordStr.length() == 0) return wordStr;
@@ -188,14 +166,14 @@ public class Inflector {
      * </p>
      *
      * @param lowerCaseAndUnderscoredWord the word that is to be converted to camel case
-     * @param delimiterChars optional characters that are used to delimit word boundaries
+     * @param delimiterChars              optional characters that are used to delimit word boundaries
      * @return the lower camel case version of the word
      * @see #underscore(String, char[])
      * @see #camelCase(String, boolean, char[])
      * @see #upperCamelCase(String, char[])
      */
-    public String lowerCamelCase( String lowerCaseAndUnderscoredWord,
-                                  char... delimiterChars ) {
+    public String lowerCamelCase(String lowerCaseAndUnderscoredWord,
+                                 char... delimiterChars) {
         return camelCase(lowerCaseAndUnderscoredWord, false, delimiterChars);
     }
 
@@ -214,14 +192,14 @@ public class Inflector {
      * </p>
      *
      * @param lowerCaseAndUnderscoredWord the word that is to be converted to camel case
-     * @param delimiterChars optional characters that are used to delimit word boundaries
+     * @param delimiterChars              optional characters that are used to delimit word boundaries
      * @return the upper camel case version of the word
      * @see #underscore(String, char[])
      * @see #camelCase(String, boolean, char[])
      * @see #lowerCamelCase(String, char[])
      */
-    public String upperCamelCase( String lowerCaseAndUnderscoredWord,
-                                  char... delimiterChars ) {
+    public String upperCamelCase(String lowerCaseAndUnderscoredWord,
+                                 char... delimiterChars) {
         return camelCase(lowerCaseAndUnderscoredWord, true, delimiterChars);
     }
 
@@ -244,17 +222,17 @@ public class Inflector {
      * </p>
      *
      * @param lowerCaseAndUnderscoredWord the word that is to be converted to camel case
-     * @param uppercaseFirstLetter true if the first character is to be uppercased, or false if the first character is to be
-     *        lowercased
-     * @param delimiterChars optional characters that are used to delimit word boundaries
+     * @param uppercaseFirstLetter        true if the first character is to be uppercased, or false if the first character is to be
+     *                                    lowercased
+     * @param delimiterChars              optional characters that are used to delimit word boundaries
      * @return the camel case version of the word
      * @see #underscore(String, char[])
      * @see #upperCamelCase(String, char[])
      * @see #lowerCamelCase(String, char[])
      */
-    public String camelCase( String lowerCaseAndUnderscoredWord,
-                             boolean uppercaseFirstLetter,
-                             char... delimiterChars ) {
+    public String camelCase(String lowerCaseAndUnderscoredWord,
+                            boolean uppercaseFirstLetter,
+                            char... delimiterChars) {
         if (lowerCaseAndUnderscoredWord == null) return null;
         lowerCaseAndUnderscoredWord = lowerCaseAndUnderscoredWord.trim();
         if (lowerCaseAndUnderscoredWord.length() == 0) return "";
@@ -292,12 +270,12 @@ public class Inflector {
      *
      * </p>
      *
-     * @param camelCaseWord the camel-cased word that is to be converted;
+     * @param camelCaseWord  the camel-cased word that is to be converted;
      * @param delimiterChars optional characters that are used to delimit word boundaries (beyond capitalization)
      * @return a lower-cased version of the input, with separate words delimited by the underscore character.
      */
-    public String underscore( String camelCaseWord,
-                              char... delimiterChars ) {
+    public String underscore(String camelCaseWord,
+                             char... delimiterChars) {
         if (camelCaseWord == null) return null;
         String result = camelCaseWord.trim();
         if (result.length() == 0) return "";
@@ -318,7 +296,7 @@ public class Inflector {
      * @param words the word to be capitalized
      * @return the string with the first character capitalized and the remaining characters lowercased
      */
-    public String capitalize( String words ) {
+    public String capitalize(String words) {
         if (words == null) return null;
         String result = words.trim();
         if (result.length() == 0) return "";
@@ -340,12 +318,12 @@ public class Inflector {
      * </p>
      *
      * @param lowerCaseAndUnderscoredWords the input to be humanized
-     * @param removableTokens optional array of tokens that are to be removed
+     * @param removableTokens              optional array of tokens that are to be removed
      * @return the humanized string
      * @see #titleCase(String, String[])
      */
-    public String humanize( String lowerCaseAndUnderscoredWords,
-                            String... removableTokens ) {
+    public String humanize(String lowerCaseAndUnderscoredWords,
+                           String... removableTokens) {
         if (lowerCaseAndUnderscoredWords == null) return null;
         String result = lowerCaseAndUnderscoredWords.trim();
         if (result.length() == 0) return "";
@@ -375,12 +353,12 @@ public class Inflector {
      *
      * </p>
      *
-     * @param words the input to be turned into title case
+     * @param words           the input to be turned into title case
      * @param removableTokens optional array of tokens that are to be removed
      * @return the title-case version of the supplied words
      */
-    public String titleCase( String words,
-                             String... removableTokens ) {
+    public String titleCase(String words,
+                            String... removableTokens) {
         String result = humanize(words, removableTokens);
         result = replaceAllWithUppercase(result, "\\b([a-z])", 1); // change first char of each word to uppercase
         return result;
@@ -393,7 +371,7 @@ public class Inflector {
      * @param number the non-negative number
      * @return the string with the number and ordinal suffix
      */
-    public String ordinalize( int number ) {
+    public String ordinalize(int number) {
         int remainder = number % 100;
         String numberStr = Integer.toString(number);
         if (11 <= number && number <= 13) return numberStr + "th";
@@ -415,7 +393,7 @@ public class Inflector {
      * @param word the word
      * @return true if the plural and singular forms of the word are the same
      */
-    public boolean isUncountable( String word ) {
+    public boolean isUncountable(String word) {
         if (word == null) return false;
         String trimmedLower = word.trim().toLowerCase();
         return this.uncountables.contains(trimmedLower);
@@ -430,20 +408,20 @@ public class Inflector {
         return uncountables;
     }
 
-    public void addPluralize( String rule,
-                              String replacement ) {
+    public void addPluralize(String rule,
+                             String replacement) {
         final Rule pluralizeRule = new Rule(rule, replacement);
         this.plurals.addFirst(pluralizeRule);
     }
 
-    public void addSingularize( String rule,
-                                String replacement ) {
+    public void addSingularize(String rule,
+                               String replacement) {
         final Rule singularizeRule = new Rule(rule, replacement);
         this.singulars.addFirst(singularizeRule);
     }
 
-    public void addIrregular( String singular,
-                              String plural ) {
+    public void addIrregular(String singular,
+                             String plural) {
         if (singular == null || singular.isEmpty()) {
             throw new IllegalArgumentException("singular");
         }
@@ -456,39 +434,11 @@ public class Inflector {
         addSingularize("(" + plural.charAt(0) + ")" + pluralRemainder + "$", "$1" + singularRemainder);
     }
 
-    public void addUncountable( String... words ) {
+    public void addUncountable(String... words) {
         if (words == null || words.length == 0) return;
         for (String word : words) {
             if (word != null) uncountables.add(word.trim().toLowerCase());
         }
-    }
-
-    /**
-     * Utility method to replace all occurrences given by the specific backreference with its uppercased form, and remove all
-     * other backreferences.
-     * <p>
-     * The Java {@link Pattern regular expression processing} does not use the preprocessing directives <code>\l</code>,
-     * <code>&#92;u</code>, <code>\L</code>, and <code>\U</code>. If so, such directives could be used in the replacement string
-     * to uppercase or lowercase the backreferences. For example, <code>\L1</code> would lowercase the first backreference, and
-     * <code>&#92;u3</code> would uppercase the 3rd backreference.
-     * </p>
-     *
-     * @param input
-     * @param regex
-     * @param groupNumberToUppercase
-     * @return the input string with the appropriate characters converted to upper-case
-     */
-    protected static String replaceAllWithUppercase( String input,
-                                                     String regex,
-                                                     int groupNumberToUppercase ) {
-        Pattern underscoreAndDotPattern = Pattern.compile(regex);
-        Matcher matcher = underscoreAndDotPattern.matcher(input);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, matcher.group(groupNumberToUppercase).toUpperCase());
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
     }
 
     /**
@@ -564,6 +514,53 @@ public class Inflector {
         inflect.addIrregular("stadium", "stadiums");
 
         inflect.addUncountable("equipment", "information", "rice", "money", "species", "series", "fish", "sheep");
+    }
+
+    protected class Rule {
+
+        protected final String expression;
+        protected final Pattern expressionPattern;
+        protected final String replacement;
+
+        protected Rule(String expression,
+                       String replacement) {
+            this.expression = expression;
+            this.replacement = replacement != null ? replacement : "";
+            this.expressionPattern = Pattern.compile(this.expression, Pattern.CASE_INSENSITIVE);
+        }
+
+        /**
+         * Apply the rule against the input string, returning the modified string or null if the rule didn't apply (and no
+         * modifications were made)
+         *
+         * @param input the input string
+         * @return the modified string if this rule applied, or null if the input was not modified by this rule
+         */
+        protected String apply(String input) {
+            Matcher matcher = this.expressionPattern.matcher(input);
+            if (!matcher.find()) return null;
+            return matcher.replaceAll(this.replacement);
+        }
+
+        @Override
+        public int hashCode() {
+            return expression.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj != null && obj.getClass() == this.getClass()) {
+                final Rule that = (Rule) obj;
+                if (this.expression.equalsIgnoreCase(that.expression)) return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String toString() {
+            return expression + ", " + replacement;
+        }
     }
 
 }

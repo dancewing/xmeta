@@ -8,37 +8,41 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="AppRole" )
+@Table(name = "App_Role", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"app_id", "display_name"}),
+        @UniqueConstraint(columnNames = {"app_id", "name"})
+})
 public class AppRoleEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
 
-	@ManyToOne
-	private AppEntity app;
+    @ManyToOne
+    @JoinColumn(name = "app_id")
+    private AppEntity app;
 
-	@Column(name = "name")
-	private String name;
+    @Column(name = "name")
+    private String name;
 
-	@Column(name = "displayName")
-	private String displayName;
+    @Column(name = "display_Name")
+    private String displayName;
 
-	@Column(name = "description")
-	private String description;
+    @Column(name = "description")
+    private String description;
 
 }

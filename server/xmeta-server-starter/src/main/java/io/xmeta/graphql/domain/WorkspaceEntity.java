@@ -10,33 +10,33 @@ import java.util.List;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Workspace" )
+@Table(name = "Workspace")
 public class WorkspaceEntity extends BaseEntity {
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @Column(name = "updatedAt")
+    private ZonedDateTime updatedAt;
 
-	@Column(name = "name")
-	private String name;
+    @Column(name = "name")
+    private String name;
 
-	@OneToMany(mappedBy = "workspace")
-	private List<UserEntity> users = new ArrayList<>();
+    @OneToMany(mappedBy = "workspace")
+    private List<UserEntity> users = new ArrayList<>();
 
-	@OneToMany(mappedBy = "workspace")
-	private List<AppEntity> apps = new ArrayList<>();
+    @OneToMany(mappedBy = "workspace")
+    private List<AppEntity> apps = new ArrayList<>();
 
 }

@@ -8,40 +8,40 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Environment" )
+@Table(name = "Environment")
 public class EnvironmentEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @Column(name = "updatedAt")
+    private ZonedDateTime updatedAt;
 
-	@Column(name = "app_Id", insertable = false, updatable = false)
-	private String appId;
+    @Column(name = "app_Id", insertable = false, updatable = false)
+    private String appId;
 
-	@Column(name = "name")
-	private String name;
+    @Column(name = "name")
+    private String name;
 
-	@Column(name = "description")
-	private String description;
+    @Column(name = "description")
+    private String description;
 
-	@Column(name = "address")
-	private String address;
+    @Column(name = "address")
+    private String address;
 
-	@ManyToOne
-	private AppEntity app;
+    @ManyToOne
+    private AppEntity app;
 
 }

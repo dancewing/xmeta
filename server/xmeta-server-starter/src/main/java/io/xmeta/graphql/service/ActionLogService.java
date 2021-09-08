@@ -1,13 +1,13 @@
 package io.xmeta.graphql.service;
 
-import org.springframework.stereotype.Service;
 import io.xmeta.graphql.domain.ActionLogEntity;
 import io.xmeta.graphql.repository.ActionLogRepository;
+import org.springframework.stereotype.Service;
 
 /**
- * @Description  
- * @Author  Jeff
- * @Date 2021-09-05 
+ * @Description
+ * @Author Jeff
+ * @Date 2021-09-05
  */
 
 @Service

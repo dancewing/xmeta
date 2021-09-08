@@ -28,19 +28,21 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     private final BuildService buildService;
 
+    private final BlockService blockService;
+
     @Override
     public Account account() {
-        return null;
+        return this.accountService.currentAccount();
     }
 
     @Override
     public List<Workspace> workspaces() {
-        return null;
+        return this.workspaceService.getCurrentAccountWorkspaces();
     }
 
     @Override
     public Workspace workspace(WhereUniqueInput where) {
-        return null;
+        return this.workspaceService.getWorkspace(where.getId());
     }
 
     @Override
@@ -60,17 +62,17 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public List<Block> blocks(BlockWhereInput where, BlockOrderByInput orderBy, Integer skip, Integer take) {
-        return null;
+        return this.blockService.blocks(where, orderBy, skip, take);
     }
 
     @Override
     public Block block(WhereUniqueInput where) {
-        return null;
+        return this.blockService.getBlock(where.getId());
     }
 
     @Override
     public AppRole appRole(WhereUniqueInput where, Double version) {
-        return null;
+        return this.appRoleService.appRole(where, version);
     }
 
     @Override
@@ -125,7 +127,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public Commit commit(CommitWhereUniqueInput where) {
-        return null;
+        return this.commitService.getCommit(where.getId());
     }
 
     @Override
@@ -180,6 +182,6 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public Build build(WhereUniqueInput where) {
-        return null;
+        return this.buildService.getBuild(where.getId());
     }
 }

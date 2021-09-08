@@ -1,0 +1,68 @@
+[
+  {
+    "name": "User",
+    "displayName": "User",
+    "pluralDisplayName": "Users",
+    "description": "An automatically created entity to manage users in the application",
+    "fields": [
+      {
+        "dataType": "SingleLineText",
+        "name": "firstName",
+        "displayName": "First Name",
+        "description": "An automatically created field of the first name of the user",
+        "required": false,
+        "unique": false,
+        "searchable": true,
+        "properties": {
+          "maxLength": 256
+        }
+      },
+      {
+        "dataType": "SingleLineText",
+        "name": "lastName",
+        "displayName": "Last Name",
+        "description": "An automatically created field of the last name of the user",
+        "unique": false,
+        "required": false,
+        "searchable": true,
+        "properties": {
+          "maxLength": 256
+        }
+      },
+      {
+        "dataType": "Username",
+        "name": "username",
+        "displayName": "Username",
+        "description": "An automatically created field of the username of the user",
+        "unique": false,
+        "required": true,
+        "searchable": true,
+        "properties": {
+          "maxLength": 256
+        }
+      },
+      {
+        "dataType": "Password",
+        "name": "password",
+        "displayName": "Password",
+        "description": "An automatically created field of the password of the user",
+        "unique": false,
+        "required": true,
+        "searchable": false,
+        "properties": {
+          "maxLength": 256
+        }
+      },
+      {
+        "dataType": "Roles",
+        "name": "roles",
+        "displayName": "Roles",
+        "description": "An automatically created field of the roles of the user",
+        "unique": false,
+        "required": true,
+        "searchable": false,
+        "properties": {}
+      }
+    ]
+  }
+]

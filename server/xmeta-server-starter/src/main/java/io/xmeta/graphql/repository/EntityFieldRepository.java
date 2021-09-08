@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
@@ -21,4 +21,8 @@ public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void deleteByEntityVersionId(@Param("entityVersionId") String entityVersionId);
 
+    @Query("delete from EntityFieldEntity ef where ef.entityVersion.id  = :entityVersionId and ef.permanentId = :permanentId")
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    void deleteByEntityVersionAndPermanentId(@Param("permanentId") String permanentId,
+                                             @Param("entityVersionId") String entityVersionId);
 }

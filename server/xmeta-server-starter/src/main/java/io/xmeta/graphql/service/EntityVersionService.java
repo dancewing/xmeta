@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
@@ -56,7 +56,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         Specification<EntityVersionEntity> specification = Specification.where(null);
         Specification<EntityVersionEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (entity!=null && entity.getId()!=null){
+            if (entity != null && entity.getId() != null) {
                 Join<Object, Object> join = root.join(EntityVersionEntity_.ENTITY, JoinType.LEFT);
                 predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(EntityEntity_.ID), entity.getId()));
             }
@@ -65,7 +65,8 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<EntityVersionEntity> result = null;
-        if (skip != null && take != null) {
+        if (skip == null) skip = 0;
+        if (take != null) {
             Pageable pageable = PageRequest.of(skip, take, sort);
             result = this.entityVersionRepository.findAll(specification, pageable).getContent();
         } else {
@@ -79,11 +80,11 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         EntityEntity entityEntity = this.entityRepository.getById(entityId);
         List<EntityVersionEntity> entityVersions = this.entityVersionRepository.findEntityVersions(entityId);
         if (entityVersions.size() == 0) {
-            throw new RuntimeException("Entity "+ entityId +" has no versions");
+            throw new RuntimeException("Entity " + entityId + " has no versions");
         }
         EntityVersionEntity firstEntityVersion = entityVersions.get(0);
-        EntityVersionEntity lastEntityVersion =  entityVersions.get(entityVersions.size()-1);
-            Integer lastVersionNumber = lastEntityVersion.getVersionNumber();
+        EntityVersionEntity lastEntityVersion = entityVersions.get(entityVersions.size() - 1);
+        Integer lastVersionNumber = lastEntityVersion.getVersionNumber();
 
         Integer nextVersionNumber = lastVersionNumber + 1;
         EntityVersionEntity newEntityVersion = new EntityVersionEntity();
@@ -133,7 +134,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         //create new entity fields from source;
         List<EntityFieldEntity> fields = sourceVersion.getFields();
 
-        for (EntityFieldEntity entityFieldEntity: fields) {
+        for (EntityFieldEntity entityFieldEntity : fields) {
             EntityFieldEntity newField = new EntityFieldEntity();
             //Copy Value
             newField.setCreatedAt(ZonedDateTime.now());
@@ -148,12 +149,13 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
             newField.setDescription(entityFieldEntity.getDescription());
             newField.setPosition(entityFieldEntity.getPosition());
             newField.setUnique(entityFieldEntity.getUnique());
+            newField.setPermanentId(entityFieldEntity.getPermanentId());
 
             this.entityFieldRepository.save(newField);
         }
 
         //when the source target is flagged as deleted (commit on DELETE action), do not update the parent entity
-        if (sourceVersion.getDeleted()==null || sourceVersion.getDeleted()) {
+        if (sourceVersion.getDeleted() == null || sourceVersion.getDeleted()) {
             EntityEntity entityEntity = targetVersion.getEntity();
             entityEntity.setName(sourceVersion.getName());
             entityEntity.setDisplayName(sourceVersion.getDisplayName());
@@ -164,7 +166,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         }
 
         //update permission
-        for (EntityPermissionEntity entityPermissionEntity: sourceVersion.getPermissions()) {
+        for (EntityPermissionEntity entityPermissionEntity : sourceVersion.getPermissions()) {
             EntityPermissionEntity permissionEntity = new EntityPermissionEntity();
             permissionEntity.setAction(entityPermissionEntity.getAction());
             permissionEntity.setType(entityPermissionEntity.getType());
@@ -180,13 +182,13 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         }
         this.entityPermissionRoleRepository.flush();
         //update permission field
-        for (EntityPermissionEntity permissionEntity: sourceVersion.getPermissions()) {
+        for (EntityPermissionEntity permissionEntity : sourceVersion.getPermissions()) {
             List<EntityPermissionEntity> entityPermissionEntities = this.entityPermissionRepository.getEntitiesByActionAndVersion(permissionEntity.getAction(),
                     targetVersionId);
 
             for (EntityPermissionEntity updEntityPermission : entityPermissionEntities) {
                 List<EntityPermissionFieldEntity> permissionFields = permissionEntity.getPermissionFields();
-                for (EntityPermissionFieldEntity permissionField: permissionFields) {
+                for (EntityPermissionFieldEntity permissionField : permissionFields) {
                     EntityPermissionFieldEntity newPermissionFieldEntity = new EntityPermissionFieldEntity();
                     newPermissionFieldEntity.setEntityVersionId(targetVersionId);
                     newPermissionFieldEntity.setFieldPermanentId(permissionField.getFieldPermanentId());

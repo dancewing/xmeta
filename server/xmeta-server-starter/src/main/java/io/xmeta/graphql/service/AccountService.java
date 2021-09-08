@@ -4,17 +4,14 @@ import io.xmeta.graphql.domain.AccountEntity;
 import io.xmeta.graphql.mapper.AccountMapper;
 import io.xmeta.graphql.model.Account;
 import io.xmeta.graphql.repository.AccountRepository;
-import io.xmeta.graphql.repository.UserRepository;
-import io.xmeta.graphql.repository.UserRoleRepository;
-import io.xmeta.graphql.repository.WorkspaceRepository;
-import io.xmeta.security.jwt.TokenProvider;
+import io.xmeta.security.AuthUserDetail;
+import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 /**
  * @Description
@@ -38,6 +35,13 @@ public class AccountService extends BaseService<AccountRepository, AccountEntity
 
     @Transactional
     public Account createAccount(Account account) {
+        //检查email 是否重复
+
+        Optional<AccountEntity> optionalAccount = this.accountRepository.findOneByEmailIgnoreCase(account.getEmail());
+        if (optionalAccount.isPresent()) {
+            throw new RuntimeException(account.getEmail() + " is already registered");
+        }
+
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setCreatedAt(ZonedDateTime.now());
         accountEntity.setUpdatedAt(ZonedDateTime.now());
@@ -52,5 +56,13 @@ public class AccountService extends BaseService<AccountRepository, AccountEntity
     @Transactional
     public void setCurrentUser(String accountId, String userId) {
         this.accountRepository.setCurrentUser(accountId, userId);
+    }
+
+    public Account currentAccount() {
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        if (authUser != null) {
+            return this.accountMapper.toDto(this.accountRepository.getById(authUser.getAccountId()));
+        }
+        return null;
     }
 }

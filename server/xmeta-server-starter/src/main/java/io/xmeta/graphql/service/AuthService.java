@@ -29,6 +29,7 @@ public class AuthService {
     @Transactional
     public Auth signup(SignupInput data) {
 
+
         String hashedPassword = passwordEncoder.encode(data.getPassword());
 
         Account account = new Account();

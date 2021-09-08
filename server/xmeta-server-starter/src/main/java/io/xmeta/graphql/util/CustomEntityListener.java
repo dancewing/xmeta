@@ -1,7 +1,7 @@
 package io.xmeta.graphql.util;
 
-import org.apache.commons.lang3.StringUtils;
 import io.xmeta.graphql.domain.BaseEntity;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.PrePersist;
 import javax.persistence.PreRemove;

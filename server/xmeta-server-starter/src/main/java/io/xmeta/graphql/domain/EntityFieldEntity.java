@@ -8,58 +8,61 @@ import java.time.ZonedDateTime;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="EntityField" )
+@Table(name = "Entity_Field",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"entity_version_id", "display_name"}),
+                @UniqueConstraint(columnNames = {"entity_version_id", "name"}),
+        })
 public class EntityFieldEntity extends BaseEntity {
 
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Column(name = "createdAt")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "updatedAt")
+    private ZonedDateTime updatedAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @ManyToOne
+    private EntityVersionEntity entityVersion;
 
-	@ManyToOne
-	private EntityVersionEntity entityVersion;
+    @Column(name = "permanent_Id")
+    private String permanentId;
 
-	@Column(name = "permanentId")
-	private String permanentId;
+    @Column(name = "name")
+    private String name;
 
-	@Column(name = "name")
-	private String name;
+    @Column(name = "display_name")
+    private String displayName;
 
-	@Column(name = "displayName")
-	private String displayName;
+    @Column(name = "dataType")
+    private String dataType;
 
-	@Column(name = "dataType")
-	private String dataType;
+    @Column(name = "properties")
+    private byte[] properties;
 
-	@Column(name = "properties")
-	private String properties;
+    @Column(name = "required_")
+    private Boolean required;
 
-	@Column(name = "required_")
-	private Boolean required;
+    @Column(name = "searchable")
+    private Boolean searchable;
 
-	@Column(name = "searchable")
-	private Boolean searchable;
+    @Column(name = "description")
+    private String description;
 
-	@Column(name = "description")
-	private String description;
+    @Column(name = "position_")
+    private Integer position;
 
-	@Column(name = "position_")
-	private Integer position;
-
-	@Column(name = "unique_")
-	private Boolean unique;
+    @Column(name = "unique_")
+    private Boolean unique;
 
 }

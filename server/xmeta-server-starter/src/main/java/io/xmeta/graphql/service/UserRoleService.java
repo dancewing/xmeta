@@ -1,12 +1,12 @@
 package io.xmeta.graphql.service;
 
-import org.springframework.stereotype.Service;
 import io.xmeta.graphql.domain.UserRoleEntity;
 import io.xmeta.graphql.repository.UserRoleRepository;
+import org.springframework.stereotype.Service;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 

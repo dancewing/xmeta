@@ -10,55 +10,59 @@ import java.util.List;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Block" )
+@Table(name = "Block",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"app_id", "display_name"})
+        })
 public class BlockEntity extends BaseEntity {
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column(name = "createdAt")
-	private ZonedDateTime createdAt;
+    @Column(name = "created_At")
+    private ZonedDateTime createdAt;
 
-	@Column(name = "updatedAt")
-	private ZonedDateTime updatedAt;
+    @Column(name = "updated_At")
+    private ZonedDateTime updatedAt;
 
-	@ManyToOne
-	private AppEntity app;
+    @ManyToOne
+    private AppEntity app;
 
-	@ManyToOne
-	private BlockEntity parentBlock;
+    @ManyToOne
+    private BlockEntity parentBlock;
 
-	@Column(name = "blockType")
-	private String blockType;
+    @Column(name = "block_Type")
+    private String blockType;
 
-	@Column(name = "displayName")
-	private String displayName;
+    @Column(name = "display_Name")
+    private String displayName;
 
-	@Column(name = "description")
-	private String description;
+    @Column(name = "description")
+    private String description;
 
-	@ManyToOne
-	private UserEntity lockedByUser;
+    @ManyToOne
+    private UserEntity lockedByUser;
 
-	@Column(name = "lockedAt")
-	private ZonedDateTime lockedAt;
+    @Column(name = "locked_At")
+    private ZonedDateTime lockedAt;
 
-	@Column(name = "deletedAt")
-	private ZonedDateTime deletedAt;
+    @Column(name = "deleted_At")
+    private ZonedDateTime deletedAt;
 
-	@OneToMany(mappedBy = "parentBlock")
-	private List<BlockEntity> blocks = new ArrayList<>();;
+    @OneToMany(mappedBy = "parentBlock")
+    private List<BlockEntity> blocks = new ArrayList<>();
+    ;
 
-	@OneToMany(mappedBy = "block")
-	@OrderBy("versionNumber desc")
-	private List<BlockVersionEntity> versions = new ArrayList<>();
+    @OneToMany(mappedBy = "block")
+    @OrderBy("versionNumber desc")
+    private List<BlockVersionEntity> versions = new ArrayList<>();
 
 }

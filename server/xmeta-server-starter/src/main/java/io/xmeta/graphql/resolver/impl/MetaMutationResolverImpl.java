@@ -15,6 +15,8 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     private final AppService appService;
 
+    private final AppRoleService appRoleService;
+
     private final CommitService commitService;
 
     private final AuthService authService;
@@ -57,17 +59,17 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Entity deleteEntity(WhereUniqueInput where) {
-        return null;
+        return this.entityService.deleteEntity(where);
     }
 
     @Override
     public Entity updateEntity(EntityUpdateInput data, WhereUniqueInput where) {
-        return null;
+        return this.entityService.updateEntity(data, where);
     }
 
     @Override
     public Entity lockEntity(WhereUniqueInput where) {
-        return null;
+        return this.entityService.lockEntity(where);
     }
 
     @Override
@@ -107,12 +109,12 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public EntityField deleteEntityField(WhereUniqueInput where) {
-        return null;
+        return this.entityFieldService.deleteEntityField(where.getId());
     }
 
     @Override
     public EntityField updateEntityField(EntityFieldUpdateInput data, WhereUniqueInput where, String relatedFieldName, String relatedFieldDisplayName) {
-        return null;
+        return this.entityFieldService.updateEntityField(data, where, relatedFieldName, relatedFieldDisplayName);
     }
 
     @Override
@@ -122,17 +124,17 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public AppRole createAppRole(AppRoleCreateInput data) {
-        return null;
+        return this.appRoleService.createAppRole(data);
     }
 
     @Override
     public AppRole deleteAppRole(WhereUniqueInput where) {
-        return null;
+        return this.appRoleService.deleteAppRole(where);
     }
 
     @Override
     public AppRole updateAppRole(AppRoleUpdateInput data, WhereUniqueInput where) {
-        return null;
+        return this.appRoleService.updateAppRole(data, where);
     }
 
     @Override
@@ -147,7 +149,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public App createApp(AppCreateInput data) {
-        return null;
+        return this.appService.createApp(data);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Commit commit(CommitCreateInput data) {
-        return this.commitService.commit(data);
+        return this.appService.commit(data, false);
     }
 
     @Override

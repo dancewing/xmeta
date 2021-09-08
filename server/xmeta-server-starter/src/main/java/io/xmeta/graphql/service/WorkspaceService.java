@@ -1,10 +1,9 @@
 package io.xmeta.graphql.service;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 
 import io.xmeta.graphql.domain.AccountEntity;
 import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.domain.UserRoleEntity;
+import io.xmeta.graphql.domain.WorkspaceEntity;
 import io.xmeta.graphql.mapper.UserMapper;
 import io.xmeta.graphql.mapper.WorkspaceMapper;
 import io.xmeta.graphql.model.Role;
@@ -13,16 +12,20 @@ import io.xmeta.graphql.model.Workspace;
 import io.xmeta.graphql.model.WorkspaceCreateInput;
 import io.xmeta.graphql.repository.UserRepository;
 import io.xmeta.graphql.repository.UserRoleRepository;
+import io.xmeta.graphql.repository.WorkspaceRepository;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import org.springframework.stereotype.Service;
-import io.xmeta.graphql.domain.WorkspaceEntity;
-import io.xmeta.graphql.repository.WorkspaceRepository;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
@@ -95,6 +98,18 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
         workspace.setUsers(Arrays.asList(user));
 
         return workspace;
+    }
 
+    public List<Workspace> getCurrentAccountWorkspaces() {
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        if (authUser != null) {
+            List<WorkspaceEntity> workspaces = this.userRepository.findWorkspaceByAccount(authUser.getAccountId());
+            return this.workspaceMapper.toDto(workspaces);
+        }
+        return Collections.emptyList();
+    }
+
+    public Workspace getWorkspace(String id) {
+        return this.workspaceMapper.toDto(this.workspaceRepository.getById(id));
     }
 }

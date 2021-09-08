@@ -1,6 +1,5 @@
 package io.xmeta.graphql.domain;
 
-import io.xmeta.graphql.model.ActionStep;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,25 +10,25 @@ import java.util.List;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Entity
 @Getter
 @Setter
-@Table ( name ="Action" )
+@Table(name = "Action")
 public class ActionEntity extends BaseEntity {
 
 
-   	@Id
-	@Column(name = "id", length = 64)
-	private String id;
+    @Id
+    @Column(name = "id", length = 64)
+    private String id;
 
-	@Column
-	private ZonedDateTime createdAt;
+    @Column
+    private ZonedDateTime createdAt;
 
-	@OneToMany(mappedBy = "action")
-	private List<ActionStepEntity> steps = new ArrayList<>();
+    @OneToMany(mappedBy = "action")
+    private List<ActionStepEntity> steps = new ArrayList<>();
 
 }

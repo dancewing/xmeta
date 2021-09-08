@@ -1,5 +1,6 @@
 package io.xmeta.graphql.service;
 
+import io.xmeta.graphql.constants.FieldConstProperties;
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityFieldMapper;
 import io.xmeta.graphql.mix.CreateOneEntityField;
@@ -7,8 +8,9 @@ import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
-import io.xmeta.graphql.util.Inflector;
-import io.xmeta.graphql.util.PredicateBuilder;
+import io.xmeta.graphql.util.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,68 +24,67 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
 @Service
 @Transactional
+@Slf4j
 public class EntityFieldService extends BaseService<EntityFieldRepository, EntityFieldEntity, String> {
 
     private final EntityFieldRepository entityFieldRepository;
     private final EntityVersionRepository entityVersionRepository;
     private final EntityFieldMapper entityFieldMapper;
     private final EntityRepository entityRepository;
+    private final LockService lockService;
 
-    public EntityFieldService(EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityFieldMapper entityFieldMapper, EntityRepository entityRepository) {
+    public EntityFieldService(EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityFieldMapper entityFieldMapper, EntityRepository entityRepository, LockService lockService) {
         super(entityFieldRepository);
         this.entityFieldRepository = entityFieldRepository;
         this.entityVersionRepository = entityVersionRepository;
         this.entityFieldMapper = entityFieldMapper;
         this.entityRepository = entityRepository;
+        this.lockService = lockService;
     }
 
     public List<EntityField> fields(Entity entity, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
-        return this.entityFieldMapper.toDto(this.getFields(entity.getId(), null));
+        return this.entityFieldMapper.toDto(this.getVersionFields(entity.getId(), 0, where, orderBy, skip, take));
     }
 
     public List<EntityField> fields(EntityVersion entityVersion, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
         return this.entityFieldMapper.toDto(this.getVersionFields(entityVersion.getEntityId(),
-                entityVersion.getVersionNumber(), null));
+                entityVersion.getVersionNumber(), where, orderBy, skip, take));
     }
 
 
     @Transactional
-    public EntityField create(EntityField entityField, String entityId, EntityVersionEntity entityVersion) {
+    public EntityField createDefaultField(EntityField entityField, String entityId, EntityVersionEntity entityVersion) {
         EntityFieldEntity fieldEntity = new EntityFieldEntity();
         fieldEntity.setCreatedAt(ZonedDateTime.now());
         fieldEntity.setUpdatedAt(ZonedDateTime.now());
         fieldEntity.setEntityVersion(entityVersion);
-        fieldEntity.setPermanentId(entityField.getPermanentId());
+        fieldEntity.setPermanentId(IDGenerator.nextId());
         fieldEntity.setName(entityField.getName());
         fieldEntity.setDisplayName(entityField.getDisplayName());
         fieldEntity.setDataType(entityField.getDataType().name());
-        fieldEntity.setProperties(entityField.getProperties());
+        fieldEntity.setProperties(ObjectMapperUtils.toBytes(entityField.getProperties()));
         fieldEntity.setRequired(entityField.getRequired());
         fieldEntity.setSearchable(entityField.getSearchable());
         fieldEntity.setDescription(entityField.getDescription());
         fieldEntity.setPosition(entityField.getPosition());
         fieldEntity.setUnique(entityField.getUnique());
 
-        EntityEntity entityEntity = new EntityEntity();
-        entityEntity.setId(entityId);
-
         this.entityFieldRepository.save(fieldEntity);
 
         return this.entityFieldMapper.toDto(fieldEntity);
     }
 
+    @Transactional
     public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
         CreateOneEntityField createOneEntityField = new CreateOneEntityField();
         createOneEntityField.setData(data);
@@ -92,6 +93,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         return this.createField(createOneEntityField);
     }
 
+    @Transactional
     public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
         // validate the entity
 
@@ -99,15 +101,19 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         EntityFieldCreateInput createInput = this.createFieldCreateInputByDisplayName(data);
 
+        createInput.setDisplayName(data.getDisplayName());
+        createInput.setEntity(data.getEntity());
+
         CreateOneEntityField createOneEntityField = new CreateOneEntityField();
         createOneEntityField.setData(createInput);
         if (createInput.getDataType() == EnumDataType.Lookup) {
-            boolean allowMultipleSelection = false;
             //TODO allowMultipleSelection, 从properties 属性中获取
-
-            createOneEntityField.setRelatedFieldName(Inflector.getInstance().camelCase(
+            boolean allowMultipleSelection =
+                    createInput.getProperties() != null && MapUtils.getBooleanValue(createInput.getProperties(), "allowMultipleSelection",
+                            false);
+            createOneEntityField.setRelatedFieldName(Inflector.getInstance().lowerCamelCase(
                     !allowMultipleSelection ? entityEntity.getPluralDisplayName() : entityEntity.getName()
-            ,false));
+                    , ' '));
 
             createOneEntityField.setRelatedFieldDisplayName(!allowMultipleSelection
                     ? entityEntity.getPluralDisplayName()
@@ -116,9 +122,54 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         return this.createField(createOneEntityField);
     }
 
-    public EntityField createField(CreateOneEntityField createOneEntityField){
+    @Transactional
+    public EntityField createField(CreateOneEntityField createOneEntityField) {
+        EntityFieldCreateInput fieldData = createOneEntityField.getData();
 
-        return null;
+        EntityEntity entityEntity = this.lockService.acquireEntityLock(fieldData.getEntity().getConnect().getId());
+
+        //this.validateFieldMutationArgs();
+
+
+        if (fieldData.getDataType() == EnumDataType.Lookup) {
+            //生成relatedFieldId
+            fieldData.getProperties().put("relatedFieldId", IDGenerator.nextId());
+        }
+        //this.validateFieldData();
+        String fieldId = IDGenerator.nextId();
+
+        if (fieldData.getDataType() == EnumDataType.Lookup) {
+            this.createRelatedField(
+                    MapUtils.getString(fieldData.getProperties(), "relatedFieldId"),
+                    createOneEntityField.getRelatedFieldName(),
+                    createOneEntityField.getRelatedFieldDisplayName(),
+                    !MapUtils.getBooleanValue(fieldData.getProperties(), "allowMultipleSelection"),
+                    MapUtils.getString(fieldData.getProperties(), "relatedEntityId"),
+                    entityEntity.getId(),
+                    fieldId
+            );
+        }
+
+        EntityVersionEntity entityVersion = this.entityVersionRepository.findEntityVersion(entityEntity.getId(), 0);
+        EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
+        entityFieldEntity.setId(fieldId);
+        entityFieldEntity.setCreatedAt(ZonedDateTime.now());
+        entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
+        entityFieldEntity.setEntityVersion(entityVersion);
+        entityFieldEntity.setPermanentId(fieldId);
+        entityFieldEntity.setName(fieldData.getName());
+        entityFieldEntity.setDisplayName(fieldData.getDisplayName());
+        entityFieldEntity.setDataType(fieldData.getDataType().name());
+        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(fieldData.getProperties()));
+        entityFieldEntity.setRequired(fieldData.getRequired());
+        entityFieldEntity.setSearchable(fieldData.getSearchable());
+        entityFieldEntity.setDescription(fieldData.getDescription());
+        entityFieldEntity.setPosition(0);
+        entityFieldEntity.setUnique(fieldData.getUnique());
+
+        this.entityFieldRepository.saveAndFlush(entityFieldEntity);
+
+        return this.entityFieldMapper.toDto(entityFieldEntity);
     }
 
     // 创建一个供存储用的EntityField 设置 name， dataType, properties
@@ -132,7 +183,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         String displayName = data.getDisplayName();
         String lowerCaseName = displayName.toLowerCase();
-        String name = Inflector.getInstance().camelCase(displayName, false);
+        String name = Inflector.getInstance().lowerCamelCase(displayName, ' ');
         EnumDataType dataType = data.getDataType();
         if (dataType == null) {
             // guest dataType
@@ -158,7 +209,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         if (dataType == EnumDataType.Lookup || dataType == null) {
             List<EntityEntity> entities = this.entityRepository.findEntityByNames(name, entity.getApp().getId());
-            if (entities!=null && entities.size()>0) {
+            if (entities != null && entities.size() > 0) {
                 EntityEntity relatedEntity = entities.get(0);
                 // The created field would be multiple selection if its name is equal to
                 // the related entity's plural display name
@@ -169,61 +220,252 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                 boolean relatedFieldAllowMultipleSelection = !allowMultipleSelection;
 
                 // The related field name should resemble the name of the field's entity
-                String relatedFieldName = Inflector.getInstance().camelCase(
+                String relatedFieldName = Inflector.getInstance().lowerCamelCase(
                         relatedFieldAllowMultipleSelection
                                 ? entity.getName()
-                                : entity.getPluralDisplayName(), false);
+                                : entity.getPluralDisplayName(), ' ');
                 if (isFieldNameAvailable(relatedFieldName, relatedEntity.getId())) {
                     //TODO relation 类型需要重新处理
                     builder.setName(name)
                             .setDataType(EnumDataType.Lookup)
-                            .setProperties("");
+                            .setProperties(
+                                    Maps.of("relatedEntityId", relatedEntity.getId())
+                                            .and("allowMultipleSelection", true)
+                                            .build());
                     return builder.build();
                 }
 
             }
         }
 
-        builder.setName(name).setDataType(dataType==null ? EnumDataType.SingleLineText: dataType)
-                .setProperties("");
+        builder.setName(name).setDataType(dataType == null ? EnumDataType.SingleLineText : dataType)
+                .setProperties(getDefaultFieldProperties(dataType));
+
+        builder.setEntity(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(entityId).build()).build());
 
         return builder.build();
     }
 
+    //获取
+    private Map<String, Object> getDefaultFieldProperties(EnumDataType dataType) {
+        if (dataType == null) {
+            return FieldConstProperties.SingleLineText;
+        }
+        switch (dataType) {
+            case SingleLineText:
+                return FieldConstProperties.SingleLineText;
+            case MultiLineText:
+                return FieldConstProperties.MultiLineText;
+            case WholeNumber:
+                return FieldConstProperties.WholeNumber;
+            case DecimalNumber:
+                return FieldConstProperties.DecimalNumber;
+            case DateTime:
+                return FieldConstProperties.DateTime;
+            case Lookup:
+                return FieldConstProperties.Lookup;
+            case OptionSet:
+                return FieldConstProperties.OptionSet;
+            case MultiSelectOptionSet:
+                return FieldConstProperties.MultiSelectOptionSet;
+            default:
+                return new HashMap<>();
+        }
+    }
+
     private boolean isFieldNameAvailable(String name, String entityId) {
         EntityField entityField = EntityField.builder().setName(name).build();
-        return CollectionUtils.isEmpty(getFields(entityId, entityField));
+        EntityFieldWhereInput.Builder builder = EntityFieldWhereInput.builder();
+        StringFilter stringFilter = new StringFilter();
+        stringFilter.setEq(name);
+        builder.setName(stringFilter);
+
+        return CollectionUtils.isEmpty(getVersionFields(entityId, 0, builder.build(), null, null, null));
     }
 
-    private List<EntityFieldEntity> getFields(String entityId, EntityField entityField) {
-        return getVersionFields(entityId, 0, entityField);
-    }
-
-
-    public List<EntityFieldEntity> getVersionFields(String entityId, Integer versionNumber, EntityField entityField) {
+    public List<EntityFieldEntity> getVersionFields(String entityId, Integer versionNumber,
+                                                    EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
         Specification<EntityFieldEntity> specification = Specification.where(null);
         Specification<EntityFieldEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             Predicate predicate = null;
 
-            if (entityField !=null && StringUtils.isNotEmpty(entityField.getName())) {
-                predicate = criteriaBuilder.equal(root.get(EntityFieldEntity_.NAME), entityField.getName());
-                predicates.add(predicate);
+            if (where != null) {
+                if (where.getId() != null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.ID),
+                            where.getId()));
+                }
+                if (where.getPermanentId() != null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.PERMANENT_ID),
+                            where.getPermanentId()));
+                }
+                if (where.getName() != null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.NAME),
+                            where.getName()));
+                }
+                if (where.getDisplayName() != null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.DISPLAY_NAME),
+                            where.getDisplayName()));
+                }
+
+                if (where.getDescription() != null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.DESCRIPTION),
+                            where.getDescription()));
+                }
+
             }
 
-            if (StringUtils.isNotEmpty(entityId) && versionNumber!=null) {
+            if (StringUtils.isNotEmpty(entityId) || versionNumber != null) {
                 Join<Object, Object> join = root.join(EntityFieldEntity_.ENTITY_VERSION, JoinType.LEFT);
-                predicate = criteriaBuilder.equal(join.get(EntityVersionEntity_.ENTITY_ID), entityId);
-                predicates.add(predicate);
 
-                predicate = criteriaBuilder.equal(join.get(EntityVersionEntity_.VERSION_NUMBER), versionNumber);
-                predicates.add(predicate);
+                if (StringUtils.isNotEmpty(entityId)) {
+                    predicate = criteriaBuilder.equal(join.get(EntityVersionEntity_.ENTITY_ID), entityId);
+                    predicates.add(predicate);
+                }
+                if (versionNumber != null) {
+                    predicate = criteriaBuilder.equal(join.get(EntityVersionEntity_.VERSION_NUMBER), versionNumber);
+                    predicates.add(predicate);
+                }
             }
 
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
         specification = specification.and(condition);
-        return this.entityFieldRepository.findAll(specification);
+        Sort sort = createSort(orderBy);
+        List<EntityFieldEntity> result = null;
+        if (skip == null) skip = 0;
+        if (take != null) {
+            Pageable pageable = PageRequest.of(skip, take, sort);
+            result = this.entityFieldRepository.findAll(specification, pageable).getContent();
+        } else {
+            result = this.entityFieldRepository.findAll(specification, sort);
+        }
+
+        return result;
+    }
+
+    @Transactional
+    public EntityField deleteEntityField(String id) {
+        EntityFieldEntity entityFieldEntity = this.entityFieldRepository.getById(id);
+        this.lockService.acquireEntityLock(entityFieldEntity.getEntityVersion().getEntityId());
+        if (EnumDataType.Lookup.name().equals(entityFieldEntity.getDataType())) {
+            Map<String, Object> properties = ObjectMapperUtils.toMap(entityFieldEntity.getProperties());
+            String relatedFieldId = MapUtils.getString(properties, "relatedFieldId");
+            String relatedEntityId = MapUtils.getString(properties, "relatedEntityId");
+            this.deleteRelatedField(relatedFieldId, relatedEntityId);
+        }
+        this.entityFieldRepository.deleteById(entityFieldEntity.getId());
+        return this.entityFieldMapper.toDto(entityFieldEntity);
+    }
+
+    @Transactional
+    public EntityField updateEntityField(EntityFieldUpdateInput data, WhereUniqueInput where, String relatedFieldName, String relatedFieldDisplayName) {
+        EntityFieldEntity field = this.entityFieldRepository.getById(where.getId());
+
+        Map<String, Object> properties = ObjectMapperUtils.toMap(field.getProperties());
+        // isSystemDataType
+        // Delete related field in case field data type is changed from lookup
+        boolean shouldDeleteRelated = StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name()) &&
+                data.getDataType() != EnumDataType.Lookup;
+
+        // Create related field in case field data type is changed to lookup
+        boolean shouldCreateRelated = data.getDataType() == EnumDataType.Lookup &&
+                !StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name());
+
+        boolean shouldChangeRelated = !shouldCreateRelated &&
+                !shouldDeleteRelated && !StringUtils.equals(MapUtils.getString(properties, "relatedEntityId"),
+                MapUtils.getString(data.getProperties(), "relatedEntityId"));
+
+        EntityEntity entity = this.lockService.acquireEntityLock(field.getEntityVersion().getEntityId());
+
+        //this.validateFieldMutationArgs
+
+        if (shouldCreateRelated || shouldChangeRelated) {
+            data.getProperties().put("relatedFieldId", IDGenerator.nextId());
+        }
+
+        //this.validateFieldData
+        if (shouldDeleteRelated || shouldChangeRelated) {
+            this.deleteRelatedField(MapUtils.getString(data.getProperties(), "relatedFieldId"),
+                    MapUtils.getString(data.getProperties(), "relatedEntityId"));
+        }
+
+        if (shouldCreateRelated || shouldChangeRelated) {
+
+            this.createRelatedField(
+                    MapUtils.getString(data.getProperties(), "relatedFieldId"),
+                    relatedFieldName,
+                    relatedFieldDisplayName,
+                    !MapUtils.getBooleanValue(data.getProperties(), "allowMultipleSelection"),
+                    MapUtils.getString(data.getProperties(), "relatedEntityId"),
+                    entity.getId(),
+                    field.getPermanentId()
+            );
+        }
+
+        field.setUpdatedAt(ZonedDateTime.now());
+        // field.setPermanentId("");
+        field.setName(data.getName());
+        field.setDisplayName(data.getDisplayName());
+        field.setDataType(data.getDataType().name());
+        field.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
+        field.setRequired(data.getRequired());
+        field.setSearchable(data.getSearchable());
+        field.setDescription(data.getDescription());
+        field.setPosition(data.getPosition());
+        field.setUnique(data.getUnique());
+        this.entityFieldRepository.save(field);
+        return this.entityFieldMapper.toDto(field);
+    }
+
+
+    @Transactional
+    public void createRelatedField(String id, String name, String displayName, boolean allowMultipleSelection,
+                                   String entityId, String relatedEntityId, String relatedFieldId) {
+        this.lockService.acquireEntityLock(entityId);
+
+        Optional<EntityVersionEntity> entityVersionEntity = this.entityVersionRepository.getCurrentVersion(entityId);
+        if (!entityVersionEntity.isPresent()) {
+            throw new RuntimeException("can't find entity version");
+        }
+        EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
+        entityFieldEntity.setCreatedAt(ZonedDateTime.now());
+        entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
+        entityFieldEntity.setEntityVersion(entityVersionEntity.get());
+        entityFieldEntity.setPermanentId(id);
+        entityFieldEntity.setName(name);
+        entityFieldEntity.setDisplayName(displayName);
+        entityFieldEntity.setDataType(EnumDataType.Lookup.name());
+        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(Maps.of("allowMultipleSelection", allowMultipleSelection)
+                .and("relatedEntityId", relatedEntityId)
+                .and("relatedFieldId", relatedFieldId).build()));
+        entityFieldEntity.setRequired(false);
+        entityFieldEntity.setSearchable(true);
+        entityFieldEntity.setDescription("");
+        entityFieldEntity.setPosition(0);
+        entityFieldEntity.setUnique(false);
+        this.entityFieldRepository.save(entityFieldEntity);
+    }
+
+    @Transactional
+    public void deleteRelatedField(String relatedFieldId, String relatedEntityId) {
+        this.lockService.acquireEntityLock(relatedEntityId);
+        EntityFieldWhereInput.Builder builder = EntityFieldWhereInput.builder();
+        builder.setPermanentId(StringFilter.builder().setEq(relatedFieldId).build());
+        List<EntityFieldEntity> versionFields = this.getVersionFields(relatedEntityId, 0, builder.build(), null, null, null);
+        if (versionFields.size() == 0) {
+            throw new RuntimeException("can't find relation fields");
+        }
+        if (versionFields.size() > 1) {
+            throw new RuntimeException("more than one relation fields founded");
+        }
+        EntityFieldEntity entityField = versionFields.get(0);
+        this.entityFieldRepository.deleteByEntityVersionAndPermanentId(entityField.getEntityVersion().getId(), relatedEntityId);
     }
 
 }

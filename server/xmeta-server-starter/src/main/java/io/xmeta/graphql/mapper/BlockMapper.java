@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class, AppMapper.class})
-public interface BlockMapper extends BaseMapper<Block, BlockEntity>{
+public interface BlockMapper extends BaseMapper<Block, BlockEntity> {
     @Mapping(target = "lockedByUser", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "blocks", ignore = true)

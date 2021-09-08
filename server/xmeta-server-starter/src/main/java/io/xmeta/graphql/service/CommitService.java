@@ -3,6 +3,7 @@ package io.xmeta.graphql.service;
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.CommitMapper;
 import io.xmeta.graphql.model.*;
+import io.xmeta.graphql.repository.CommitRepository;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import org.apache.commons.lang.StringUtils;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import io.xmeta.graphql.repository.CommitRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.criteria.Join;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 /**
  * @Description
- * @Author  Jeff
+ * @Author Jeff
  * @Date 2021-09-05
  */
 
@@ -41,8 +41,12 @@ public class CommitService extends BaseService<CommitRepository, CommitEntity, S
         this.commitMapper = commitMapper;
     }
 
+    public Commit getCommit(String id) {
+        return this.commitMapper.toDto(this.commitRepository.getById(id));
+    }
+
     @Transactional
-    public Commit commit(CommitCreateInput data) {
+    public Commit createCommit(CommitCreateInput data) {
         CommitEntity commit = new CommitEntity();
         AppEntity app = new AppEntity();
         app.setId(data.getApp().getConnect().getId());
@@ -62,7 +66,7 @@ public class CommitService extends BaseService<CommitRepository, CommitEntity, S
         Specification<CommitEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (where != null) {
-                if (where.getApp()!=null && StringUtils.isNotEmpty(where.getApp().getId())) {
+                if (where.getApp() != null && StringUtils.isNotEmpty(where.getApp().getId())) {
                     Join<Object, Object> join = root.join(CommitEntity_.APP, JoinType.LEFT);
                     predicates.add(criteriaBuilder.equal(join.get(AppEntity_.ID), where.getApp().getId()));
                 }
@@ -73,7 +77,8 @@ public class CommitService extends BaseService<CommitRepository, CommitEntity, S
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<CommitEntity> result = null;
-        if (skip != null && take != null) {
+        if (skip == null) skip = 0;
+        if (take != null) {
             Pageable pageable = PageRequest.of(skip, take, sort);
             result = this.commitRepository.findAll(specification, pageable).getContent();
         } else {

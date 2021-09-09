@@ -42,7 +42,7 @@ const PendingChangeDiffBlock = ({
               not: CURRENT_VERSION_NUMBER,
             }
           : {
-              equals: change.versionNumber > 1 ? change.versionNumber - 1 : -1,
+              eq: change.versionNumber > 1 ? change.versionNumber - 1 : -1,
             },
     },
     fetchPolicy: "no-cache",
@@ -56,10 +56,10 @@ const PendingChangeDiffBlock = ({
       whereVersion:
         compareType === EnumCompareType.Pending
           ? {
-              equals: CURRENT_VERSION_NUMBER,
+              eq: CURRENT_VERSION_NUMBER,
             }
           : {
-              equals: change.versionNumber,
+              eq: change.versionNumber,
             },
     },
     fetchPolicy: "no-cache",

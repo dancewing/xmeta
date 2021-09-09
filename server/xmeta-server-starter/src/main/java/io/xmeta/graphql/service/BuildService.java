@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class BuildService extends BaseService<BuildRepository, BuildEntity, String> {
 
     private final BuildRepository buildRepository;

@@ -1,6 +1,7 @@
 package io.xmeta.graphql.util;
 
 import io.xmeta.graphql.model.DateTimeFilter;
+import io.xmeta.graphql.model.IntFilter;
 import io.xmeta.graphql.model.StringFilter;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -54,6 +55,36 @@ public abstract class PredicateBuilder {
         return predicates;
     }
 
+    public static List<Predicate> buildIntFilter(CriteriaBuilder criteriaBuilder, Expression<Integer> expression,
+                                                    final IntFilter filter) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (filter.getEq() != null) {
+            predicates.add(equalsPredicate(criteriaBuilder, expression, filter.getEq()));
+        }
+        if (filter.getNot() != null) {
+            predicates.add(notEqualsPredicate(criteriaBuilder, expression, filter.getNot()));
+        }
+        if (filter.getIn() != null) {
+            predicates.add(valueInPredicate(criteriaBuilder, expression, filter.getIn()));
+        }
+        if (filter.getNotIn() != null) {
+            predicates.add(valueNotInPredicate(criteriaBuilder, expression, filter.getNotIn()));
+        }
+        if (filter.getLt() != null) {
+            predicates.add(lessThanPredicate(criteriaBuilder, expression, filter.getLt()));
+        }
+        if (filter.getLte() != null) {
+            predicates.add(lessThanOrEqualToPredicate(criteriaBuilder, expression, filter.getLte()));
+        }
+        if (filter.getGt() != null) {
+            predicates.add(greaterThanPredicate(criteriaBuilder, expression, filter.getGt()));
+        }
+        if (filter.getGte() != null) {
+            predicates.add(greaterThanOrEqualToPredicate(criteriaBuilder, expression, filter.getGte()));
+        }
+        return predicates;
+    }
 
     public static List<Predicate> buildDateTimeFilter(CriteriaBuilder criteriaBuilder, Expression<ZonedDateTime> expression,
                                                       final DateTimeFilter filter) {

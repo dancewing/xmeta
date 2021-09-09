@@ -7,6 +7,8 @@ import io.xmeta.graphql.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author Jeff
@@ -29,4 +31,9 @@ public class UserService extends BaseService<UserRepository, UserEntity, String>
     public User getUser(String userId) {
         return this.userMapper.toDto(this.userRepository.getById(userId));
     }
+
+    public List<User> findUsers(String workspaceId, String accountId) {
+        return this.userMapper.toDto(this.userRepository.findUsers(accountId, workspaceId));
+    }
+
 }

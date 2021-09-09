@@ -10,9 +10,9 @@ import { formatError } from "../util/error";
 import FormikAutoSave from "../util/formikAutoSave";
 import { validate } from "../util/formikValidateJsonSchema";
 import PendingChangesContext from "../VersionControl/PendingChangesContext";
-
+import { match } from "react-router-dom";
 type Props = {
-  applicationId: string;
+  match: match<{ application: string }>;
 };
 
 type TData = {
@@ -45,9 +45,9 @@ const FORM_SCHEMA = {
   },
 };
 
-const CLASS_NAME = "application-settings-form";
+function ApplicationDatabaseSettingsForms({ match }: Props) {
+  const applicationId = match.params.application;
 
-function ApplicationSettingsForm({ applicationId }: Props) {
   const { data, error } = useQuery<{
     appSettings: models.AppSettings;
   }>(GET_APP_SETTINGS, {
@@ -70,7 +70,7 @@ function ApplicationSettingsForm({ applicationId }: Props) {
 
   const handleSubmit = useCallback(
     (data: models.AppSettings) => {
-      const { dbHost, dbName, dbPassword, dbPort, dbUser } = data;
+      const { dbHost, dbName, dbPassword, dbPort, dbUser, authProvider } = data;
       trackEvent({
         eventName: "updateAppSettings",
       });
@@ -82,6 +82,7 @@ function ApplicationSettingsForm({ applicationId }: Props) {
             dbPassword,
             dbPort,
             dbUser,
+            authProvider,
           },
           appId: applicationId,
         },
@@ -92,7 +93,7 @@ function ApplicationSettingsForm({ applicationId }: Props) {
 
   const errorMessage = formatError(error || updateError);
   return (
-    <div className={CLASS_NAME}>
+    <div>
       {data?.appSettings && (
         <Formik
           initialValues={data.appSettings}
@@ -141,7 +142,7 @@ function ApplicationSettingsForm({ applicationId }: Props) {
   );
 }
 
-export default ApplicationSettingsForm;
+export default ApplicationDatabaseSettingsForms;
 
 const UPDATE_APP_SETTINGS = gql`
   mutation updateAppSettings($data: AppSettingsUpdateInput!, $appId: String!) {
@@ -152,6 +153,7 @@ const UPDATE_APP_SETTINGS = gql`
       dbUser
       dbPassword
       dbPort
+      authProvider
     }
   }
 `;
@@ -165,6 +167,7 @@ const GET_APP_SETTINGS = gql`
       dbUser
       dbPassword
       dbPort
+      authProvider
     }
   }
 `;

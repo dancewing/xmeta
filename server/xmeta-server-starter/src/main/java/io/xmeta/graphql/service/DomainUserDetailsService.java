@@ -40,7 +40,7 @@ public class DomainUserDetailsService implements UserDetailsService {
         log.debug("Authenticating {}", login);
         if (EmailValidator.isValid(login)) {
             return accountRepository.findOneByEmailIgnoreCase(login)
-                    .map(account -> createSpringSecurityUser(login, account))
+                    .map(account -> createSpringSecurityUser(account))
                     .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
         }
 
@@ -53,15 +53,11 @@ public class DomainUserDetailsService implements UserDetailsService {
 
     }
 
-    private AuthUserDetail createSpringSecurityUser(String lowercaseLogin, AccountEntity account) {
+    public AuthUserDetail createSpringSecurityUser(AccountEntity account) {
 //        if (account.getIsActive() != null && !account.getIsActive()) {
 //            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
 //        }
-        Optional<UserEntity> userEntity = this.userRepository.findByAccountId(account.getId());
-        if (!userEntity.isPresent()) {
-            log.error("can't find user by account: {}", account.getId());
-            throw new RuntimeException("");
-        }
+        UserEntity userEntity = this.userRepository.getById(account.getCurrentUser().getId());
         List<String> roles = this.userRoleRepository.findRoles(account.getId());
         List<GrantedAuthority> grantedAuthorities = roles.stream()
                 .map(authority -> new SimpleGrantedAuthority(authority))
@@ -69,8 +65,8 @@ public class DomainUserDetailsService implements UserDetailsService {
         AuthUserDetail user = new AuthUserDetail(account.getId(), account.getEmail(),
                 account.getPassword(),
                 grantedAuthorities);
-        user.setUserId(userEntity.get().getId());
-        user.setWorkspaceId(userEntity.get().getWorkspace().getId());
+        user.setUserId(userEntity.getId());
+        user.setWorkspaceId(userEntity.getWorkspace().getId());
         return user;
     }
 }

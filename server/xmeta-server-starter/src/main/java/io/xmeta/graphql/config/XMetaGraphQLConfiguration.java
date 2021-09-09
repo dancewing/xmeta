@@ -1,7 +1,9 @@
 package io.xmeta.graphql.config;
 
+import graphql.kickstart.tools.TypeDefinitionFactory;
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLScalarType;
+import io.xmeta.graphql.mix.CustomTypeDefinitionFactory;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -24,13 +26,8 @@ public class XMetaGraphQLConfiguration {
 
     @Bean
     public GraphQLScalarType json() {
-        return ExtendedScalars.Json;
+        return GraphQLScalarType.newScalar().name("JSONObject").description("A JSON scalar").coercing(ExtendedScalars.Json.getCoercing()).build();
     }
-
-//    @Bean
-//    public Validator validator() {
-//        return Validation.buildDefaultValidatorFactory().getValidator();
-//    }
 
     @Bean
     public ImplicitNamingStrategy implicitNamingStrategy() {
@@ -42,4 +39,8 @@ public class XMetaGraphQLConfiguration {
         return new SpringPhysicalNamingStrategy();
     }
 
+    @Bean
+    public TypeDefinitionFactory metaDefinitionFactory(){
+        return new CustomTypeDefinitionFactory();
+    }
 }

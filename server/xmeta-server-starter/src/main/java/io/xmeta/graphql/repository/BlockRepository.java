@@ -27,4 +27,7 @@ public interface BlockRepository extends JpaRepository<BlockEntity, String>, Jpa
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void releaseLock(@Param("blockId") String blockId);
 
+    @Query("from BlockEntity b inner join b.versions v where v.commit.id = :commitId")
+    List<BlockEntity> findChangedBlocks(@Param("commitId") String commitId);
+
 }

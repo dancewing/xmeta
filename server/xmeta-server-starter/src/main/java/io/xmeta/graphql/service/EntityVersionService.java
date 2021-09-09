@@ -60,6 +60,18 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
                 Join<Object, Object> join = root.join(EntityVersionEntity_.ENTITY, JoinType.LEFT);
                 predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(EntityEntity_.ID), entity.getId()));
             }
+            if (where!=null) {
+                if (where.getId()!=null) {
+                    predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
+                            root.get(EntityVersionEntity_.ID),
+                            where.getId()));
+                }
+                if (where.getVersionNumber()!=null) {
+                    predicates.addAll(PredicateBuilder.buildIntFilter(criteriaBuilder,
+                            root.get(EntityVersionEntity_.VERSION_NUMBER),
+                            where.getVersionNumber()));
+                }
+            }
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
         specification = specification.and(condition);

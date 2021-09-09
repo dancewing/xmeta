@@ -60,7 +60,7 @@ export const GET_ENTITY_FIELD_BY_PERMANENT_ID = gql`
       id
       displayName
       appId
-      fields(where: { permanentId: { equals: $fieldPermanentId } }) {
+      fields(where: { permanentId: { eq: $fieldPermanentId } }) {
         id
         permanentId
         displayName

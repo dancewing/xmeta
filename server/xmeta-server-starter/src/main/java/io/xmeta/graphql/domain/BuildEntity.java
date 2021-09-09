@@ -50,10 +50,13 @@ public class BuildEntity extends BaseEntity {
     @Lob
     private String images;
 
-    @Column(name = "containerStatusQuery")
+    @Column
+    private String archiveURI = "/generated-apps/xxxxxx.zip";
+
+    @Column(name = "container_status_query")
     private String containerStatusQuery;
 
-    @Column(name = "containerStatusUpdatedAt")
+    @Column(name = "container_status_updated_at")
     private ZonedDateTime containerStatusUpdatedAt;
 
     @ManyToOne

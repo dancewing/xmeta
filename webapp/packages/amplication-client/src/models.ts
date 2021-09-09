@@ -2,6 +2,10 @@ export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K];
 };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
+  { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -202,6 +206,7 @@ export type AppSettings = IBlock & {
   dbUser: Scalars["String"];
   dbPassword: Scalars["String"];
   dbPort: Scalars["Int"];
+  authProvider: EnumAuthProviderType;
 };
 
 export type AppSettingsUpdateInput = {
@@ -212,6 +217,7 @@ export type AppSettingsUpdateInput = {
   dbUser: Scalars["String"];
   dbPassword: Scalars["String"];
   dbPort: Scalars["Int"];
+  authProvider: EnumAuthProviderType;
 };
 
 export type AppUpdateInput = {
@@ -264,7 +270,7 @@ export type Block = {
   app?: Maybe<App>;
   parentBlock?: Maybe<Block>;
   displayName: Scalars["String"];
-  description: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
   blockType: EnumBlockType;
   versionNumber?: Maybe<Scalars["Float"]>;
   lockedByUserId?: Maybe<Scalars["String"]>;
@@ -320,6 +326,8 @@ export type BlockVersion = {
   id: Scalars["String"];
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
+  displayName: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
   block: Block;
   versionNumber: Scalars["Int"];
   commit?: Maybe<Commit>;
@@ -685,8 +693,8 @@ export type EntityFieldCreateInput = {
   displayName: Scalars["String"];
   dataType: EnumDataType;
   properties: Scalars["JSONObject"];
-  unique: Scalars["Boolean"];
   required: Scalars["Boolean"];
+  unique: Scalars["Boolean"];
   searchable: Scalars["Boolean"];
   description: Scalars["String"];
   entity: WhereParentIdInput;
@@ -983,6 +991,11 @@ export enum EnumActionStepStatus {
   Success = "Success",
 }
 
+export enum EnumAuthProviderType {
+  Http = "Http",
+  Jwt = "Jwt",
+}
+
 export enum EnumBlockType {
   AppSettings = "AppSettings",
   Flow = "Flow",
@@ -1000,7 +1013,7 @@ export enum EnumBlockType {
 }
 
 export type EnumBlockTypeFilter = {
-  equals?: Maybe<EnumBlockType>;
+  eq?: Maybe<EnumBlockType>;
   not?: Maybe<EnumBlockType>;
   in?: Maybe<Array<EnumBlockType>>;
   notIn?: Maybe<Array<EnumBlockType>>;
@@ -1043,7 +1056,7 @@ export enum EnumDataType {
 }
 
 export type EnumDataTypeFilter = {
-  equals?: Maybe<EnumDataType>;
+  eq?: Maybe<EnumDataType>;
   not?: Maybe<EnumDataType>;
   in?: Maybe<Array<EnumDataType>>;
   notIn?: Maybe<Array<EnumDataType>>;
@@ -1057,7 +1070,7 @@ export enum EnumDeploymentStatus {
 }
 
 export type EnumDeploymentStatusFilter = {
-  equals?: Maybe<EnumDeploymentStatus>;
+  eq?: Maybe<EnumDeploymentStatus>;
   not?: Maybe<EnumDeploymentStatus>;
   in?: Maybe<Array<EnumDeploymentStatus>>;
   notIn?: Maybe<Array<EnumDeploymentStatus>>;
@@ -1147,7 +1160,7 @@ export type IEntityPageSettings = {
 };
 
 export type IntFilter = {
-  equals?: Maybe<Scalars["Int"]>;
+  eq?: Maybe<Scalars["Int"]>;
   not?: Maybe<Scalars["Int"]>;
   in?: Maybe<Array<Scalars["Int"]>>;
   notIn?: Maybe<Array<Scalars["Int"]>>;
@@ -1668,7 +1681,7 @@ export enum SortOrder {
 }
 
 export type StringFilter = {
-  equals?: Maybe<Scalars["String"]>;
+  eq?: Maybe<Scalars["String"]>;
   not?: Maybe<Scalars["String"]>;
   in?: Maybe<Array<Scalars["String"]>>;
   notIn?: Maybe<Array<Scalars["String"]>>;

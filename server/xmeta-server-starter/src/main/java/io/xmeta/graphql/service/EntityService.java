@@ -143,7 +143,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setName(data.getName());
         entityEntity.setDisplayName(data.getDisplayName());
         entityEntity.setPluralDisplayName(data.getPluralDisplayName());
-        entityEntity.setDescription(null);
+        entityEntity.setDescription("");
         entityEntity.setLockedByUser(user);
         entityEntity.setLockedAt(ZonedDateTime.now());
         //   entityEntity.setDeletedAt(ZonedDateTime.now());
@@ -158,7 +158,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityVersionEntity.setName(data.getName());
         entityVersionEntity.setDisplayName(data.getDisplayName());
         entityVersionEntity.setPluralDisplayName(data.getPluralDisplayName());
-        entityVersionEntity.setDescription(null);
+        entityVersionEntity.setDescription("");
         entityVersionEntity.setCommit(null);
         entityVersionEntity.setDeleted(null);
         //entityVersionEntity.setBuilds(Sets.newHashSet());
@@ -247,6 +247,46 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             pendingChange.setResourceId(entity.getId());
             pendingChange.setResource(entity);
             pendingChange.setVersionNumber(lastVersion.getVersionNumber() + 1);
+
+            pendingChanges.add(pendingChange);
+        });
+
+        return pendingChanges;
+    }
+
+    public List<PendingChange> getChangedEntitiesByCommit(String commitId) {
+        List<PendingChange> pendingChanges = new ArrayList<>();
+        List<EntityEntity> changedEntities = this.entityRepository.findChangedEntities(commitId);
+        changedEntities.forEach(entityEntity -> {
+
+            List<EntityVersionEntity> versions = entityEntity.getVersions();
+
+            if (versions.size() == 0) {
+                log.error("no entity versions {}, {}", entityEntity.getId(), entityEntity.getName());
+                throw new RuntimeException("no entity versions");
+            }
+            Entity entity = this.entityMapper.toDto(entityEntity);
+
+            EntityVersionEntity changedVersion = versions.get(0);
+
+            EnumPendingChangeAction action = entityEntity.getDeletedAt() != null
+                    ? EnumPendingChangeAction.Delete
+                    : changedVersion.getVersionNumber() > 1
+                    ? EnumPendingChangeAction.Update
+                    : EnumPendingChangeAction.Create;
+
+            if (action == EnumPendingChangeAction.Delete) {
+                entity.setName(changedVersion.getName());
+                entity.setDisplayName(changedVersion.getDisplayName());
+                entity.setPluralDisplayName(changedVersion.getPluralDisplayName());
+            }
+
+            PendingChange pendingChange = new PendingChange();
+            pendingChange.setAction(action);
+            pendingChange.setResourceType(EnumPendingChangeResourceType.Entity);
+            pendingChange.setResourceId(entity.getId());
+            pendingChange.setResource(entity);
+            pendingChange.setVersionNumber(changedVersion.getVersionNumber());
 
             pendingChanges.add(pendingChange);
         });

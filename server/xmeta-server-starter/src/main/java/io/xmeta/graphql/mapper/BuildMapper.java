@@ -13,7 +13,6 @@ public interface BuildMapper extends BaseMapper<Build, BuildEntity> {
     @Mapping(target = "appId", source = "app.id")
     @Mapping(target = "commitId", source = "commit.id")
     @Mapping(target = "actionId", source = "action.id")
-    @Mapping(target = "archiveURI", ignore = true)
     @Mapping(target = "status", ignore = true)
     Build toDto(BuildEntity entity);
 

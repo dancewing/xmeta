@@ -156,7 +156,7 @@ export const GET_LOOKUP_FIELDS = gql`
         displayName
         pluralDisplayName
         fields(
-          where: { dataType: { equals: Lookup } }
+          where: { dataType: { eq: Lookup } }
           orderBy: { displayName: Asc }
         ) {
           id

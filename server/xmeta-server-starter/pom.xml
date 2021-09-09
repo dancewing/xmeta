@@ -51,6 +51,22 @@
         </dependency>
 
         <dependency>
+            <groupId>com.graphql-java-kickstart</groupId>
+            <artifactId>graphql-java-tools</artifactId>
+            <version>11.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-extended-scalars</artifactId>
+            <version>17.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -246,7 +262,7 @@
                             <generateApisWithThrowsException>false</generateApisWithThrowsException>
                             <customTypesMapping>
                                 <DateTime>java.time.ZonedDateTime</DateTime>
-                                <JSON>java.util.Map&lt;String, Object&gt;</JSON>
+                                <JSONObject>java.util.Map&lt;String, Object&gt;</JSONObject>
                                 <Price.amount>java.math.BigDecimal</Price.amount>
                             </customTypesMapping>
                             <parentInterfaces>

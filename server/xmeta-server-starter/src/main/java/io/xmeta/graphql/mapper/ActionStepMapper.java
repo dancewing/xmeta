@@ -10,6 +10,6 @@ public interface ActionStepMapper extends BaseMapper<ActionStep, ActionStepEntit
     @Mapping(target = "action", ignore = true)
     ActionStepEntity toEntity(ActionStep dto);
 
-    @Override
+    @Mapping(target = "logs", ignore = true)
     ActionStep toDto(ActionStepEntity entity);
 }

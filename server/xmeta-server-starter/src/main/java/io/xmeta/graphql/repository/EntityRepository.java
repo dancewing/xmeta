@@ -33,4 +33,7 @@ public interface EntityRepository extends JpaRepository<EntityEntity, String>, J
     @Query("from EntityEntity et where et.app.id = :appId and et.deletedAt is null")
     List<EntityEntity> findEntitiesByApp(@Param("appId") String appId);
 
+    @Query("select b from EntityEntity b inner join b.versions v where v.commit.id = :commitId")
+    List<EntityEntity> findChangedEntities(@Param("commitId") String commitId);
+
 }

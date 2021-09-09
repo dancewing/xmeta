@@ -1,5 +1,7 @@
 package io.xmeta.graphql.service;
 
+import io.xmeta.graphql.domain.AccountEntity;
+import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.model.*;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
@@ -10,9 +12,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,7 +30,7 @@ public class AuthService {
     private final WorkspaceService workspaceService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
-
+    private final DomainUserDetailsService domainUserDetailsService;
     @Transactional
     public Auth signup(SignupInput data) {
 
@@ -76,5 +81,25 @@ public class AuthService {
             return this.userService.getUser(authUser.getUserId());
         }
         return null;
+    }
+
+    @Transactional
+    public Auth setCurrentWorkspace(WhereUniqueInput data) {
+
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        AccountEntity accountEntity = this.accountService.getById(authUser.getAccountId());
+
+        List<User> users = this.userService.findUsers(data.getId(), authUser.getAccountId());
+        if (users.size() == 0) {
+            throw new RuntimeException("This account does not have an active user records in the selected workspace " +
+                    "or workspace not found " + data.getId());
+        }
+        //用户已经登录，重新制作token
+        User user = users.get(0);
+        this.accountService.setCurrentUser(authUser.getAccountId(), user.getId());
+        AuthUserDetail authUserDetail = this.domainUserDetailsService.createSpringSecurityUser(accountEntity);
+        Authentication newAuth =
+                new UsernamePasswordAuthenticationToken(authUserDetail, null, authUserDetail.getAuthorities());
+        return new Auth(tokenProvider.createToken(newAuth, true));
     }
 }

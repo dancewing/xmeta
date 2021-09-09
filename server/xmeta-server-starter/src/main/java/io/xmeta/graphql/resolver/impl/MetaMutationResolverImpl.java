@@ -230,7 +230,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Auth setCurrentWorkspace(WhereUniqueInput data) {
-        return null;
+        return this.authService.setCurrentWorkspace(data);
     }
 
     @Override

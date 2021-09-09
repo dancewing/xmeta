@@ -29,10 +29,10 @@ public class EntityEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @ManyToOne
@@ -53,10 +53,10 @@ public class EntityEntity extends BaseEntity {
     @ManyToOne
     private UserEntity lockedByUser;
 
-    @Column(name = "lockedAt")
+    @Column(name = "locked_at")
     private ZonedDateTime lockedAt;
 
-    @Column(name = "deletedAt")
+    @Column(name = "deleted_at")
     private ZonedDateTime deletedAt;
 
     @OneToMany(mappedBy = "entity")

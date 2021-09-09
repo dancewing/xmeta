@@ -11,7 +11,6 @@ public interface EntityMapper extends BaseMapper<Entity, EntityEntity> {
     @Mapping(source = "app.id", target = "appId")
     @Mapping(source = "lockedByUser.id", target = "lockedByUserId")
     @Mapping(target = "permissions", ignore = true)
-    @Mapping(target = "versions", ignore = true)
     Entity toDto(EntityEntity entity);
 
     @Mapping(target = "deletedAt", ignore = true)

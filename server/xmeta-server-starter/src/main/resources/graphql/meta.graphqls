@@ -23,7 +23,7 @@ type ActionLog {
   id: String!
   createdAt: DateTime!
   message: String!
-  meta: JSON!
+  meta: JSONObject!
   level: EnumActionLogLevel!
 }
 
@@ -168,6 +168,7 @@ type AppSettings implements IBlock {
   dbUser: String!
   dbPassword: String!
   dbPort: Int!
+  authProvider: EnumAuthProviderType!
 }
 
 input AppSettingsUpdateInput {
@@ -178,6 +179,7 @@ input AppSettingsUpdateInput {
   dbUser: String!
   dbPassword: String!
   dbPort: Int!
+  authProvider: EnumAuthProviderType!
 }
 
 input AppUpdateInput {
@@ -278,7 +280,7 @@ type BlockVersion {
   block: Block!
   versionNumber: Int!
   commit: Commit
-  settings: JSON
+  settings: JSONObject
 }
 
 input BlockVersionOrderByInput {
@@ -589,7 +591,7 @@ type EntityField {
   name: String!
   displayName: String!
   dataType: EnumDataType!
-  properties: JSON
+  properties: JSONObject
   required: Boolean!
   unique: Boolean!
   searchable: Boolean!
@@ -607,7 +609,7 @@ input EntityFieldCreateInput {
   name: String!
   displayName: String!
   dataType: EnumDataType!
-  properties: JSON!
+  properties: JSONObject!
   required: Boolean!
   unique: Boolean!
   searchable: Boolean!
@@ -641,7 +643,7 @@ input EntityFieldUpdateInput {
   name: String
   displayName: String
   dataType: EnumDataType
-  properties: JSON
+  properties: JSONObject
   required: Boolean
   unique: Boolean
   searchable: Boolean
@@ -892,6 +894,11 @@ enum EnumActionStepStatus {
   Success
 }
 
+enum EnumAuthProviderType {
+  Http
+  Jwt
+}
+
 enum EnumBlockType {
   AppSettings
   Flow
@@ -1017,7 +1024,7 @@ type Environment {
 type GithubRepo {
   name: String!
   url: String!
-  isPrivate: Boolean!
+  private: Boolean!
   fullName: String!
   admin: Boolean!
 }
@@ -1068,9 +1075,9 @@ input InviteUserInput {
 }
 
 """
-The `JSON` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
-scalar JSON
+scalar JSONObject
 
 input LoginInput {
   email: String!

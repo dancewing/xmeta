@@ -1,9 +1,6 @@
 package io.xmeta.graphql.service;
 
-import io.xmeta.graphql.domain.AppEntity;
-import io.xmeta.graphql.domain.AppEntity_;
-import io.xmeta.graphql.domain.AppRoleEntity;
-import io.xmeta.graphql.domain.WorkspaceEntity;
+import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.AppMapper;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.AppRepository;
@@ -22,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -72,9 +71,15 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     }
 
     public List<App> apps(AppWhereInput where, AppOrderByInput orderBy, Integer skip, Integer take) {
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
         Specification<AppEntity> specification = Specification.where(null);
         Specification<AppEntity> condition = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            //只查找当前workspace的
+            Join<Object, Object> join = root.join(AppEntity_.WORKSPACE, JoinType.LEFT);
+            predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(WorkspaceEntity_.ID),
+                    authUser.getWorkspaceId()));
             // 过滤非删除app
             predicates.add(criteriaBuilder.isNull(root.get(AppEntity_.DELETED_AT)));
 

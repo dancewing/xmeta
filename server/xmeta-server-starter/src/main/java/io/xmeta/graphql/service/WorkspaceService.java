@@ -50,11 +50,9 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
 
     @Transactional
     public Workspace createWorkspace(WorkspaceCreateInput data) {
-        WorkspaceEntity workspaceEntity = new WorkspaceEntity();
-        workspaceEntity.setCreatedAt(ZonedDateTime.now());
-        workspaceEntity.setUpdatedAt(ZonedDateTime.now());
-        workspaceEntity.setName(data.getName());
-        return this.workspaceMapper.toDto(this.workspaceRepository.save(workspaceEntity));
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+
+        return this.createWorkspace(authUser.getAccountId(), data.getName());
     }
 
     public Workspace currentWorkspace() {

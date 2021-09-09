@@ -111,4 +111,39 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
     public void releaseLock(String blockId) {
         this.blockRepository.releaseLock(blockId);
     }
+
+    public List<PendingChange> getChangedBlocksByCommit(String commitId){
+        List<PendingChange> pendingChanges = new ArrayList<>();
+
+        List<BlockEntity> changedBlocks = this.blockRepository.findChangedBlocks(commitId);
+        changedBlocks.forEach(blockEntity -> {
+
+            List<BlockVersionEntity> versions = blockEntity.getVersions();
+            if (versions.size() == 0) {
+                throw new RuntimeException("no block versions");
+            }
+            Block block = this.blockMapper.toDto(blockEntity);
+            BlockVersionEntity changedVersion = versions.get(0);
+
+            EnumPendingChangeAction action = blockEntity.getDeletedAt() != null
+                    ? EnumPendingChangeAction.Delete
+                    : changedVersion.getVersionNumber() > 1
+                    ? EnumPendingChangeAction.Update
+                    : EnumPendingChangeAction.Create;
+
+            if (action == EnumPendingChangeAction.Delete) {
+                block.setDisplayName(changedVersion.getDisplayName());
+            }
+            PendingChange pendingChange = new PendingChange();
+            pendingChange.setAction(action);
+            pendingChange.setResourceType(EnumPendingChangeResourceType.Block);
+            pendingChange.setResourceId(block.getId());
+            pendingChange.setResource(block);
+            pendingChange.setVersionNumber(changedVersion.getVersionNumber());
+
+            pendingChanges.add(pendingChange);
+        });
+
+        return pendingChanges;
+    }
 }

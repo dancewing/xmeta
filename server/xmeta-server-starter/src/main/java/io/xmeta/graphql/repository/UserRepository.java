@@ -26,4 +26,8 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
 
     @Query("select distinct ue.workspace from UserEntity ue where ue.account.id = :accountId ")
     List<WorkspaceEntity> findWorkspaceByAccount(@Param("accountId") String accountId);
+
+
+    @Query("select distinct ue from UserEntity ue where ue.workspace.id = :workspaceId and ue.account.id = :accountId ")
+    List<UserEntity> findUsers(@Param("accountId") String accountId, @Param("workspaceId") String workspaceId);
 }

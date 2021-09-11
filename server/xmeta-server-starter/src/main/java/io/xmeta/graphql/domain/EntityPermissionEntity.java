@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "EntityPermission", uniqueConstraints = {
+@Table(name = "Entity_Permission", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"entity_version_id", "action"})
 })
 public class EntityPermissionEntity extends BaseEntity {

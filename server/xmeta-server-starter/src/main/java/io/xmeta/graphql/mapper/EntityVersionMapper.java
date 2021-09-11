@@ -8,10 +8,11 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", uses = {EntityPermissionMapper.class, CommitMapper.class, EntityMapper.class})
 public interface EntityVersionMapper extends BaseMapper<EntityVersion, EntityVersionEntity> {
 
+    @Mapping(target = "permissions", ignore = true)
     EntityVersion toDto(EntityVersionEntity entity);
 
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "builds", ignore = true)
-    @Mapping(target = "fields", ignore = true)
+        // @Mapping(target = "fields", ignore = true)
     EntityVersionEntity toEntity(EntityVersion dto);
 }

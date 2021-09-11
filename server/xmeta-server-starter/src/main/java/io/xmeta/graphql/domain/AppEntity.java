@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "App", uniqueConstraints = {
+@Table(name = "app", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"workspace_id", "name"})
 })
 public class AppEntity extends BaseEntity {
@@ -27,10 +27,10 @@ public class AppEntity extends BaseEntity {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @ManyToOne
@@ -45,28 +45,28 @@ public class AppEntity extends BaseEntity {
     @Column(name = "color")
     private String color;
 
-    @Column(name = "githubToken")
+    @Column(name = "github_token")
     private String githubToken;
 
-    @Column(name = "githubTokenCreatedDate")
+    @Column(name = "github_token_created_date")
     private ZonedDateTime githubTokenCreatedDate;
 
-    @Column(name = "githubSyncEnabled")
+    @Column(name = "github_sync_enabled")
     private Boolean githubSyncEnabled;
 
-    @Column(name = "githubRepo")
+    @Column(name = "github_repo")
     private String githubRepo;
 
-    @Column(name = "githubBranch")
+    @Column(name = "github_branch")
     private String githubBranch;
 
-    @Column(name = "githubLastSync")
+    @Column(name = "github_last_sync")
     private ZonedDateTime githubLastSync;
 
-    @Column(name = "githubLastMessage")
+    @Column(name = "github_last_message")
     private String githubLastMessage;
 
-    @Column(name = "deletedAt")
+    @Column(name = "deleted_at")
     private ZonedDateTime deletedAt;
 
     @OneToMany(mappedBy = "app")

@@ -3,8 +3,6 @@ package io.xmeta.graphql.resolver.impl;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.resolver.MetaQueryResolver;
 import io.xmeta.graphql.service.*;
-import io.xmeta.security.AuthUserDetail;
-import io.xmeta.security.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -84,7 +82,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public AppSettings appSettings(WhereUniqueInput where) {
-        return null;
+        return this.appService.appSettings(where);
     }
 
     @Override

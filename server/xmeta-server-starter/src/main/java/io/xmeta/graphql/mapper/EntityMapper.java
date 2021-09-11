@@ -14,6 +14,6 @@ public interface EntityMapper extends BaseMapper<Entity, EntityEntity> {
     Entity toDto(EntityEntity entity);
 
     @Mapping(target = "deletedAt", ignore = true)
-    @Mapping(target = "versions", ignore = true)
+        //@Mapping(target = "versions", ignore = true)
     EntityEntity toEntity(Entity dto);
 }

@@ -27,29 +27,29 @@ public class BlockVersionEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @ManyToOne
     private BlockEntity block;
 
-    @Column(name = "version_Number")
+    @Column(name = "version_number")
     private Integer versionNumber;
 
-    @Column(name = "inputParameters")
+    @Column(name = "input_parameters")
     private String inputParameters;
 
-    @Column(name = "outputParameters")
+    @Column(name = "output_parameters")
     private String outputParameters;
 
     @Column(name = "settings")
     @Lob
     private byte[] settings;
 
-    @Column(name = "displayName")
+    @Column(name = "display_name")
     private String displayName;
 
     @Column(name = "description")
@@ -62,7 +62,7 @@ public class BlockVersionEntity extends BaseEntity {
     private Boolean deleted;
 
     @ManyToMany
-    @JoinTable(name = "BlockVersionToBuild",
+    @JoinTable(name = "block_version_build",
             joinColumns = @JoinColumn(name = "block_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "build_id", referencedColumnName = "id"))
     private Set<BuildEntity> builds = new HashSet<>();

@@ -1,3 +1,8 @@
+logging:
+  level:
+    org.hibernate.internal: DEBUG
+
+
 spring:
   application:
     name: chassis-server
@@ -30,7 +35,7 @@ spring:
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
       hibernate.show_sql: true
-      hibernate.format_sql: true
+      hibernate.format_sql: false
       hibernate.use_sql_comments: false
     hibernate:
       ddl-auto: update

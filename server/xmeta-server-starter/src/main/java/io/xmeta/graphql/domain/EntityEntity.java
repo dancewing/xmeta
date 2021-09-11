@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Description
@@ -59,8 +57,8 @@ public class EntityEntity extends BaseEntity {
     @Column(name = "deleted_at")
     private ZonedDateTime deletedAt;
 
-    @OneToMany(mappedBy = "entity")
-    @OrderBy("versionNumber desc")
-    private List<EntityVersionEntity> versions = new ArrayList<>();
+//    @OneToMany(mappedBy = "entity")
+//    @OrderBy("versionNumber desc")
+//    private List<EntityVersionEntity> versions = new ArrayList<>();
 
 }

@@ -23,10 +23,10 @@ public class DeploymentEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
-    @Column(name = "userId")
+    @Column(name = "user_Id")
     private String userId;
 
     @Column(name = "build_id", insertable = false, updatable = false)
@@ -53,10 +53,10 @@ public class DeploymentEntity extends BaseEntity {
     @ManyToOne
     private ActionEntity action;
 
-    @Column(name = "statusQuery")
+    @Column(name = "status_Query")
     private String statusQuery;
 
-    @Column(name = "statusUpdatedAt")
+    @Column(name = "status_Updated_At")
     private ZonedDateTime statusUpdatedAt;
 
 }

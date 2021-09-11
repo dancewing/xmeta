@@ -10,7 +10,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class ActionResolverImpl implements graphql.kickstart.tools.GraphQLResolver<Action>{
+public class ActionResolverImpl implements graphql.kickstart.tools.GraphQLResolver<Action> {
 
     private final ActionStepService actionStepService;
 

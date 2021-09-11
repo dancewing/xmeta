@@ -40,7 +40,7 @@ public class XMetaGraphQLConfiguration {
     }
 
     @Bean
-    public TypeDefinitionFactory metaDefinitionFactory(){
+    public TypeDefinitionFactory metaDefinitionFactory() {
         return new CustomTypeDefinitionFactory();
     }
 }

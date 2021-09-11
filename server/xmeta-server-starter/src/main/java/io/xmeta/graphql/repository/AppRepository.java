@@ -3,6 +3,8 @@ package io.xmeta.graphql.repository;
 import io.xmeta.graphql.domain.AppEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,4 +16,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AppRepository extends JpaRepository<AppEntity, String>, JpaSpecificationExecutor<AppEntity> {
 
+    @Query("from AppEntity ae inner join ae.workspace ws inner join ws.users u where ae.id = :appId and u.id = " +
+            ":userId ")
+    AppEntity findAppEntity(@Param("appId") String appId, @Param("userId") String userId);
 }

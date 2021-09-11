@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "ActionLog")
+@Table(name = "action_log")
 public class ActionLogEntity extends BaseEntity {
 
 
@@ -23,7 +23,7 @@ public class ActionLogEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
     @Column(name = "message")

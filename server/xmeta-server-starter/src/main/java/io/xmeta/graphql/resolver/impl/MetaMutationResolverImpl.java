@@ -12,20 +12,15 @@ import org.springframework.stereotype.Component;
 public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     private final AccountService accountService;
-
     private final AppService appService;
-
     private final AppRoleService appRoleService;
-
     private final CommitService commitService;
-
     private final AuthService authService;
-
     private final WorkspaceService workspaceService;
-
     private final EntityService entityService;
-
     private final EntityFieldService entityFieldService;
+    private final EntityPermissionService entityPermissionService;
+    private final EntityPermissionFieldService entityPermissionFieldService;
 
     @Override
     public Account updateAccount(UpdateAccountInput data) {
@@ -74,27 +69,27 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public EntityPermission updateEntityPermission(EntityUpdatePermissionInput data, WhereUniqueInput where) {
-        return null;
+        return this.entityPermissionService.updateEntityPermission(data, where);
     }
 
     @Override
     public EntityPermission updateEntityPermissionRoles(EntityUpdatePermissionRolesInput data) {
-        return null;
+        return this.entityPermissionService.updateEntityPermissionRoles(data);
     }
 
     @Override
     public EntityPermissionField addEntityPermissionField(EntityAddPermissionFieldInput data) {
-        return null;
+        return this.entityPermissionFieldService.addEntityPermissionField(data);
     }
 
     @Override
     public EntityPermissionField deleteEntityPermissionField(EntityPermissionFieldWhereUniqueInput where) {
-        return null;
+        return this.entityPermissionFieldService.deleteEntityPermissionField(where);
     }
 
     @Override
     public EntityPermissionField updateEntityPermissionFieldRoles(EntityUpdatePermissionFieldRolesInput data) {
-        return null;
+        return this.entityPermissionFieldService.updateEntityPermissionFieldRoles(data);
     }
 
     @Override
@@ -139,7 +134,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public AppSettings updateAppSettings(AppSettingsUpdateInput data, WhereUniqueInput where) {
-        return null;
+        return this.appService.updateAppSettings(data, where);
     }
 
     @Override
@@ -174,7 +169,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Boolean discardPendingChanges(PendingChangesDiscardInput data) {
-        return null;
+        return this.appService.discardPendingChanges(data);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.xmeta.graphql.repository;
 
 import io.xmeta.graphql.domain.EntityVersionEntity;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -22,6 +23,9 @@ public interface EntityVersionRepository extends JpaRepository<EntityVersionEnti
 
     @Query("from EntityVersionEntity ev where ev.entity.id = :entityId order by ev.versionNumber asc")
     List<EntityVersionEntity> findEntityVersions(@Param("entityId") String entityId);
+
+    @Query("from EntityVersionEntity ev where ev.entity.id = :entityId")
+    Page<EntityVersionEntity> findEntityVersions(@Param("entityId") String entityId, Pageable page);
 
     @Query("from EntityVersionEntity ev where ev.entity.id = :entityId and ev.versionNumber = :versionNumber")
     EntityVersionEntity findEntityVersion(@Param("entityId") String entityId, @Param("versionNumber") Integer versionNumber);

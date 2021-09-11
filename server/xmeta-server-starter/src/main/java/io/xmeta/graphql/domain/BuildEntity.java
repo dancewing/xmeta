@@ -28,7 +28,7 @@ public class BuildEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
     @ManyToOne
@@ -67,7 +67,7 @@ public class BuildEntity extends BaseEntity {
     private Set<BlockVersionEntity> blockVersions = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "_BuildToEntityVersion",
+    @JoinTable(name = "build_entity_version",
             joinColumns = @JoinColumn(name = "build_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "version_id", referencedColumnName = "id"))
     private Set<EntityVersionEntity> entityVersions = new HashSet<>();

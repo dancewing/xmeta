@@ -22,9 +22,11 @@ public class Inflector {
     private final Set<String> uncountables = new HashSet<String>();
     private LinkedList<Rule> plurals = new LinkedList<Rule>();
     private LinkedList<Rule> singulars = new LinkedList<Rule>();
+
     public Inflector() {
         initialize();
     }
+
     protected Inflector(Inflector original) {
         this.plurals.addAll(original.plurals);
         this.singulars.addAll(original.singulars);

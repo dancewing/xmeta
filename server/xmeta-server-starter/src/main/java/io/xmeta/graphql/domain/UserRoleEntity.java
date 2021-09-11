@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "UserRole", uniqueConstraints = {
+@Table(name = "User_Role", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"user_id", "role_"})
 })
 public class UserRoleEntity extends BaseEntity {
@@ -24,10 +24,10 @@ public class UserRoleEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_At")
     private ZonedDateTime updatedAt;
 
     @ManyToOne

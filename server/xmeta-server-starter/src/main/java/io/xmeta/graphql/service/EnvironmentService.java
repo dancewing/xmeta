@@ -6,6 +6,8 @@ import io.xmeta.graphql.repository.EnvironmentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
+
 /**
  * @Description
  * @Author Jeff
@@ -29,6 +31,9 @@ public class EnvironmentService extends BaseService<EnvironmentRepository, Envir
         AppEntity appEntity = new AppEntity();
         appEntity.setId(appId);
         environment.setApp(appEntity);
+        environment.setCreatedAt(ZonedDateTime.now());
+        environment.setCreatedAt(ZonedDateTime.now());
+        environment.setDescription("Sandbox");
         environment.setName("Sandbox environment");
         this.environmentRepository.save(environment);
     }

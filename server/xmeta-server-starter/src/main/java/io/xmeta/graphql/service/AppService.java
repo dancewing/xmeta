@@ -50,8 +50,9 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     private final EntityVersionService entityVersionService;
     private final EntityFieldService entityFieldService;
     private final BuildService buildService;
+    private final LockService lockService;
 
-    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService, BlockService blockService, BlockVersionService blockVersionService, CommitService commitService, EntityVersionService entityVersionService, EntityFieldService entityFieldService, BuildService buildService) {
+    public AppService(AppRepository appRepository, AppRoleRepository appRoleRepository, AppMapper appMapper, EntityService entityService, EnvironmentService environmentService, BlockService blockService, BlockVersionService blockVersionService, CommitService commitService, EntityVersionService entityVersionService, EntityFieldService entityFieldService, BuildService buildService, LockService lockService) {
         super(appRepository);
         this.appRepository = appRepository;
         this.appRoleRepository = appRoleRepository;
@@ -64,6 +65,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         this.entityVersionService = entityVersionService;
         this.entityFieldService = entityFieldService;
         this.buildService = buildService;
+        this.lockService = lockService;
     }
 
     public App app(WhereUniqueInput where) {
@@ -248,12 +250,12 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
 
         changedEntities.forEach(pendingChange -> {
             this.entityVersionService.createVersion(pendingChange.getResourceId(), commit.getId());
-            this.entityService.releaseLock(pendingChange.getResourceId());
+            this.lockService.releaseEntityLock(pendingChange.getResourceId());
         });
 
         changedBlocks.forEach(pendingChange -> {
             this.blockVersionService.createVersion(pendingChange.getResourceId(), commit.getId());
-            this.blockService.releaseLock(pendingChange.getResourceId());
+            this.lockService.releaseBlockLock(pendingChange.getResourceId());
         });
 
         this.buildService.createBuild(appId, commit.getId(), userId, commitCreateInput.getMessage(), skipPublish);
@@ -274,9 +276,15 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     public App updateApp(AppUpdateInput data, WhereUniqueInput where) {
         AppEntity appEntity = this.appRepository.getById(where.getId());
         appEntity.setUpdatedAt(ZonedDateTime.now());
-        appEntity.setName(data.getName());
-        appEntity.setDescription(data.getDescription());
-        appEntity.setColor(data.getColor());
+        if (StringUtils.isNotEmpty(data.getName())) {
+            appEntity.setName(data.getName());
+        }
+        if (StringUtils.isNotEmpty(data.getDescription())) {
+            appEntity.setDescription(data.getDescription());
+        }
+        if (StringUtils.isNotEmpty(data.getColor())) {
+            appEntity.setColor(data.getColor());
+        }
         this.appRepository.save(appEntity);
         return this.appMapper.toDto(appEntity);
     }
@@ -290,6 +298,33 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         pendingChanges.addAll(this.blockService.getChangedBlocks(appId, userId));
 
         return pendingChanges;
+    }
+
+    @Transactional
+    public Boolean discardPendingChanges(PendingChangesDiscardInput data) {
+        String appId = data.getApp().getConnect().getId();
+        String userId = SecurityUtils.getAuthUser().getUserId();
+        // validate
+        AppEntity appEntity = this.appRepository.findAppEntity(appId, userId);
+        if (appEntity == null) {
+            throw new RuntimeException("Can't find app by user");
+        }
+
+        List<PendingChange> changedEntities = this.entityService.getChangedEntities(appId, userId);
+        List<PendingChange> changedBlocks = this.blockService.getChangedBlocks(appId, userId);
+
+        if (changedEntities.size() == 0 && changedBlocks.size() == 0) {
+            throw new RuntimeException("There are no pending changes for user " + userId + " in app " + appId);
+        }
+
+        for (PendingChange pendingChange : changedEntities) {
+            this.entityVersionService.discardPendingChanges(pendingChange.getResourceId(), userId);
+        }
+
+        for (PendingChange pendingChange : changedBlocks) {
+            this.blockVersionService.discardPendingChanges(pendingChange.getResourceId(), userId);
+        }
+        return true;
     }
 
     public AppValidationResult appValidateBeforeCommit(WhereUniqueInput where) {
@@ -307,5 +342,36 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         entityBuilder.setConnect(WhereUniqueInput.builder().setId(entity.getId()).build());
         builder.setDisplayName(displayName).setDataType(dataType).setEntity(entityBuilder.build());
         return builder.build();
+    }
+
+    @Transactional
+    public AppSettings appSettings(WhereUniqueInput where) {
+        List<AppSettings> blocks = this.blockService.findByBlockType(where.getId(), EnumBlockType.AppSettings,
+                AppSettings.class);
+        if (blocks.size() == 0) {
+            //create default app settings
+            AppSettings.Builder appSettings = AppSettings.builder();
+            appSettings.setParentBlock(new Block());
+            appSettings.setDisplayName("App Settings");
+            appSettings.setDescription("Default app settings");
+            appSettings.setBlockType(EnumBlockType.AppSettings);
+            appSettings.setVersionNumber(0.0D);
+            appSettings.setDbHost("localhost");
+            appSettings.setDbName("");
+            appSettings.setDbUser("admin");
+            appSettings.setDbPassword("admin");
+            appSettings.setDbPort(5432);
+            appSettings.setAuthProvider(EnumAuthProviderType.Http);
+
+            return this.blockService.createBlock(where.getId(), appSettings.build(), EnumBlockType.AppSettings, null);
+        }
+
+        return blocks.get(0);
+    }
+
+    @Transactional
+    public AppSettings updateAppSettings(AppSettingsUpdateInput data, WhereUniqueInput where) {
+        AppSettings appSettings = appSettings(where);
+        return this.blockService.updateBlock(appSettings.getId(), data, AppSettings.class);
     }
 }

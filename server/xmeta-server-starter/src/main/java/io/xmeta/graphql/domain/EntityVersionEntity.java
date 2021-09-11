@@ -18,8 +18,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "EntityVersion", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"entity_id", "versionNumber"})
+@Table(name = "Entity_Version", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"entity_id", "version_Number"})
 })
 public class EntityVersionEntity extends BaseEntity {
 
@@ -28,10 +28,10 @@ public class EntityVersionEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_At")
     private ZonedDateTime updatedAt;
 
     @Column(name = "entity_id", insertable = false, updatable = false)
@@ -40,16 +40,16 @@ public class EntityVersionEntity extends BaseEntity {
     @ManyToOne
     private EntityEntity entity;
 
-    @Column(name = "versionNumber")
+    @Column(name = "version_Number")
     private Integer versionNumber;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "displayName")
+    @Column(name = "display_Name")
     private String displayName;
 
-    @Column(name = "pluralDisplayName")
+    @Column(name = "plural_Display_Name")
     private String pluralDisplayName;
 
     @Column(name = "description")
@@ -65,9 +65,9 @@ public class EntityVersionEntity extends BaseEntity {
     @JsonIgnore
     private List<BuildEntity> builds = new ArrayList<>();
 
-    @OneToMany(mappedBy = "entityVersion")
-    private List<EntityFieldEntity> fields = new ArrayList<>();
+//    @OneToMany(mappedBy = "entityVersion")
+//    private List<EntityFieldEntity> fields = new ArrayList<>();
 
-    @OneToMany(mappedBy = "entityVersion")
-    private List<EntityPermissionEntity> permissions = new ArrayList<>();
+//    @OneToMany(mappedBy = "entityVersion")
+//    private List<EntityPermissionEntity> permissions = new ArrayList<>();
 }

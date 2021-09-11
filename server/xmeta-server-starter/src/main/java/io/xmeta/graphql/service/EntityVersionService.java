@@ -8,6 +8,7 @@ import io.xmeta.graphql.model.EntityVersionOrderByInput;
 import io.xmeta.graphql.model.EntityVersionWhereInput;
 import io.xmeta.graphql.repository.*;
 import io.xmeta.graphql.util.PredicateBuilder;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
+@Transactional(readOnly = true)
 public class EntityVersionService extends BaseService<EntityVersionRepository, EntityVersionEntity, String> {
 
     private final EntityVersionRepository entityVersionRepository;
@@ -40,8 +42,9 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
     private final EntityPermissionRoleRepository entityPermissionRoleRepository;
     private final EntityFieldRepository entityFieldRepository;
     private final EntityPermissionRepository entityPermissionRepository;
+    private final LockService lockService;
 
-    public EntityVersionService(EntityVersionRepository entityVersionRepository, EntityVersionMapper entityVersionMapper, EntityRepository entityRepository, EntityPermissionFieldRepository entityPermissionFieldRepository, EntityPermissionRoleRepository entityPermissionRoleRepository, EntityFieldRepository entityFieldRepository, EntityPermissionRepository entityPermissionRepository) {
+    public EntityVersionService(EntityVersionRepository entityVersionRepository, EntityVersionMapper entityVersionMapper, EntityRepository entityRepository, EntityPermissionFieldRepository entityPermissionFieldRepository, EntityPermissionRoleRepository entityPermissionRoleRepository, EntityFieldRepository entityFieldRepository, EntityPermissionRepository entityPermissionRepository, LockService lockService) {
         super(entityVersionRepository);
         this.entityVersionRepository = entityVersionRepository;
         this.entityVersionMapper = entityVersionMapper;
@@ -50,6 +53,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         this.entityPermissionRoleRepository = entityPermissionRoleRepository;
         this.entityFieldRepository = entityFieldRepository;
         this.entityPermissionRepository = entityPermissionRepository;
+        this.lockService = lockService;
     }
 
     public List<EntityVersion> versions(Entity entity, EntityVersionWhereInput where, EntityVersionOrderByInput orderBy, Integer skip, Integer take) {
@@ -60,13 +64,13 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
                 Join<Object, Object> join = root.join(EntityVersionEntity_.ENTITY, JoinType.LEFT);
                 predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(EntityEntity_.ID), entity.getId()));
             }
-            if (where!=null) {
-                if (where.getId()!=null) {
+            if (where != null) {
+                if (where.getId() != null) {
                     predicates.addAll(PredicateBuilder.buildStringFilter(criteriaBuilder,
                             root.get(EntityVersionEntity_.ID),
                             where.getId()));
                 }
-                if (where.getVersionNumber()!=null) {
+                if (where.getVersionNumber() != null) {
                     predicates.addAll(PredicateBuilder.buildIntFilter(criteriaBuilder,
                             root.get(EntityVersionEntity_.VERSION_NUMBER),
                             where.getVersionNumber()));
@@ -85,6 +89,26 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
             result = this.entityVersionRepository.findAll(sort);
         }
         return result.stream().map(this.entityVersionMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void discardPendingChanges(String entityId, String userId) {
+        List<EntityVersionEntity> entityVersions = this.entityVersionRepository.findEntityVersions(entityId);
+        if (entityVersions.size() == 0) {
+            throw new RuntimeException("Entity " + entityId + " has no versions");
+        }
+        EntityVersionEntity firstEntityVersion = entityVersions.get(0);
+        EntityVersionEntity lastEntityVersion = entityVersions.get(entityVersions.size() - 1);
+        if (firstEntityVersion.getEntity().getLockedByUser() != null &&
+                !StringUtils.equals(firstEntityVersion.getEntity().getLockedByUser().getId(), userId)) {
+            throw new RuntimeException("Cannot discard pending changes on Entity " + entityId + " since it is not currently " +
+                    "locked" +
+                    " by the requesting user ");
+        }
+
+        this.cloneVersionData(lastEntityVersion.getId(), firstEntityVersion.getId());
+
+        this.lockService.releaseEntityLock(entityId);
     }
 
     @Transactional
@@ -121,6 +145,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
 
     @Transactional
     public EntityVersion cloneVersionData(String sourceVersionId, String targetVersionId) {
+
         EntityVersionEntity sourceVersion = this.entityVersionRepository.getById(sourceVersionId);
         EntityVersionEntity targetVersion = this.entityVersionRepository.getById(targetVersionId);
 
@@ -144,7 +169,8 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         this.entityVersionRepository.save(targetVersion);
 
         //create new entity fields from source;
-        List<EntityFieldEntity> fields = sourceVersion.getFields();
+        //List<EntityFieldEntity> fields = sourceVersion.getFields();
+        List<EntityFieldEntity> fields = this.entityFieldRepository.getFields(sourceVersion.getId());
 
         for (EntityFieldEntity entityFieldEntity : fields) {
             EntityFieldEntity newField = new EntityFieldEntity();
@@ -178,7 +204,9 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         }
 
         //update permission
-        for (EntityPermissionEntity entityPermissionEntity : sourceVersion.getPermissions()) {
+        List<EntityPermissionEntity> sourcePermissionEntities =
+                this.entityPermissionRepository.getPermissions(sourceVersion.getId());
+        for (EntityPermissionEntity entityPermissionEntity : sourcePermissionEntities) {
             EntityPermissionEntity permissionEntity = new EntityPermissionEntity();
             permissionEntity.setAction(entityPermissionEntity.getAction());
             permissionEntity.setType(entityPermissionEntity.getType());
@@ -194,7 +222,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         }
         this.entityPermissionRoleRepository.flush();
         //update permission field
-        for (EntityPermissionEntity permissionEntity : sourceVersion.getPermissions()) {
+        for (EntityPermissionEntity permissionEntity : sourcePermissionEntities) {
             List<EntityPermissionEntity> entityPermissionEntities = this.entityPermissionRepository.getEntitiesByActionAndVersion(permissionEntity.getAction(),
                     targetVersionId);
 

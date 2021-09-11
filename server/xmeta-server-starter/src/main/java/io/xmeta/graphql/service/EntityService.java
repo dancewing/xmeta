@@ -13,6 +13,7 @@ import io.xmeta.graphql.util.SoftDelete;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -218,20 +219,23 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         List<PendingChange> pendingChanges = new ArrayList<>();
         List<EntityEntity> changedEntities = this.entityRepository.findChangedEntities(appId, userId);
         changedEntities.forEach(entityEntity -> {
+            Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("versionNumber")));
+            Page<EntityVersionEntity> page = this.entityVersionRepository.findEntityVersions(entityEntity.getId(),
+                    pageable);
 
-            List<EntityVersionEntity> versions = entityEntity.getVersions();
+            // List<EntityVersionEntity> versions = entityEntity.getVersions();
 
-            if (versions.size() == 0) {
+            if (page.getContent().size() == 0) {
                 log.error("no entity versions {}, {}", entityEntity.getId(), entityEntity.getName());
                 throw new RuntimeException("no entity versions");
             }
             Entity entity = this.entityMapper.toDto(entityEntity);
 
-            EntityVersionEntity lastVersion = versions.get(0);
+            EntityVersionEntity lastVersion = page.getContent().get(0);
 
             EnumPendingChangeAction action = entityEntity.getDeletedAt() != null
                     ? EnumPendingChangeAction.Delete
-                    : versions.size() > 1
+                    : page.getTotalElements() > 1
                     ? EnumPendingChangeAction.Update
                     : EnumPendingChangeAction.Create;
 
@@ -258,16 +262,20 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         List<PendingChange> pendingChanges = new ArrayList<>();
         List<EntityEntity> changedEntities = this.entityRepository.findChangedEntities(commitId);
         changedEntities.forEach(entityEntity -> {
+            Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("versionNumber")));
+            Page<EntityVersionEntity> page = this.entityVersionRepository.findEntityVersions(entityEntity.getId(),
+                    pageable);
 
-            List<EntityVersionEntity> versions = entityEntity.getVersions();
+            // List<EntityVersionEntity> versions = entityEntity.getVersions();
 
-            if (versions.size() == 0) {
+            if (page.getContent().size() == 0) {
                 log.error("no entity versions {}, {}", entityEntity.getId(), entityEntity.getName());
                 throw new RuntimeException("no entity versions");
             }
+
             Entity entity = this.entityMapper.toDto(entityEntity);
 
-            EntityVersionEntity changedVersion = versions.get(0);
+            EntityVersionEntity changedVersion = page.getContent().get(0);
 
             EnumPendingChangeAction action = entityEntity.getDeletedAt() != null
                     ? EnumPendingChangeAction.Delete
@@ -339,11 +347,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             this.entityVersionRepository.save(versionEntity);
         }
         return this.entityMapper.toDto(entityEntity);
-    }
-
-    @Transactional
-    public void releaseLock(String entityId) {
-        this.entityRepository.releaseLock(entityId);
     }
 
     public Entity lockEntity(WhereUniqueInput where) {

@@ -26,7 +26,7 @@ public class ReleaseEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
     @Column(name = "version_")
@@ -35,7 +35,7 @@ public class ReleaseEntity extends BaseEntity {
     @Column(name = "description_")
     private String description;
 
-    @Column(name = "commitId")
+    @Column(name = "commit_Id")
     private String commitId;
 
 }

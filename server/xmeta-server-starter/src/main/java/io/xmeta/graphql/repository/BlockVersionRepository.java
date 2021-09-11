@@ -2,6 +2,7 @@ package io.xmeta.graphql.repository;
 
 import io.xmeta.graphql.domain.BlockVersionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,9 +16,11 @@ import java.util.List;
  */
 
 @Repository
-public interface BlockVersionRepository extends JpaRepository<BlockVersionEntity, String> {
+public interface BlockVersionRepository extends JpaRepository<BlockVersionEntity, String>, JpaSpecificationExecutor<BlockVersionEntity> {
 
     @Query("from BlockVersionEntity ev where ev.block.id = :blockId order by ev.versionNumber asc")
     List<BlockVersionEntity> findBlockVersions(@Param("blockId") String blockId);
 
+    @Query("from BlockVersionEntity ev where ev.block.id = :blockId and ev.versionNumber = 0")
+    BlockVersionEntity findBlockCurrentVersion(@Param("blockId") String blockId);
 }

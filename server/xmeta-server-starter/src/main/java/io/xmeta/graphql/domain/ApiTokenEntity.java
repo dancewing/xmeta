@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "ApiToken")
+@Table(name = "api_token")
 public class ApiTokenEntity extends BaseEntity {
 
 
@@ -26,25 +26,25 @@ public class ApiTokenEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private String userId;
 
     @Column(name = "token")
     private String token;
 
-    @Column(name = "previewChars")
+    @Column(name = "preview_chars")
     private String previewChars;
 
-    @Column(name = "lastAccessAt")
+    @Column(name = "last_access_at")
     private ZonedDateTime lastAccessAt;
 
 }

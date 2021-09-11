@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "ActionStep")
+@Table(name = "action_step")
 public class ActionStepEntity extends BaseEntity {
 
 
@@ -25,7 +25,7 @@ public class ActionStepEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
     @Column(name = "message")
@@ -34,7 +34,7 @@ public class ActionStepEntity extends BaseEntity {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "completedAt")
+    @Column(name = "completed_at")
     private ZonedDateTime completedAt;
 
     @Column(name = "name")

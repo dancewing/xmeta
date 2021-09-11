@@ -30,4 +30,12 @@ public interface BlockRepository extends JpaRepository<BlockEntity, String>, Jpa
     @Query("from BlockEntity b inner join b.versions v where v.commit.id = :commitId")
     List<BlockEntity> findChangedBlocks(@Param("commitId") String commitId);
 
+    @Query("from BlockEntity b inner join fetch b.versions v where b.app.id = :appId and b.blockType = :blockType and" +
+            " v.versionNumber = 0")
+    List<BlockEntity> findByBlockType(@Param("appId") String appId, @Param("blockType") String blockType);
+
+
+    @Query("from BlockEntity b where b.app.id = :appId and b.id = :blockId")
+    List<BlockEntity> findByApp(@Param("appId") String appId, @Param("blockId") String blockId);
+
 }

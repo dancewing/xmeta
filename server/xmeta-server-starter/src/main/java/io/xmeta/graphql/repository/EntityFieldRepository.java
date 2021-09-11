@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author Jeff
@@ -25,4 +27,7 @@ public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void deleteByEntityVersionAndPermanentId(@Param("permanentId") String permanentId,
                                              @Param("entityVersionId") String entityVersionId);
+
+    @Query("from EntityFieldEntity ef where ef.entityVersion.id = :entityVersionId ")
+    List<EntityFieldEntity> getFields(@Param("entityVersionId") String entityVersionId);
 }

@@ -1,13 +1,15 @@
 package io.xmeta.graphql.service;
 
-import io.xmeta.graphql.domain.AppEntity_;
-import io.xmeta.graphql.domain.BlockEntity;
-import io.xmeta.graphql.domain.BlockEntity_;
-import io.xmeta.graphql.domain.BlockVersionEntity;
+import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.BlockMapper;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.BlockRepository;
+import io.xmeta.graphql.repository.BlockVersionRepository;
+import io.xmeta.graphql.util.Maps;
+import io.xmeta.graphql.util.ObjectMapperUtils;
 import io.xmeta.graphql.util.PredicateBuilder;
+import io.xmeta.security.AuthUserDetail;
+import io.xmeta.security.SecurityUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +37,15 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
 
     private final BlockRepository blockRepository;
     private final BlockMapper blockMapper;
+    private final BlockVersionRepository blockVersionRepository;
+    private final LockService lockService;
 
-    public BlockService(BlockRepository blockRepository, BlockMapper blockMapper) {
+    public BlockService(BlockRepository blockRepository, BlockMapper blockMapper, BlockVersionRepository blockVersionRepository, LockService lockService) {
         super(blockRepository);
         this.blockRepository = blockRepository;
         this.blockMapper = blockMapper;
+        this.blockVersionRepository = blockVersionRepository;
+        this.lockService = lockService;
     }
 
     public Block getBlock(String id) {
@@ -107,12 +114,7 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
         return pendingChanges;
     }
 
-    @Transactional
-    public void releaseLock(String blockId) {
-        this.blockRepository.releaseLock(blockId);
-    }
-
-    public List<PendingChange> getChangedBlocksByCommit(String commitId){
+    public List<PendingChange> getChangedBlocksByCommit(String commitId) {
         List<PendingChange> pendingChanges = new ArrayList<>();
 
         List<BlockEntity> changedBlocks = this.blockRepository.findChangedBlocks(commitId);
@@ -145,5 +147,127 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
         });
 
         return pendingChanges;
+    }
+
+    @Transactional(readOnly = true)
+    public <T extends IBlock> List<T> findByBlockType(String appId, EnumBlockType blockType, Class<T> blockClass) {
+        //只查找version number = 0
+        List<BlockEntity> byBlockType = this.blockRepository.findByBlockType(appId, blockType.name());
+        List<T> blocks = new ArrayList<>();
+        byBlockType.forEach(blockEntity -> {
+            List<BlockVersionEntity> versions = blockEntity.getVersions();
+            if (versions.size() == 0) {
+                throw new RuntimeException("can't find block version");
+            }
+            blocks.add(this.versionToIBlock(blockEntity, versions.get(0), blockClass));
+        });
+        return blocks;
+    }
+
+    public <T extends IBlock> T versionToIBlock(BlockEntity blockEntity, BlockVersionEntity blockVersionEntity,
+                                                Class<T> blockClass) {
+
+        byte[] settings = blockVersionEntity.getSettings();
+        T block = ObjectMapperUtils.toBlock(settings, blockClass);
+        if (block == null) {
+            throw new RuntimeException("can't convert block");
+        }
+        if (block instanceof AppSettings) {
+            AppSettings appSettings = (AppSettings) block;
+            appSettings.setId(blockEntity.getId());
+            appSettings.setCreatedAt(blockEntity.getCreatedAt());
+            appSettings.setUpdatedAt(blockEntity.getUpdatedAt());
+            appSettings.setParentBlock(null);
+            appSettings.setDisplayName(blockEntity.getDisplayName());
+            appSettings.setDescription(blockEntity.getDescription());
+            appSettings.setBlockType(EnumBlockType.AppSettings);
+            appSettings.setVersionNumber(0.0D);
+            //   appSettings.setInputParameters(blockVersionEntity.getInputParameters());
+            //    appSettings.setOutputParameters(Lists.newArrayList());
+            appSettings.setLockedByUserId(blockEntity.getLockedByUser() != null ? blockEntity.getLockedByUser().getId() :
+                    null);
+            appSettings.setLockedAt(blockEntity.getLockedAt());
+        }
+        return block;
+    }
+
+    public <T extends IBlock> T createBlock(String appId, T settings, EnumBlockType blockType, Block parent) {
+        if (parent != null) {
+            parent = this.resolveParentBlock(parent.getId(), appId);
+        }
+
+//        if (parent!=null && !this.canUseParentType(blockType, parent.getBlockType())) {
+//
+//        }
+        AuthUserDetail authUser = SecurityUtils.getAuthUser();
+        AppEntity appEntity = new AppEntity();
+        appEntity.setId(appId);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(authUser.getUserId());
+
+        BlockEntity blockEntity = new BlockEntity();
+        blockEntity.setCreatedAt(ZonedDateTime.now());
+        blockEntity.setUpdatedAt(ZonedDateTime.now());
+        blockEntity.setApp(appEntity);
+        blockEntity.setParentBlock(null);
+        blockEntity.setBlockType(blockType.name());
+        blockEntity.setDisplayName(settings.getDisplayName());
+        blockEntity.setDescription(settings.getDescription());
+        blockEntity.setLockedByUser(userEntity);
+        blockEntity.setLockedAt(ZonedDateTime.now());
+
+        this.blockRepository.save(blockEntity);
+
+        BlockVersionEntity versionEntity = new BlockVersionEntity();
+        versionEntity.setCreatedAt(ZonedDateTime.now());
+        versionEntity.setUpdatedAt(ZonedDateTime.now());
+        versionEntity.setBlock(blockEntity);
+        versionEntity.setVersionNumber(0);
+        versionEntity.setInputParameters("");
+        versionEntity.setOutputParameters("");
+        versionEntity.setSettings(parseSettings(settings));
+        versionEntity.setDisplayName(settings.getDisplayName());
+        versionEntity.setDescription(settings.getDescription());
+        versionEntity.setCommit(null);
+
+        this.blockVersionRepository.save(versionEntity);
+
+        return (T) this.versionToIBlock(blockEntity, versionEntity, settings.getClass());
+    }
+
+    private <T extends IBlock> byte[] parseSettings(T settings) {
+        Maps.MapBuilder builder = null;
+        if (settings instanceof AppSettings) {
+            AppSettings appSettings = (AppSettings) settings;
+            builder = Maps.of("dbHost", appSettings.getDbHost())
+                    .and("dbName", appSettings.getDbName())
+                    .and("dbUser", appSettings.getDbUser())
+                    .and("dbPassword", appSettings.getDbPassword())
+                    .and("dbPort", appSettings.getDbPort())
+                    .and("authProvider", appSettings.getAuthProvider());
+        }
+        return ObjectMapperUtils.toBytes(builder.build());
+    }
+
+    public Block resolveParentBlock(String blockId, String appId) {
+        List<BlockEntity> blockEntities = this.blockRepository.findByApp(appId, blockId);
+        if (blockEntities.size() == 0) {
+            throw new RuntimeException("Can't find parent block with ID " + blockId);
+        }
+        if (blockEntities.size() == 1) {
+            return this.blockMapper.toDto(blockEntities.get(0));
+        }
+        throw new RuntimeException("Unexpected length of matchingBlocks");
+    }
+
+    @Transactional
+    public <T extends IBlock> T updateBlock(String blockId, Object data, Class<T> blockClass) {
+
+        BlockEntity blockEntity = this.lockService.acquireBlockLock(blockId);
+
+        BlockVersionEntity blockCurrentVersion = this.blockVersionRepository.findBlockCurrentVersion(blockId);
+        blockCurrentVersion.setSettings(ObjectMapperUtils.toBytes(data));
+        this.blockVersionRepository.save(blockCurrentVersion);
+        return this.versionToIBlock(blockEntity, blockCurrentVersion, blockClass);
     }
 }

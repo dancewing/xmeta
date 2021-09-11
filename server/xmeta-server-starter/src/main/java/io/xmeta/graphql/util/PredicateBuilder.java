@@ -1,6 +1,7 @@
 package io.xmeta.graphql.util;
 
 import io.xmeta.graphql.model.DateTimeFilter;
+import io.xmeta.graphql.model.EnumDataTypeFilter;
 import io.xmeta.graphql.model.IntFilter;
 import io.xmeta.graphql.model.StringFilter;
 
@@ -56,7 +57,7 @@ public abstract class PredicateBuilder {
     }
 
     public static List<Predicate> buildIntFilter(CriteriaBuilder criteriaBuilder, Expression<Integer> expression,
-                                                    final IntFilter filter) {
+                                                 final IntFilter filter) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (filter.getEq() != null) {
@@ -113,6 +114,34 @@ public abstract class PredicateBuilder {
         }
         if (filter.getGte() != null) {
             predicates.add(greaterThanOrEqualToPredicate(criteriaBuilder, expression, filter.getGte()));
+        }
+        return predicates;
+    }
+
+
+    public static List<Predicate> buildEnumDataTypeFilter(CriteriaBuilder criteriaBuilder, Expression<String> expression,
+                                                          final EnumDataTypeFilter filter) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (filter.getEq() != null) {
+            predicates.add(equalsPredicate(criteriaBuilder, expression, filter.getEq().name()));
+        }
+        if (filter.getNot() != null) {
+            predicates.add(notEqualsPredicate(criteriaBuilder, expression, filter.getNot().name()));
+        }
+        if (filter.getIn() != null) {
+            List<String> in = new ArrayList<>();
+            filter.getIn().stream().forEach(enumDataType -> {
+                in.add(enumDataType.name());
+            });
+            predicates.add(valueInPredicate(criteriaBuilder, expression, in));
+        }
+        if (filter.getNotIn() != null) {
+            List<String> notIn = new ArrayList<>();
+            filter.getNotIn().stream().forEach(enumDataType -> {
+                notIn.add(enumDataType.name());
+            });
+            predicates.add(valueNotInPredicate(criteriaBuilder, expression, notIn));
         }
         return predicates;
     }

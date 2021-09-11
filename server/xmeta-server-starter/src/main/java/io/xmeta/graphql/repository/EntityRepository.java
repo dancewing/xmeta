@@ -22,7 +22,7 @@ public interface EntityRepository extends JpaRepository<EntityEntity, String>, J
     @Query("from EntityEntity et where et.name =:name and et.app.id = :appId")
     List<EntityEntity> findEntityByNames(@Param("name") String name, @Param("appId") String appId);
 
-    @Query("select distinct b from EntityEntity b left join fetch b.versions where b.lockedByUser.id = :userId and b.app.id " +
+    @Query("select distinct b from EntityEntity b where b.lockedByUser.id = :userId and b.app.id " +
             "= :appId")
     List<EntityEntity> findChangedEntities(@Param("appId") String appId, @Param("userId") String userId);
 
@@ -33,7 +33,7 @@ public interface EntityRepository extends JpaRepository<EntityEntity, String>, J
     @Query("from EntityEntity et where et.app.id = :appId and et.deletedAt is null")
     List<EntityEntity> findEntitiesByApp(@Param("appId") String appId);
 
-    @Query("select b from EntityEntity b inner join b.versions v where v.commit.id = :commitId")
+    @Query("select b from EntityEntity b inner join EntityVersionEntity v on b.id = v.entityId where v.commit.id = :commitId")
     List<EntityEntity> findChangedEntities(@Param("commitId") String commitId);
 
 }

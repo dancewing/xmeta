@@ -26,10 +26,10 @@ public class EntityFieldEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_At")
     private ZonedDateTime updatedAt;
 
     @ManyToOne
@@ -44,7 +44,7 @@ public class EntityFieldEntity extends BaseEntity {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "dataType")
+    @Column(name = "data_Type")
     private String dataType;
 
     @Column(name = "properties")

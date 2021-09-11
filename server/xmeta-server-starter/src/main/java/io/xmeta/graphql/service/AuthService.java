@@ -1,7 +1,6 @@
 package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.AccountEntity;
-import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.model.*;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
@@ -12,7 +11,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +29,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserService userService;
     private final DomainUserDetailsService domainUserDetailsService;
+
     @Transactional
     public Auth signup(SignupInput data) {
 

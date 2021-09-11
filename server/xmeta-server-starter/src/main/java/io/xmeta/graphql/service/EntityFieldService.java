@@ -318,6 +318,12 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                             where.getDescription()));
                 }
 
+                if (where.getDataType() != null) {
+                    predicates.addAll(PredicateBuilder.buildEnumDataTypeFilter(criteriaBuilder,
+                            root.get(EntityFieldEntity_.DESCRIPTION),
+                            where.getDataType()));
+                }
+
             }
 
             if (StringUtils.isNotEmpty(entityId) || versionNumber != null) {

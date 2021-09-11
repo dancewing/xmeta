@@ -82,5 +82,4 @@ public abstract class BaseService<R extends JpaRepository<T, ID>, T extends Base
     public void clear() {
         this.em.clear();
     }
-
 }

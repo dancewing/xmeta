@@ -24,10 +24,10 @@ public class WorkspaceEntity extends BaseEntity {
     @Column(name = "id", length = 64)
     private String id;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_At")
     private ZonedDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(name = "updated_At")
     private ZonedDateTime updatedAt;
 
     @Column(name = "name")

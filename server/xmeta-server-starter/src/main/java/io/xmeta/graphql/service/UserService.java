@@ -4,10 +4,12 @@ import io.xmeta.graphql.domain.UserEntity;
 import io.xmeta.graphql.mapper.UserMapper;
 import io.xmeta.graphql.model.User;
 import io.xmeta.graphql.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Description
@@ -17,6 +19,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@PreAuthorize("isAuthenticated()")
 public class UserService extends BaseService<UserRepository, UserEntity, String> {
 
     private final UserRepository userRepository;

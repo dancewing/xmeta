@@ -6,6 +6,7 @@ import io.xmeta.security.jwt.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -72,15 +73,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/admin/init").permitAll()
-                .antMatchers("/api/admin/login").permitAll()
-                .antMatchers("/api/admin/register-admin").permitAll()
-                .antMatchers("/api/authenticate").permitAll()
-                .antMatchers("/api/register").permitAll()
-                .antMatchers("/api/activate").permitAll()
-                .antMatchers("/api/account/reset-password/init").permitAll()
-                .antMatchers("/api/account/reset-password/finish").permitAll()
-                .antMatchers("/api/admin/users/me/permissions").permitAll() // 临时打开, TODO fix, 应打开前台用户权限检查，未登录不返回任何权限信息
+                .antMatchers("/api/login").permitAll()
+                .antMatchers("/health/check").permitAll()
                 .antMatchers("/api/site/**").permitAll() // 前台api在前面前端检查是否能访问
                 .antMatchers("/api/data-helper/**").permitAll() // 页面渲染辅助api，未登录也应该可以访问
                 .antMatchers("/api/data/**").permitAll() // 数据接口应该在ActionHandler 里去检查是否有权限

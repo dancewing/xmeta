@@ -9,6 +9,7 @@ import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime;
 @Service
 @Transactional
 @AllArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class LockService {
 
     private final EntityRepository entityRepository;

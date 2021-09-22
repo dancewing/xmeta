@@ -82,7 +82,7 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     @Override
     public AppSettings appSettings(WhereUniqueInput where) {
-        return this.appService.appSettings(where);
+        return this.appService.appSettings(where.getId());
     }
 
     @Override

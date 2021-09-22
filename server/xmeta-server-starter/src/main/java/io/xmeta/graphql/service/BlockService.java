@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("isAuthenticated()")
 public class BlockService extends BaseService<BlockRepository, BlockEntity, String> {
 
     private final BlockRepository blockRepository;
@@ -191,6 +193,7 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
         return block;
     }
 
+    @Transactional
     public <T extends IBlock> T createBlock(String appId, T settings, EnumBlockType blockType, Block parent) {
         if (parent != null) {
             parent = this.resolveParentBlock(parent.getId(), appId);
@@ -216,7 +219,7 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
         blockEntity.setLockedByUser(userEntity);
         blockEntity.setLockedAt(ZonedDateTime.now());
 
-        this.blockRepository.save(blockEntity);
+        this.blockRepository.saveAndFlush(blockEntity);
 
         BlockVersionEntity versionEntity = new BlockVersionEntity();
         versionEntity.setCreatedAt(ZonedDateTime.now());
@@ -230,7 +233,7 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
         versionEntity.setDescription(settings.getDescription());
         versionEntity.setCommit(null);
 
-        this.blockVersionRepository.save(versionEntity);
+        this.blockVersionRepository.saveAndFlush(versionEntity);
 
         return (T) this.versionToIBlock(blockEntity, versionEntity, settings.getClass());
     }
@@ -261,12 +264,12 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
     }
 
     @Transactional
-    public <T extends IBlock> T updateBlock(String blockId, Object data, Class<T> blockClass) {
+    public <T extends IBlock> T updateBlock(String blockId, T data, Class<T> blockClass) {
 
         BlockEntity blockEntity = this.lockService.acquireBlockLock(blockId);
 
         BlockVersionEntity blockCurrentVersion = this.blockVersionRepository.findBlockCurrentVersion(blockId);
-        blockCurrentVersion.setSettings(ObjectMapperUtils.toBytes(data));
+        blockCurrentVersion.setSettings(parseSettings(data));
         this.blockVersionRepository.save(blockCurrentVersion);
         return this.versionToIBlock(blockEntity, blockCurrentVersion, blockClass);
     }

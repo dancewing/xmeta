@@ -2,7 +2,9 @@ package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.EntityPermissionRoleEntity;
 import io.xmeta.graphql.repository.EntityPermissionRoleRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @Description
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@Transactional(readOnly = true)
+@PreAuthorize("isAuthenticated()")
 public class EntityPermissionRoleService extends BaseService<EntityPermissionRoleRepository, EntityPermissionRoleEntity, String> {
 
     private final EntityPermissionRoleRepository permissionroleRepository;

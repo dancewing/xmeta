@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("isAuthenticated()")
 public class EntityVersionService extends BaseService<EntityVersionRepository, EntityVersionEntity, String> {
 
     private final EntityVersionRepository entityVersionRepository;

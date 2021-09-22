@@ -4,6 +4,7 @@ import io.xmeta.graphql.domain.ActionLogEntity;
 import io.xmeta.graphql.mapper.ActionLogMapper;
 import io.xmeta.graphql.model.ActionLog;
 import io.xmeta.graphql.repository.ActionLogRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@PreAuthorize("isAuthenticated()")
 public class ActionLogService extends BaseService<ActionLogRepository, ActionLogEntity, String> {
 
     private final ActionLogRepository actionlogRepository;

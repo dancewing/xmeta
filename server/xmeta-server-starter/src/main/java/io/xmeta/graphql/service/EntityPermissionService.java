@@ -8,6 +8,7 @@ import io.xmeta.graphql.repository.EntityVersionRepository;
 import io.xmeta.graphql.util.PredicateBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("isAuthenticated()")
 public class EntityPermissionService extends BaseService<EntityPermissionRepository, EntityPermissionEntity, String> {
 
     private final EntityPermissionRepository permissionRepository;

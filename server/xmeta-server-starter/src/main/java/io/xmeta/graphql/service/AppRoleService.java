@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@PreAuthorize("isAuthenticated()")
 public class AppRoleService extends BaseService<AppRoleRepository, AppRoleEntity, String> {
 
     private final AppRoleRepository appRoleRepository;

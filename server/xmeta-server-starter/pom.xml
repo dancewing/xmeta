@@ -265,6 +265,7 @@
                                 <JSONObject>java.util.Map&lt;String, Object&gt;</JSONObject>
                                 <Price.amount>java.math.BigDecimal</Price.amount>
                             </customTypesMapping>
+                            <responseProjectionMaxDepth>10</responseProjectionMaxDepth>
                             <parentInterfaces>
                                 <queryResolver>graphql.kickstart.tools.GraphQLQueryResolver</queryResolver>
                                 <mutationResolver>graphql.kickstart.tools.GraphQLMutationResolver</mutationResolver>

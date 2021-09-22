@@ -2,7 +2,9 @@ package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.UserRoleEntity;
 import io.xmeta.graphql.repository.UserRoleRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @Description
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@PreAuthorize("isAuthenticated()")
+@Transactional(readOnly = true)
 public class UserRoleService extends BaseService<UserRoleRepository, UserRoleEntity, String> {
 
     private final UserRoleRepository userRoleRepository;

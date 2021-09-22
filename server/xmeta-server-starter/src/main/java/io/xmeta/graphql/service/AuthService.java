@@ -7,6 +7,8 @@ import io.xmeta.security.SecurityUtils;
 import io.xmeta.security.jwt.TokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -77,12 +79,17 @@ public class AuthService {
     public User currentUser() {
         AuthUserDetail authUser = SecurityUtils.getAuthUser();
         if (authUser != null) {
-            return this.userService.getUser(authUser.getUserId());
+            try {
+                return this.userService.getUser(authUser.getUserId());
+            } catch (Exception ex) {
+                throw new AuthenticationServiceException("un login");
+            }
         }
         return null;
     }
 
     @Transactional
+    @PreAuthorize("isAuthenticated()")
     public Auth setCurrentWorkspace(WhereUniqueInput data) {
 
         AuthUserDetail authUser = SecurityUtils.getAuthUser();

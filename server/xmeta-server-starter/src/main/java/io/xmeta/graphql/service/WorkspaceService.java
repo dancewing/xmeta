@@ -6,6 +6,7 @@ import io.xmeta.graphql.domain.UserRoleEntity;
 import io.xmeta.graphql.domain.WorkspaceEntity;
 import io.xmeta.graphql.mapper.UserMapper;
 import io.xmeta.graphql.mapper.WorkspaceMapper;
+import io.xmeta.graphql.mix.WorkspaceDomain;
 import io.xmeta.graphql.model.Role;
 import io.xmeta.graphql.model.User;
 import io.xmeta.graphql.model.Workspace;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,14 +40,16 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final AppService appService;
 
-    public WorkspaceService(WorkspaceRepository workspaceRepository, WorkspaceMapper workspaceMapper, UserMapper userMapper, UserRepository userRepository, UserRoleRepository userRoleRepository) {
+    public WorkspaceService(WorkspaceRepository workspaceRepository, WorkspaceMapper workspaceMapper, UserMapper userMapper, UserRepository userRepository, UserRoleRepository userRoleRepository, AppService appService) {
         super(workspaceRepository);
         this.workspaceRepository = workspaceRepository;
         this.workspaceMapper = workspaceMapper;
         this.userMapper = userMapper;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
+        this.appService = appService;
     }
 
     @Transactional
@@ -109,5 +113,18 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
 
     public Workspace getWorkspace(String id) {
         return this.workspaceMapper.toDto(this.workspaceRepository.getById(id));
+    }
+
+    public List<WorkspaceDomain> metadata() {
+        List<Workspace>  workspaces = this.getCurrentAccountWorkspaces();
+        List<WorkspaceDomain> workspaceDomains = new ArrayList<>();
+        for (Workspace workspace : workspaces) {
+            WorkspaceDomain workspaceDomain = new WorkspaceDomain();
+            workspaceDomain.setId(workspace.getId());
+            workspaceDomain.setName(workspace.getName());
+            workspaceDomain.setApps(this.appService.loadApps(workspace.getId()));
+            workspaceDomains.add(workspaceDomain);
+        }
+        return workspaceDomains;
     }
 }

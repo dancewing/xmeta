@@ -6,7 +6,9 @@ import io.xmeta.graphql.model.EntityPermissionField;
 import io.xmeta.graphql.model.EntityPermissionFieldWhereUniqueInput;
 import io.xmeta.graphql.model.EntityUpdatePermissionFieldRolesInput;
 import io.xmeta.graphql.repository.EntityPermissionFieldRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @Description
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
  */
 
 @Service
+@PreAuthorize("isAuthenticated()")
+@Transactional(readOnly = true)
 public class EntityPermissionFieldService extends BaseService<EntityPermissionFieldRepository, EntityPermissionFieldEntity, String> {
 
     private final EntityPermissionFieldRepository permissionfieldRepository;

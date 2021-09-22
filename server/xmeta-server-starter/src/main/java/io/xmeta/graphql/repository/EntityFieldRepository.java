@@ -28,6 +28,6 @@ public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, 
     void deleteByEntityVersionAndPermanentId(@Param("permanentId") String permanentId,
                                              @Param("entityVersionId") String entityVersionId);
 
-    @Query("from EntityFieldEntity ef where ef.entityVersion.id = :entityVersionId ")
+    @Query("from EntityFieldEntity ef where ef.entityVersion.id = :entityVersionId order by ef.createdAt asc ")
     List<EntityFieldEntity> getFields(@Param("entityVersionId") String entityVersionId);
 }

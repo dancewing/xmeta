@@ -3,6 +3,7 @@ package io.xmeta.graphql.service;
 import io.xmeta.graphql.domain.AppEntity;
 import io.xmeta.graphql.domain.EnvironmentEntity;
 import io.xmeta.graphql.repository.EnvironmentRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.time.ZonedDateTime;
 
 @Service
 @Transactional(readOnly = true)
+@PreAuthorize("isAuthenticated()")
 public class EnvironmentService extends BaseService<EnvironmentRepository, EnvironmentEntity, String> {
 
     private final EnvironmentRepository environmentRepository;

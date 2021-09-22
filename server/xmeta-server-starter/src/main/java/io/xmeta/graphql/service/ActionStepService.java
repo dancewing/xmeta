@@ -4,7 +4,9 @@ import io.xmeta.graphql.domain.ActionStepEntity;
 import io.xmeta.graphql.mapper.ActionStepMapper;
 import io.xmeta.graphql.model.ActionStep;
 import io.xmeta.graphql.repository.ActionStepRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +17,8 @@ import java.util.List;
  */
 
 @Service
+@PreAuthorize("isAuthenticated()")
+@Transactional
 public class ActionStepService extends BaseService<ActionStepRepository, ActionStepEntity, String> {
 
     private final ActionStepRepository actionstepRepository;

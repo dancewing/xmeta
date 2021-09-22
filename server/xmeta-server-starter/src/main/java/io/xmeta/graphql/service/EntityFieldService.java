@@ -4,6 +4,7 @@ import io.xmeta.graphql.constants.FieldConstProperties;
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityFieldMapper;
 import io.xmeta.graphql.mix.CreateOneEntityField;
+import io.xmeta.graphql.mix.FieldDomain;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityFieldRepository;
 import io.xmeta.graphql.repository.EntityRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -33,8 +35,9 @@ import java.util.*;
  */
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class EntityFieldService extends BaseService<EntityFieldRepository, EntityFieldEntity, String> {
 
     private final EntityFieldRepository entityFieldRepository;
@@ -472,6 +475,27 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         }
         EntityFieldEntity entityField = versionFields.get(0);
         this.entityFieldRepository.deleteByEntityVersionAndPermanentId(entityField.getEntityVersion().getId(), relatedEntityId);
+    }
+
+    public List<FieldDomain> getFields(String versionId) {
+        List<EntityFieldEntity> fieldEntities = this.entityFieldRepository.getFields(versionId);
+        List<FieldDomain> fieldDomains = new ArrayList<>();
+        for (EntityFieldEntity fieldEntity : fieldEntities) {
+            FieldDomain fieldDomain = new FieldDomain();
+            fieldDomain.setId(fieldEntity.getId());
+            fieldDomain.setPermanentId(fieldEntity.getPermanentId());
+            fieldDomain.setName(fieldEntity.getName());
+            fieldDomain.setDisplayName(fieldEntity.getDisplayName());
+            fieldDomain.setDataType(fieldEntity.getDataType());
+            fieldDomain.setProperties(ObjectMapperUtils.toMap(fieldEntity.getProperties()));
+            fieldDomain.setRequired(fieldEntity.getRequired());
+            fieldDomain.setSearchable(fieldEntity.getSearchable());
+            fieldDomain.setDescription(fieldEntity.getDescription());
+            fieldDomain.setPosition(fieldEntity.getPosition());
+            fieldDomain.setUnique(fieldEntity.getUnique());
+            fieldDomains.add(fieldDomain);
+        }
+        return fieldDomains;
     }
 
 }

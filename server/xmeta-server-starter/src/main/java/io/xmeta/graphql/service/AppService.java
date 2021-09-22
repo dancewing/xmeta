@@ -2,6 +2,7 @@ package io.xmeta.graphql.service;
 
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.AppMapper;
+import io.xmeta.graphql.mix.AppDomain;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.AppRepository;
 import io.xmeta.graphql.repository.AppRoleRepository;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class AppService extends BaseService<AppRepository, AppEntity, String> {
 
     private final AppRepository appRepository;
@@ -146,6 +148,9 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
 
         this.environmentService.createDefaultEnvironment(appEntity.getId());
 
+        // create default app settings
+        this.appSettings(appEntity.getId());
+
         this.commit(new CommitCreateInput("INITIAL_COMMIT_MESSAGE",
                 new WhereParentIdInput(new WhereUniqueInput(appEntity.getId()))), true);
 
@@ -159,7 +164,6 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     }
 
     @Transactional
-    @PreAuthorize("isAuthenticated()")
     public App createAppWithEntities(AppCreateWithEntitiesInput data) {
         AuthUserDetail authUserDetail = SecurityUtils.getAuthUser();
         App app = this.createApp(new AppCreateInput(data.getApp().getName(), data.getApp().getDescription(), data.getApp().getColor()));
@@ -345,8 +349,8 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
     }
 
     @Transactional
-    public AppSettings appSettings(WhereUniqueInput where) {
-        List<AppSettings> blocks = this.blockService.findByBlockType(where.getId(), EnumBlockType.AppSettings,
+    public AppSettings appSettings(String appId) {
+        List<AppSettings> blocks = this.blockService.findByBlockType(appId, EnumBlockType.AppSettings,
                 AppSettings.class);
         if (blocks.size() == 0) {
             //create default app settings
@@ -363,7 +367,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
             appSettings.setDbPort(5432);
             appSettings.setAuthProvider(EnumAuthProviderType.Http);
 
-            return this.blockService.createBlock(where.getId(), appSettings.build(), EnumBlockType.AppSettings, null);
+            return this.blockService.createBlock(appId, appSettings.build(), EnumBlockType.AppSettings, null);
         }
 
         return blocks.get(0);
@@ -371,7 +375,46 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
 
     @Transactional
     public AppSettings updateAppSettings(AppSettingsUpdateInput data, WhereUniqueInput where) {
-        AppSettings appSettings = appSettings(where);
-        return this.blockService.updateBlock(appSettings.getId(), data, AppSettings.class);
+        AppSettings appSettings = appSettings(where.getId());
+        AppSettings.Builder builder = new AppSettings.Builder();
+        builder.setDescription(data.getDescription())
+                .setDisplayName(data.getDisplayName())
+                .setDbHost(data.getDbHost())
+                .setDbName(data.getDbName())
+                .setDbUser(data.getDbUser())
+                .setDbPassword(data.getDbPassword())
+                .setDbPort(data.getDbPort())
+                .setAuthProvider(data.getAuthProvider());
+
+        return this.blockService.updateBlock(appSettings.getId(), builder.build(), AppSettings.class);
+    }
+
+    public List<AppDomain> loadApps(String workspaceId) {
+        Specification<AppEntity> specification = Specification.where(null);
+        Specification<AppEntity> condition = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            //只查找当前workspace的
+            Join<Object, Object> join = root.join(AppEntity_.WORKSPACE, JoinType.LEFT);
+            predicates.add(PredicateBuilder.equalsPredicate(criteriaBuilder, join.get(WorkspaceEntity_.ID),
+                    workspaceId));
+            // 过滤非删除app
+            predicates.add(criteriaBuilder.isNull(root.get(AppEntity_.DELETED_AT)));
+
+            return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
+        };
+        specification = specification.and(condition);
+        Sort sort = Sort.by(Sort.Order.desc("createdAt"));
+        List<AppEntity>  result = this.appRepository.findAll(specification, sort);
+        List<AppDomain> appDomains = new ArrayList<>();
+        for (AppEntity app: result) {
+            AppDomain appDomain = new AppDomain();
+            appDomain.setId(app.getId());
+            appDomain.setName(app.getName());
+            appDomain.setEntities(this.entityService.loadEntities(app.getId()));
+
+            appDomains.add(appDomain);
+        }
+        return appDomains;
     }
 }

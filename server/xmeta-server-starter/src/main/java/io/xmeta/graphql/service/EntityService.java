@@ -4,6 +4,7 @@ import io.xmeta.graphql.constants.EntityConst;
 import io.xmeta.graphql.domain.*;
 import io.xmeta.graphql.mapper.EntityMapper;
 import io.xmeta.graphql.mix.CreateOneEntityField;
+import io.xmeta.graphql.mix.EntityDomain;
 import io.xmeta.graphql.model.*;
 import io.xmeta.graphql.repository.EntityRepository;
 import io.xmeta.graphql.repository.EntityVersionRepository;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 public class EntityService extends BaseService<EntityRepository, EntityEntity, String> {
 
     private final EntityRepository entityRepository;
@@ -351,5 +354,27 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     public Entity lockEntity(WhereUniqueInput where) {
         return this.entityMapper.toDto(this.lockService.acquireEntityLock(where.getId()));
+    }
+
+    public List<EntityDomain> loadEntities(String appId) {
+        List<EntityEntity> entityEntities = this.entityRepository.findEntitiesByApp(appId);
+        List<EntityDomain> entityDomains = new ArrayList<>();
+        for (EntityEntity entity: entityEntities) {
+            EntityDomain entityDomain = new EntityDomain();
+            entityDomain.setId(entity.getId());
+            entityDomain.setName(entity.getName());
+            entityDomain.setDisplayName(entity.getDisplayName());
+            entityDomain.setPluralDisplayName(entity.getPluralDisplayName());
+            Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("versionNumber")));
+            Page<EntityVersionEntity> page = this.entityVersionRepository.findEntityVersions(entity.getId(),
+                    pageable);
+            if (page.getContent().size() > 0) {
+                EntityVersionEntity entityVersionEntity = page.getContent().get(0);
+                entityDomain.setVersionNumber(entityVersionEntity.getVersionNumber());
+                entityDomain.setFields(this.entityFieldService.getFields(entityVersionEntity.getId()));
+            }
+            entityDomains.add(entityDomain);
+        }
+        return entityDomains;
     }
 }

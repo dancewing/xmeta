@@ -64,10 +64,4 @@ public class EntityVersionEntity extends BaseEntity {
     @ManyToMany(mappedBy = "entityVersions")
     @JsonIgnore
     private List<BuildEntity> builds = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "entityVersion")
-//    private List<EntityFieldEntity> fields = new ArrayList<>();
-
-//    @OneToMany(mappedBy = "entityVersion")
-//    private List<EntityPermissionEntity> permissions = new ArrayList<>();
 }

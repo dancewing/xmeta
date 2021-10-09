@@ -15,6 +15,7 @@
     </parent>
 
     <modules>
+        <module>xmeta-core</module>
         <module>xmeta-server-starter</module>
         <module>xmeta-server-security</module>
         <module>xmeta-server-security-jwt</module>

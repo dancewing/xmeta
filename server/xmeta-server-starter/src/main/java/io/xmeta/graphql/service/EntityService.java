@@ -14,6 +14,7 @@ import io.xmeta.graphql.util.SoftDelete;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -85,6 +86,9 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                     field.setEntity(WhereParentIdInput.builder()
                             .setConnect(WhereUniqueInput.builder().setId(entity.getId()).build())
                             .build());
+                    if (StringUtils.isEmpty(field.getColumn())) {
+                        field.setColumn(field.getName());
+                    }
                     createOneEntityField.setData(field);
                     this.entityFieldService.createField(createOneEntityField);
                 }
@@ -145,6 +149,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         appEntity.setId(data.getApp().getConnect().getId());
         entityEntity.setApp(appEntity);
         entityEntity.setName(data.getName());
+        entityEntity.setTable(data.getTable());
         entityEntity.setDisplayName(data.getDisplayName());
         entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription("");
@@ -186,6 +191,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(true)
+                        .setColumn("id")
                         .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
@@ -198,6 +204,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(false)
+                        .setColumn("created_at")
                         .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
@@ -210,6 +217,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setUnique(false)
                         .setRequired(true)
                         .setSearchable(false)
+                        .setColumn("updated_at")
                         .setProperties(Maps.empty())
                         .build(), entityEntity.getId(),
                 entityVersionEntity);
@@ -316,6 +324,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setDisplayName(data.getDisplayName());
         entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription(data.getDescription());
+        entityEntity.setTable(data.getName());
 
         this.entityRepository.save(entityEntity);
 

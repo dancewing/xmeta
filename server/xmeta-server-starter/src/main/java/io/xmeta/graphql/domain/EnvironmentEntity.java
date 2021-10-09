@@ -41,6 +41,12 @@ public class EnvironmentEntity extends BaseEntity {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "user")
+    private String user;
+
+    @Column(name = "password")
+    private String password;
+
     @ManyToOne
     private AppEntity app;
 

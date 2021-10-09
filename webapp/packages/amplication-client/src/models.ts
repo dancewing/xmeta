@@ -672,6 +672,7 @@ export type EntityField = {
   createdAt: Scalars["DateTime"];
   updatedAt: Scalars["DateTime"];
   name: Scalars["String"];
+  column: Scalars["String"];
   displayName: Scalars["String"];
   dataType: EnumDataType;
   properties?: Maybe<Scalars["JSONObject"]>;

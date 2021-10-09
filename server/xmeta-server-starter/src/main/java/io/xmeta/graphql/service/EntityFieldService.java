@@ -81,6 +81,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setDescription(entityField.getDescription());
         fieldEntity.setPosition(entityField.getPosition());
         fieldEntity.setUnique(entityField.getUnique());
+        fieldEntity.setColumn(entityField.getColumn());
+        fieldEntity.setJavaType(entityField.getJavaType());
+        if (entityField.getInputType()!=null) {
+            fieldEntity.setInputType(entityField.getInputType().name());
+        }
 
         this.entityFieldRepository.save(fieldEntity);
 
@@ -109,6 +114,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         CreateOneEntityField createOneEntityField = new CreateOneEntityField();
         createOneEntityField.setData(createInput);
+
         if (createInput.getDataType() == EnumDataType.Lookup) {
             //TODO allowMultipleSelection, 从properties 属性中获取
             boolean allowMultipleSelection =
@@ -161,6 +167,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         entityFieldEntity.setEntityVersion(entityVersion);
         entityFieldEntity.setPermanentId(fieldId);
         entityFieldEntity.setName(fieldData.getName());
+        entityFieldEntity.setColumn(fieldData.getColumn());
+        if (fieldData.getInputType()!=null) {
+            entityFieldEntity.setInputType(fieldData.getInputType().name());
+        }
+        entityFieldEntity.setJavaType(fieldData.getJavaType());
         entityFieldEntity.setDisplayName(fieldData.getDisplayName());
         entityFieldEntity.setDataType(fieldData.getDataType().name());
         entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(fieldData.getProperties()));
@@ -243,7 +254,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
         builder.setName(name).setDataType(dataType == null ? EnumDataType.SingleLineText : dataType)
                 .setProperties(getDefaultFieldProperties(dataType));
-
+        builder.setColumn(name);
         builder.setEntity(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(entityId).build()).build());
 
         return builder.build();
@@ -428,6 +439,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         field.setDescription(data.getDescription());
         field.setPosition(data.getPosition());
         field.setUnique(data.getUnique());
+        field.setColumn(data.getColumn());
         this.entityFieldRepository.save(field);
         return this.entityFieldMapper.toDto(field);
     }

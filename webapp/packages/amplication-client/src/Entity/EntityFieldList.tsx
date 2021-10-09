@@ -114,6 +114,9 @@ export const GET_FIELDS = gql`
         searchable
         description
         properties
+        column
+        javaType
+        inputType
       }
     }
   }

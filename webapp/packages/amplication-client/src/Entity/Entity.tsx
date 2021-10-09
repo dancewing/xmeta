@@ -174,6 +174,7 @@ export const GET_ENTITY = gql`
       pluralDisplayName
       description
       lockedAt
+      table
       lockedByUser {
         account {
           firstName
@@ -189,6 +190,9 @@ export const GET_ENTITY = gql`
         searchable
         dataType
         description
+        column
+        javaType
+        inputType
       }
     }
   }
@@ -203,6 +207,7 @@ const UPDATE_ENTITY = gql`
       pluralDisplayName
       description
       lockedAt
+      table
       lockedByUser {
         account {
           firstName
@@ -218,6 +223,9 @@ const UPDATE_ENTITY = gql`
         searchable
         dataType
         description
+        column
+        javaType
+        inputType
       }
     }
   }

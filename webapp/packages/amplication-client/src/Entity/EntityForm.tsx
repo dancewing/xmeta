@@ -95,6 +95,12 @@ const EntityForm = React.memo(({ entity, applicationId, onSubmit }: Props) => {
                   disabled={USER_ENTITY === entity?.name}
                   capitalized
                 />
+
+                <TextField
+                    name="table"
+                    label="Table"
+                />
+
                 <TextField
                   name="pluralDisplayName"
                   label="Plural Display Name"

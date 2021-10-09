@@ -159,6 +159,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.4.1.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -184,10 +191,6 @@
 	<build>
 		<plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -196,23 +199,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <showDeprecation>true</showDeprecation>
-                    <annotationProcessorPaths>
-                        <annotationProcessorPath>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.12</version>
-                        </annotationProcessorPath>
-                        <annotationProcessorPath>
-                            <groupId>org.mapstruct</groupId>
-                            <artifactId>mapstruct-processor</artifactId>
-                            <version>1.4.1.Final</version>
-                        </annotationProcessorPath>
-                        <annotationProcessorPath>
-                            <groupId>org.hibernate</groupId>
-                            <artifactId>hibernate-jpamodelgen</artifactId>
-                            <version>5.4.32.Final</version>
-                        </annotationProcessorPath>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -235,25 +221,19 @@
             <plugin>
                 <groupId>io.github.kobylynskyi</groupId>
                 <artifactId>graphql-codegen-maven-plugin</artifactId>
-                <version>5.2.0</version>
+                <version>5.3.0</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <!-- all config options:
-                            https://github.com/kobylynskyi/graphql-java-codegen/blob/master/docs/codegen-options.md
-                            -->
                             <graphqlSchemaPaths>
                                 <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/meta.graphqls</graphqlSchemaPath>
-<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/auth.graphqls</graphqlSchemaPath>-->
-<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/organization.graphqls</graphqlSchemaPath>-->
-<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/project.graphqls</graphqlSchemaPath>-->
-<!--                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/user.graphqls</graphqlSchemaPath>-->
                             </graphqlSchemaPaths>
                             <outputDir>${project.build.directory}/generated-sources/graphql</outputDir>
                             <modelPackageName>io.xmeta.graphql.model</modelPackageName>
+                            <modelNameSuffix>Model</modelNameSuffix>
                             <apiPackageName>io.xmeta.graphql.resolver</apiPackageName>
                             <addGeneratedAnnotation>false</addGeneratedAnnotation>
                             <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
@@ -278,7 +258,6 @@
                                     <annotation>com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.example.json.EpochMillisScalarDeserializer.class)</annotation>
                                 </EpochMillis>
                             </customAnnotationsMapping>
-                            <modelNameSuffix></modelNameSuffix>
                         </configuration>
                     </execution>
                 </executions>

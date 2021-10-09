@@ -181,6 +181,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                 builder.setApp(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(app.getId()).build()).build());
                 builder.setName(name);
                 builder.setDisplayName(displayName);
+                builder.setTable(name);
                 builder.setPluralDisplayName(pluralDisplayName);
                 Entity newEntity = this.entityService.createOneEntity(builder.build());
                 newEntities.add(newEntity);

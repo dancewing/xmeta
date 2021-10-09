@@ -233,6 +233,9 @@ const GET_ENTITY_FIELD = gql`
         unique
         searchable
         description
+        column
+        javaType
+        inputType
       }
     }
   }
@@ -262,6 +265,9 @@ const UPDATE_ENTITY_FIELD = gql`
       unique
       searchable
       description
+      column
+      javaType
+      inputType
     }
   }
 `;

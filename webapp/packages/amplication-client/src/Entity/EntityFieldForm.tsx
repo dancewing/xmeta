@@ -3,7 +3,7 @@ import { Formik, FormikErrors } from "formik";
 import omit from "lodash.omit";
 import { isEmpty } from "lodash";
 import { getSchemaForDataType } from "@amplication/data";
-import { ToggleField } from "@amplication/design-system";
+import { ToggleField, TextField } from "@amplication/design-system";
 import * as models from "../models";
 import { DisplayNameField } from "../Components/DisplayNameField";
 import { Form } from "../Components/Form";
@@ -19,6 +19,7 @@ export type Values = {
   id: string; //the id field is required in the form context to be used in "DataTypeSelectField"
   name: string;
   displayName: string;
+  column: string;
   dataType: models.EnumDataType;
   unique: boolean;
   required: boolean;
@@ -55,6 +56,7 @@ export const INITIAL_VALUES: Values = {
   id: "",
   name: "",
   displayName: "",
+  column: "",
   dataType: models.EnumDataType.SingleLineText,
   unique: false,
   required: false,
@@ -128,6 +130,7 @@ const EntityFieldForm = ({
               required
             />
             <NameField name="name" disabled={isDisabled} required />
+            <TextField name="column" label="Column" required />
             <OptionalDescriptionField
               name="description"
               label="Description"

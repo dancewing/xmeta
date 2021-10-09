@@ -190,6 +190,9 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
             newField.setPosition(entityFieldEntity.getPosition());
             newField.setUnique(entityFieldEntity.getUnique());
             newField.setPermanentId(entityFieldEntity.getPermanentId());
+            newField.setJavaType(entityFieldEntity.getJavaType());
+            newField.setColumn(entityFieldEntity.getColumn());
+            newField.setInputType(entityFieldEntity.getInputType());
 
             this.entityFieldRepository.save(newField);
         }

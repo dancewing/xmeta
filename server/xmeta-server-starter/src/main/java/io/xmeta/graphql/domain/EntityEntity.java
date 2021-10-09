@@ -39,6 +39,9 @@ public class EntityEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "table_")
+    private String table;
+
     @Column(name = "display_Name")
     private String displayName;
 

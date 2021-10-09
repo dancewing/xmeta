@@ -560,6 +560,7 @@ type Entity {
   name: String!
   displayName: String!
   pluralDisplayName: String!
+  table: String!
   description: String
   versions(where: EntityVersionWhereInput, orderBy: EntityVersionOrderByInput, skip: Int, take: Int): [EntityVersion!]
   fields(where: EntityFieldWhereInput, orderBy: EntityFieldOrderByInput, skip: Int, take: Int): [EntityField!]
@@ -577,6 +578,7 @@ input EntityAddPermissionFieldInput {
 
 input EntityCreateInput {
   name: String!
+  table: String!
   displayName: String!
   pluralDisplayName: String!
   description: String
@@ -590,7 +592,10 @@ type EntityField {
   updatedAt: DateTime!
   name: String!
   displayName: String!
+  column: String
   dataType: EnumDataType!
+  javaType: String
+  inputType: EnumInputType
   properties: JSONObject
   required: Boolean!
   unique: Boolean!
@@ -609,6 +614,9 @@ input EntityFieldCreateInput {
   name: String!
   displayName: String!
   dataType: EnumDataType!
+  javaType: String
+  inputType: EnumInputType
+  column: String
   properties: JSONObject!
   required: Boolean!
   unique: Boolean!
@@ -648,6 +656,9 @@ input EntityFieldUpdateInput {
   unique: Boolean
   searchable: Boolean
   description: String
+  javaType: String
+  inputType: EnumInputType
+  column: String
   position: Int
 }
 
@@ -804,6 +815,7 @@ type EntityPermissionRole {
 
 input EntityUpdateInput {
   name: String
+  table: String
   displayName: String
   pluralDisplayName: String
   description: String
@@ -835,6 +847,7 @@ type EntityVersion {
   entity: Entity!
   versionNumber: Int!
   name: String!
+  table: String!
   displayName: String!
   pluralDisplayName: String!
   description: String
@@ -861,6 +874,7 @@ input EntityVersionWhereInput {
   updatedAt: DateTimeFilter
   versionNumber: IntFilter
   name: StringFilter
+  table: StringFilter
   displayName: StringFilter
   pluralDisplayName: StringFilter
   description: StringFilter
@@ -938,6 +952,7 @@ enum EnumConnectorRestApiAuthenticationType {
 }
 
 enum EnumDataType {
+  Id
   SingleLineText
   MultiLineText
   Email
@@ -949,13 +964,83 @@ enum EnumDataType {
   OptionSet
   Boolean
   GeographicLocation
-  Id
   CreatedAt
   UpdatedAt
   Roles
   Username
   Password
   Json
+}
+
+enum EnumInputType {
+  #密码输入框
+  Password
+  #金额输入框
+  Money
+  #文本域
+  Textarea
+  #日期
+  Date
+  #日期时间
+  DateTime
+  #周
+  DateWeek
+  #月
+  DateMonth
+  #季度输入
+  DateQuarter
+  #年份输入
+  DateYear
+  #日期区间
+  DateRange
+  #日期时间区间
+  DateTimeRange
+  #时间
+  Time
+  #时间区间
+  TimeRange
+  #文本框
+  Text
+  #下拉框
+  Select
+  #多选框
+  Checkbox
+  #星级组件
+  Rate
+  #单选框
+  Radio
+  #按钮单选框
+  RadioButton
+  #进度条
+  Progress
+  #百分比组件
+  Percent
+  #数字输入框
+  Digit
+  #秒格式化
+  Second
+  #头像
+  Avatar
+  #代码框
+  Code
+  #单选多选
+  Switch
+  #相对于当前时间
+  FromNow
+  #图片
+  Image
+  #图片
+  Media
+  #代码框，但是带了 json 格式化
+  JsonCode
+  #颜色选择器
+  Color
+  #富文本编辑器
+  Editor
+  #邮件输入框
+  Email
+  #图标选择
+  Icon
 }
 
 input EnumDataTypeFilter {
@@ -1019,6 +1104,8 @@ type Environment {
   name: String!
   description: String
   address: String!
+  user: String!
+  password: String!
 }
 
 type GithubRepo {

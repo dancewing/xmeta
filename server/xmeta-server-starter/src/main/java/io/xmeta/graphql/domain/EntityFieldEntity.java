@@ -41,6 +41,15 @@ public class EntityFieldEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "column_")
+    private String column;
+
+    @Column(name = "java_type")
+    private String javaType;
+
+    @Column(name = "input_type")
+    private String inputType;
+
     @Column(name = "display_name")
     private String displayName;
 

@@ -1,8 +1,8 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.UserRoleEntity;
-import io.xmeta.graphql.model.Role;
-import io.xmeta.graphql.model.UserRole;
+import io.xmeta.admin.model.Role;
+import io.xmeta.admin.model.UserRole;
 import org.apache.commons.lang.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

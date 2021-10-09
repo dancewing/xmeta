@@ -1,8 +1,8 @@
 package io.xmeta.admin.resolver.impl;
 
 import io.xmeta.admin.service.ActionStepService;
-import io.xmeta.graphql.model.Action;
-import io.xmeta.graphql.model.ActionStep;
+import io.xmeta.admin.model.Action;
+import io.xmeta.admin.model.ActionStep;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

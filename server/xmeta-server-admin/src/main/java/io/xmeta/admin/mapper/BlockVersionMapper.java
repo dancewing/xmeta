@@ -2,7 +2,7 @@ package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.BlockVersionEntity;
 import io.xmeta.admin.util.ObjectMapperUtils;
-import io.xmeta.graphql.model.BlockVersion;
+import io.xmeta.admin.model.BlockVersion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

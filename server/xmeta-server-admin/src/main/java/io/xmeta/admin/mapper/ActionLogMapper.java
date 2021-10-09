@@ -2,7 +2,7 @@ package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.util.ObjectMapperUtils;
 import io.xmeta.admin.domain.ActionLogEntity;
-import io.xmeta.graphql.model.ActionLog;
+import io.xmeta.admin.model.ActionLog;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -233,8 +233,8 @@
                             </graphqlSchemaPaths>
                             <outputDir>${project.build.directory}/generated-sources/graphql</outputDir>
                             <modelPackageName>io.xmeta.admin.model</modelPackageName>
-                            <modelNameSuffix>Model</modelNameSuffix>
-                            <apiPackageName>io.xmeta.graphql.resolver</apiPackageName>
+                            <modelNameSuffix></modelNameSuffix>
+                            <apiPackageName>io.xmeta.admin.resolver</apiPackageName>
                             <addGeneratedAnnotation>false</addGeneratedAnnotation>
                             <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
                             <apiRootInterfaceStrategy>INTERFACE_PER_SCHEMA</apiRootInterfaceStrategy>

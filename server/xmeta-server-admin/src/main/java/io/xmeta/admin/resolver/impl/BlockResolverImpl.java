@@ -1,11 +1,11 @@
 package io.xmeta.admin.resolver.impl;
 
 import io.xmeta.admin.service.BlockVersionService;
-import io.xmeta.graphql.model.Block;
-import io.xmeta.graphql.model.BlockVersion;
-import io.xmeta.graphql.model.BlockVersionOrderByInput;
-import io.xmeta.graphql.model.BlockVersionWhereInput;
-import io.xmeta.graphql.resolver.BlockResolver;
+import io.xmeta.admin.model.Block;
+import io.xmeta.admin.model.BlockVersion;
+import io.xmeta.admin.model.BlockVersionOrderByInput;
+import io.xmeta.admin.model.BlockVersionWhereInput;
+import io.xmeta.admin.resolver.BlockResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

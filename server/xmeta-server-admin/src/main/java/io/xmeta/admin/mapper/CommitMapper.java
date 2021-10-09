@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.CommitEntity;
-import io.xmeta.graphql.model.Commit;
+import io.xmeta.admin.model.Commit;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

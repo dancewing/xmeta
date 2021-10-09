@@ -1,7 +1,7 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.AccountEntity;
-import io.xmeta.graphql.model.*;
+import io.xmeta.admin.model.*;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import io.xmeta.security.jwt.TokenProvider;

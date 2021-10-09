@@ -1,9 +1,9 @@
 package io.xmeta.admin.resolver.impl;
 
 import io.xmeta.admin.service.*;
-import io.xmeta.graphql.model.*;
-import io.xmeta.graphql.resolver.MetaQueryResolver;
-import io.xmeta.graphql.service.*;
+import io.xmeta.admin.model.*;
+import io.xmeta.admin.resolver.MetaQueryResolver;
+import io.xmeta.admin.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

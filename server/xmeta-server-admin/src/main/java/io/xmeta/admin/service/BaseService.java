@@ -1,7 +1,7 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.BaseEntity;
-import io.xmeta.graphql.model.SortOrder;
+import io.xmeta.admin.model.SortOrder;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;

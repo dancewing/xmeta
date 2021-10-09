@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.BlockEntity;
-import io.xmeta.graphql.model.Block;
+import io.xmeta.admin.model.Block;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

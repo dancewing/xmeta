@@ -1,9 +1,9 @@
 package io.xmeta.admin.mix;
 
-import io.xmeta.graphql.model.Account;
-import io.xmeta.graphql.model.User;
-import io.xmeta.graphql.model.UserRole;
-import io.xmeta.graphql.model.Workspace;
+import io.xmeta.admin.model.Account;
+import io.xmeta.admin.model.User;
+import io.xmeta.admin.model.UserRole;
+import io.xmeta.admin.model.Workspace;
 import lombok.Getter;
 import lombok.Setter;
 

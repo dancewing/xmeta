@@ -1,9 +1,9 @@
 package io.xmeta.admin.util;
 
-import io.xmeta.graphql.model.DateTimeFilter;
-import io.xmeta.graphql.model.EnumDataTypeFilter;
-import io.xmeta.graphql.model.IntFilter;
-import io.xmeta.graphql.model.StringFilter;
+import io.xmeta.admin.model.DateTimeFilter;
+import io.xmeta.admin.model.EnumDataTypeFilter;
+import io.xmeta.admin.model.IntFilter;
+import io.xmeta.admin.model.StringFilter;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;

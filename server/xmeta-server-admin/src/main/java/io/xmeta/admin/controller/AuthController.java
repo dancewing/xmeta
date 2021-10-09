@@ -1,7 +1,7 @@
 package io.xmeta.admin.controller;
 
-import io.xmeta.graphql.model.Auth;
-import io.xmeta.graphql.model.LoginInput;
+import io.xmeta.admin.model.Auth;
+import io.xmeta.admin.model.LoginInput;
 import io.xmeta.admin.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

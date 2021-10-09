@@ -2,10 +2,10 @@ package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.EntityPermissionFieldEntity;
 import io.xmeta.admin.repository.EntityPermissionFieldRepository;
-import io.xmeta.graphql.model.EntityAddPermissionFieldInput;
-import io.xmeta.graphql.model.EntityPermissionField;
-import io.xmeta.graphql.model.EntityPermissionFieldWhereUniqueInput;
-import io.xmeta.graphql.model.EntityUpdatePermissionFieldRolesInput;
+import io.xmeta.admin.model.EntityAddPermissionFieldInput;
+import io.xmeta.admin.model.EntityPermissionField;
+import io.xmeta.admin.model.EntityPermissionFieldWhereUniqueInput;
+import io.xmeta.admin.model.EntityUpdatePermissionFieldRolesInput;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

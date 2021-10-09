@@ -1,6 +1,6 @@
 package io.xmeta.admin.mix;
 
-import io.xmeta.graphql.model.EntityFieldCreateInput;
+import io.xmeta.admin.model.EntityFieldCreateInput;
 import lombok.Getter;
 import lombok.Setter;
 

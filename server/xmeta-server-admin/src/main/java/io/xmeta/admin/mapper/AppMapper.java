@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.AppEntity;
-import io.xmeta.graphql.model.App;
+import io.xmeta.admin.model.App;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -24,7 +24,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.xmeta</groupId>
-			<artifactId>xmeta-server-starter</artifactId>
+			<artifactId>xmeta-server-admin</artifactId>
             <version>0.3.1-SNAPSHOT</version>
         </dependency>
 

@@ -3,8 +3,8 @@ package io.xmeta.admin.resolver.impl;
 import io.xmeta.admin.service.BlockService;
 import io.xmeta.admin.service.BuildService;
 import io.xmeta.admin.service.EntityService;
-import io.xmeta.graphql.model.*;
-import io.xmeta.graphql.resolver.CommitResolver;
+import io.xmeta.admin.model.*;
+import io.xmeta.admin.resolver.CommitResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

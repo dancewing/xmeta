@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.ActionStepEntity;
-import io.xmeta.graphql.model.ActionStep;
+import io.xmeta.admin.model.ActionStep;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

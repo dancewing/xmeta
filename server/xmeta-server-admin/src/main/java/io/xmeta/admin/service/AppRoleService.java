@@ -1,11 +1,11 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.AppEntity;
-import io.xmeta.graphql.domain.AppEntity_;
+import io.xmeta.admin.domain.AppEntity_;
 import io.xmeta.admin.domain.AppRoleEntity;
-import io.xmeta.graphql.domain.AppRoleEntity_;
+import io.xmeta.admin.domain.AppRoleEntity_;
 import io.xmeta.admin.mapper.AppRoleMapper;
-import io.xmeta.graphql.model.*;
+import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.AppRoleRepository;
 import io.xmeta.admin.util.PredicateBuilder;
 import org.springframework.data.domain.PageRequest;

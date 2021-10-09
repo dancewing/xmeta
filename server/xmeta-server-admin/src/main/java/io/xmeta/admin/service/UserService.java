@@ -3,7 +3,7 @@ package io.xmeta.admin.service;
 import io.xmeta.admin.domain.UserEntity;
 import io.xmeta.admin.repository.UserRepository;
 import io.xmeta.admin.mapper.UserMapper;
-import io.xmeta.graphql.model.User;
+import io.xmeta.admin.model.User;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,11 +1,11 @@
 package io.xmeta.admin.resolver.impl;
 
 import io.xmeta.admin.service.EntityFieldService;
-import io.xmeta.graphql.model.EntityField;
-import io.xmeta.graphql.model.EntityFieldOrderByInput;
-import io.xmeta.graphql.model.EntityFieldWhereInput;
-import io.xmeta.graphql.model.EntityVersion;
-import io.xmeta.graphql.resolver.EntityVersionResolver;
+import io.xmeta.admin.model.EntityField;
+import io.xmeta.admin.model.EntityFieldOrderByInput;
+import io.xmeta.admin.model.EntityFieldWhereInput;
+import io.xmeta.admin.model.EntityVersion;
+import io.xmeta.admin.resolver.EntityVersionResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

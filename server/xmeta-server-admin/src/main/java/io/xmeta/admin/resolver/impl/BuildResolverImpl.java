@@ -1,10 +1,10 @@
 package io.xmeta.admin.resolver.impl;
 
-import io.xmeta.graphql.model.Build;
-import io.xmeta.graphql.model.Deployment;
-import io.xmeta.graphql.model.DeploymentOrderByInput;
-import io.xmeta.graphql.model.DeploymentWhereInput;
-import io.xmeta.graphql.resolver.BuildResolver;
+import io.xmeta.admin.model.Build;
+import io.xmeta.admin.model.Deployment;
+import io.xmeta.admin.model.DeploymentOrderByInput;
+import io.xmeta.admin.model.DeploymentWhereInput;
+import io.xmeta.admin.resolver.BuildResolver;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

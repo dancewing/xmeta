@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@EntityScan("io.xmeta.graphql.domain")
-@EnableJpaRepositories(basePackages = {"io.xmeta.graphql.repository"})
+@EntityScan("io.xmeta.admin.domain")
+@EnableJpaRepositories(basePackages = {"io.xmeta.admin.repository"})
 public class XMetaGraphQLConfiguration {
     @Bean
     public GraphQLScalarType datetime() {

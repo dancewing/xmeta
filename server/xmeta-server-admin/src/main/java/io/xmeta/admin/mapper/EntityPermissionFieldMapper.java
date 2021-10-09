@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.EntityPermissionFieldEntity;
-import io.xmeta.graphql.model.EntityPermissionField;
+import io.xmeta.admin.model.EntityPermissionField;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

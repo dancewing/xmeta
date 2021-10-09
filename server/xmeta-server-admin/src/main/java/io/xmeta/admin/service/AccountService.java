@@ -2,7 +2,7 @@ package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.AccountEntity;
 import io.xmeta.admin.mapper.AccountMapper;
-import io.xmeta.graphql.model.Account;
+import io.xmeta.admin.model.Account;
 import io.xmeta.admin.repository.AccountRepository;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;

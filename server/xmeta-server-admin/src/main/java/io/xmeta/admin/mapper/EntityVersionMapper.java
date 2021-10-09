@@ -1,7 +1,7 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.EntityVersionEntity;
-import io.xmeta.graphql.model.EntityVersion;
+import io.xmeta.admin.model.EntityVersion;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

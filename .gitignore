@@ -28,6 +28,7 @@ atlassian-ide-plugin.xml
 .project
 .settings
 .metadata
+.factorypath
 bin
 
 # NetBeans specific files/directories

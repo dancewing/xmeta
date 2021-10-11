@@ -22,6 +22,8 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
     private final EntityFieldService entityFieldService;
     private final EntityPermissionService entityPermissionService;
     private final EntityPermissionFieldService entityPermissionFieldService;
+    private final EnvironmentService environmentService;
+    private final DeploymentService deploymentService;
 
     @Override
     public Account updateAccount(UpdateAccountInput data) {
@@ -140,7 +142,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Deployment createDeployment(DeploymentCreateInput data) {
-        return null;
+        return this.deploymentService.createDeployment(data);
     }
 
     @Override
@@ -262,5 +264,20 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
     @Override
     public Build createBuild(BuildCreateInput data) {
         return null;
+    }
+
+    @Override
+    public Environment createEnvironment(EnvironmentCreateInput data) {
+        return this.environmentService.createEnvironment(data);
+    }
+
+    @Override
+    public Environment updateEnvironment(EnvironmentUpdateInput data, WhereUniqueInput where) {
+        return this.environmentService.updateEnvironment(data, where);
+    }
+
+    @Override
+    public Environment deleteEnvironment(WhereUniqueInput where) {
+        return this.environmentService.deleteEnvironment(where);
     }
 }

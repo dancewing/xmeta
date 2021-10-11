@@ -1118,6 +1118,19 @@ export type Environment = {
   name: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   address: Scalars["String"];
+  user: Scalars["String"];
+  password: Scalars["String"];
+};
+
+export type EnvironmentUpdateInput = {
+  __typename?: "Environment";
+  id: Scalars["String"];
+  appId: Scalars["String"];
+  name: Scalars["String"];
+  description?: Maybe<Scalars["String"]>;
+  address: Scalars["String"];
+  user: Scalars["String"];
+  password: Scalars["String"];
 };
 
 export type GithubRepo = {
@@ -1230,6 +1243,9 @@ export type Mutation = {
   updateConnectorRestApiCall: ConnectorRestApiCall;
   createEntityPage: EntityPage;
   updateEntityPage: EntityPage;
+  createEnvironment: Environment;
+  updateEnvironment: Environment;
+  deleteEnvironment: Environment;
 };
 
 export type MutationUpdateAccountArgs = {

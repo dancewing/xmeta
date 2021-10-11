@@ -1,3 +1,6 @@
+server:
+  port: 9980
+
 logging:
   level:
     org.hibernate.internal: DEBUG

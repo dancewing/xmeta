@@ -1102,6 +1102,30 @@ type Environment {
   app: App!
   appId: String!
   name: String!
+  database: EnumDatabaseType!
+  description: String
+  address: String!
+  user: String!
+  password: String!
+}
+
+enum EnumDatabaseType {
+  MySQL
+  Oracle
+}
+
+input EnvironmentCreateInput {
+  appId: String!
+  name: String!
+  description: String
+  address: String!
+  user: String!
+  password: String!
+}
+
+input EnvironmentUpdateInput {
+  appId: String!
+  name: String!
   description: String
   address: String!
   user: String!
@@ -1220,6 +1244,9 @@ type Mutation {
   updateConnectorRestApiCall(data: BlockUpdateInput!, where: WhereUniqueInput!): ConnectorRestApiCall!
   createEntityPage(data: EntityPageCreateInput!): EntityPage!
   updateEntityPage(data: EntityPageUpdateInput!, where: WhereUniqueInput!): EntityPage!
+  createEnvironment(data: EnvironmentCreateInput!): Environment!
+  updateEnvironment(data: EnvironmentUpdateInput!, where: WhereUniqueInput!): Environment!
+  deleteEnvironment(where: WhereUniqueInput!): Environment!
 }
 
 type PendingChange {
@@ -1294,6 +1321,8 @@ type Query {
   ConnectorRestApiCalls(where: ConnectorRestApiCallWhereInput, orderBy: ConnectorRestApiCallOrderByInput, skip: Int, take: Int): [ConnectorRestApiCall!]!
   EntityPage(where: WhereUniqueInput!): EntityPage
   EntityPages(where: EntityPageWhereInput, orderBy: EntityPageOrderByInput, skip: Int, take: Int): [EntityPage!]!
+  environments(where: WhereUniqueInput): [Environment!]!
+  environment(where: WhereUniqueInput!): Environment
 }
 
 enum QueryMode {

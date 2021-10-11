@@ -30,6 +30,7 @@ import { SHOW_UI_ELEMENTS } from "../feature-flags";
 import ScreenResolutionMessage from "../Layout/ScreenResolutionMessage";
 import PendingChangesMenuItem from "../VersionControl/PendingChangesMenuItem";
 import Commits from "../VersionControl/Commits";
+import Environments from "../Environment/Environments";
 import NavigationTabs from "../Layout/NavigationTabs";
 
 enum EnumFixedPanelKeys {
@@ -225,6 +226,11 @@ function ApplicationLayout({ match }: Props) {
             to={`/${application}/commits`}
             icon="history_commit_outline"
           />
+          <MenuItem
+              title="Environment"
+              to={`/${application}/environments`}
+              icon="server"
+          />
         </MainLayout.Menu>
         <MainLayout.Content>
           <div className={`${CLASS_NAME}__app-container`}>
@@ -261,6 +267,7 @@ function ApplicationLayout({ match }: Props) {
                 component={RolesPage}
               />
               <Route path="/:application/commits" component={Commits} />
+              <Route path="/:application/environments" component={Environments} />
               <RouteWithAnalytics
                 path="/:application/fix-related-entities"
                 component={RelatedFieldsMigrationFix}

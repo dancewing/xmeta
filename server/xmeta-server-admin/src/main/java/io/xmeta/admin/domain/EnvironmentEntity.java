@@ -32,6 +32,9 @@ public class EnvironmentEntity extends BaseEntity {
     @Column(name = "app_Id", insertable = false, updatable = false)
     private String appId;
 
+    @Column(name = "database_type")
+    private String databaseType;
+
     @Column(name = "name")
     private String name;
 

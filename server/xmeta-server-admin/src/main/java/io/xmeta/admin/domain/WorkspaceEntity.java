@@ -33,10 +33,10 @@ public class WorkspaceEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "workspace")
-    private List<UserEntity> users = new ArrayList<>();
-
-    @OneToMany(mappedBy = "workspace")
-    private List<AppEntity> apps = new ArrayList<>();
+//    @OneToMany(mappedBy = "workspace")
+//    private List<UserEntity> users = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "workspace")
+//    private List<AppEntity> apps = new ArrayList<>();
 
 }

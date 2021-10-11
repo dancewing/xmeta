@@ -5,7 +5,7 @@ import io.xmeta.admin.model.App;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {EnvironmentMapper.class})
 public interface AppMapper extends BaseMapper<App, AppEntity> {
     App toDto(AppEntity entity);
 

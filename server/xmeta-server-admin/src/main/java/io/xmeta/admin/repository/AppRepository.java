@@ -16,7 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AppRepository extends JpaRepository<AppEntity, String>, JpaSpecificationExecutor<AppEntity> {
 
-    @Query("from AppEntity ae inner join ae.workspace ws inner join ws.users u where ae.id = :appId and u.id = " +
-            ":userId ")
+    @Query("from AppEntity ae inner join ae.workspace ws inner join UserEntity u on u.workspace.id = ws.id  where ae.id = :appId and u.id = :userId ")
     AppEntity findAppEntity(@Param("appId") String appId, @Param("userId") String userId);
 }

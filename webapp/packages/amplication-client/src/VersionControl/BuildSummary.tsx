@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo } from "react";
+import React, {useCallback, useMemo, useState} from "react";
 
 import { Link } from "react-router-dom";
 import { isEmpty } from "lodash";
 import { Icon } from "@rmwc/icon";
 import { useQuery } from "@apollo/client";
-
+import { Dialog } from "@amplication/design-system";
 import * as models from "../models";
 import { EnumButtonStyle, Button } from "../Components/Button";
 import { downloadArchive } from "./BuildSteps";
@@ -13,6 +13,7 @@ import useBuildWatchStatus from "./useBuildWatchStatus";
 import { BuildStepsStatus } from "./BuildStepsStatus";
 import { HelpPopover } from "../Components/HelpPopover";
 import { GET_APPLICATION } from "../Application/ApplicationHome";
+import EnvironmentDeploy from '../Environment/EnvironmentDeploy';
 import useLocalStorage from "react-use-localstorage";
 
 import "./BuildSummary.scss";
@@ -42,6 +43,13 @@ const LOCAL_STORAGE_KEY_SHOW_SANDBOX_HELP = "ShowGSandboxContextHelp";
 
 const BuildSummary = ({ build, onError }: Props) => {
   const { data } = useBuildWatchStatus(build);
+
+  const [newDeploy, setNewDeploy] = useState<boolean>(false);
+
+  const handleNewDeployClick = useCallback(() => {
+    setNewDeploy(!newDeploy);
+  }, [newDeploy, setNewDeploy]);
+
 
   const [showGitHelp, setShowGitHubHelp] = useLocalStorage(
     LOCAL_STORAGE_KEY_SHOW_GITHUB_HELP,
@@ -128,6 +136,14 @@ const BuildSummary = ({ build, onError }: Props) => {
 
   return (
     <div className={`${CLASS_NAME}`}>
+      <Dialog
+          className="new-entity-dialog"
+          isOpen={newDeploy}
+          onDismiss={handleNewDeployClick}
+          title="Deploy to environment"
+      >
+        <EnvironmentDeploy applicationId={build.appId} buildId={build.id} />
+      </Dialog>
       <div className={`${CLASS_NAME}__download`}>
         {githubUrl ? ( //code was synced to github
           <a
@@ -165,11 +181,12 @@ const BuildSummary = ({ build, onError }: Props) => {
               <Button
                 buttonStyle={EnumButtonStyle.Primary}
                 icon="github"
+                onClick={handleNewDeployClick}
                 eventData={{
                   eventName: "buildConnectToGithub",
                 }}
               >
-                Push Code to GitHub
+                Deploy to environment
               </Button>
             </Link>
           </HelpPopover>
@@ -183,6 +200,12 @@ const BuildSummary = ({ build, onError }: Props) => {
             </span>
           </div>
         )}
+        <Button
+            buttonStyle={EnumButtonStyle.Secondary}
+            onClick={handleNewDeployClick}
+        >
+          Deploy to environment
+        </Button>
         <Button
           buttonStyle={EnumButtonStyle.Secondary}
           disabled={

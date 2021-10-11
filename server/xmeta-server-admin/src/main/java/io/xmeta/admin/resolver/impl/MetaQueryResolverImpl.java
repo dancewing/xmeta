@@ -31,6 +31,8 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
 
     private final BlockService blockService;
 
+    private final EnvironmentService environmentService;
+
     @Override
     public Account account() {
         return this.accountService.currentAccount();
@@ -184,5 +186,15 @@ public class MetaQueryResolverImpl implements MetaQueryResolver {
     @Override
     public Build build(WhereUniqueInput where) {
         return this.buildService.getBuild(where.getId());
+    }
+
+    @Override
+    public List<Environment> environments(WhereUniqueInput where) {
+        return this.environmentService.environments(where);
+    }
+
+    @Override
+    public Environment environment(WhereUniqueInput where) {
+        return this.environmentService.environment(where);
     }
 }

@@ -15,11 +15,7 @@
     </parent>
 
     <modules>
-        <module>xmeta-core</module>
-        <module>xmeta-server-admin</module>
-        <module>xmeta-server-security</module>
-        <module>xmeta-server-security-jwt</module>
-        <module>xmeta-server-chassis</module>
+
     </modules>
 
 </project>

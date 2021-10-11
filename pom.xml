@@ -24,8 +24,12 @@
     </licenses>
 
     <modules>
-        <module>server</module>
-<!--        <module>webapp</module>-->
+        <module>xmeta-core</module>
+        <module>xmeta-server-admin</module>
+        <module>xmeta-server-admin-ui</module>
+        <module>xmeta-server-security</module>
+        <module>xmeta-server-security-jwt</module>
+        <module>xmeta-server-chassis</module>
     </modules>
 
     <properties>
@@ -35,27 +39,6 @@
         <java.version>11</java.version>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
-
-    <repositories>
-        <!--
-        <repository>
-            <id>alimaven</id>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-        </repository>
-        -->
-        <repository>
-            <id>central</id>
-            <name>Maven Repository</name>
-            <url>https://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-    </repositories>
 
     <pluginRepositories>
         <pluginRepository>

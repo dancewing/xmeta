@@ -42,10 +42,10 @@ public class DeploymentService extends BaseService<DeploymentRepository, Deploym
         DeploymentEntity deploymentEntity = new DeploymentEntity();
 
         BuildEntity build = new BuildEntity();
-        build.setId(data.getBuild().getConnect().getId());
+        build.setId(data.getBuildId());
 
         EnvironmentEntity environment = new EnvironmentEntity();
-        environment.setId(data.getEnvironment().getConnect().getId());
+        environment.setId(data.getEnvironmentId());
 
         deploymentEntity.setCreatedAt(ZonedDateTime.now());
         deploymentEntity.setUserId(userId);

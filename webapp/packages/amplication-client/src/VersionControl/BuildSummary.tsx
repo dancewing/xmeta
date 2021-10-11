@@ -142,7 +142,7 @@ const BuildSummary = ({ build, onError }: Props) => {
           onDismiss={handleNewDeployClick}
           title="Deploy to environment"
       >
-        <EnvironmentDeploy applicationId={build.appId} buildId={build.id} />
+        <EnvironmentDeploy applicationId={build.appId} buildId={build.id} onCompleted={handleNewDeployClick}  />
       </Dialog>
       <div className={`${CLASS_NAME}__download`}>
         {githubUrl ? ( //code was synced to github

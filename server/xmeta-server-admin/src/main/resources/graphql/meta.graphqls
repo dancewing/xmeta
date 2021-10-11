@@ -528,8 +528,8 @@ type Deployment {
 }
 
 input DeploymentCreateInput {
-  build: WhereParentIdInput!
-  environment: WhereParentIdInput!
+  buildId: String!
+  environmentId: String!
   message: String
 }
 

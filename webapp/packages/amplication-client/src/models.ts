@@ -595,8 +595,8 @@ export type Deployment = {
 };
 
 export type DeploymentCreateInput = {
-  build: WhereParentIdInput;
-  environment: WhereParentIdInput;
+  buildId: Scalars["String"];
+  environmentId: Scalars["String"];
   message?: Maybe<Scalars["String"]>;
 };
 

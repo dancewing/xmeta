@@ -7,7 +7,7 @@ import { formatError } from "../util/error";
 import * as models from "../models";
 import PageContent from "../Layout/PageContent";
 import "./EnvironmentList.scss";
-import {SelectField} from "@amplication/design-system";
+import {SelectField, TextField} from "@amplication/design-system";
 import {Button, EnumButtonStyle} from "../Components/Button";
 
 type TData = {
@@ -17,17 +17,24 @@ type TData = {
 type Props = {
   applicationId: string;
   buildId: string;
+  onCompleted: () => void;
 };
 
 type UpdateData = {
-  deployment: models.Deployment;
+  createDeployment: models.DeploymentCreateInput;
 };
 
 const CLASS_NAME = "entity-list";
 
 const POLL_INTERVAL = 2000;
 
-const EnvironmentDeploy = ({ applicationId, buildId }: Props) => {
+const INITIAL_VALUES: models.DeploymentCreateInput = {
+  buildId: "",
+  environmentId: "",
+  message: "",
+};
+
+const EnvironmentDeploy = ({ applicationId, buildId, onCompleted}: Props) => {
 
   const [error] = useState<Error>();
 
@@ -55,7 +62,11 @@ const EnvironmentDeploy = ({ applicationId, buildId }: Props) => {
 
   const [updateEntity] = useMutation<UpdateData>(
       DEPLOY_ENTITY,
-      {}
+      {
+        onCompleted: (data) => {
+          onCompleted();
+        },
+      }
   );
 
   const handleSubmit = useCallback(
@@ -63,15 +74,16 @@ const EnvironmentDeploy = ({ applicationId, buildId }: Props) => {
         /**@todo: check why the "fields" and "permissions" properties are not removed by omitDeep in the form */
         console.log(111);
         let {
-          ...sanitizedCreateData
+          environmentId,
+          message
         } = data;
 
         updateEntity({
           variables: {
             data: {
-              build: { connect: { id: buildId}},
-              environment: { connect: { id: buildId}},
-              ...sanitizedCreateData,
+              buildId,
+              environmentId,
+              message
             },
           },
         }).catch(console.error);
@@ -86,7 +98,7 @@ const EnvironmentDeploy = ({ applicationId, buildId }: Props) => {
     <PageContent className={CLASS_NAME}>
       {loading && <CircularProgress />}
       <Formik
-          initialValues={{}}
+          initialValues={INITIAL_VALUES}
           enableReinitialize
           onSubmit={handleSubmit}
       >
@@ -95,7 +107,9 @@ const EnvironmentDeploy = ({ applicationId, buildId }: Props) => {
               <Form>
                 {data?.environments && <SelectField options={data.environments.map(env=>{
                   return {label: env.name, value: env.id}
-                })} label='Environment' name= 'environment' />}
+                })} label="Environment" name="environmentId" />}
+
+                <TextField name="message" label="message" />
 
                 <Button
                     type="submit"

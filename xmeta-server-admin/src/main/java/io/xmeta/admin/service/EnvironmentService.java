@@ -45,6 +45,9 @@ public class EnvironmentService extends BaseService<EnvironmentRepository, Envir
         environment.setCreatedAt(ZonedDateTime.now());
         environment.setDescription("Sandbox");
         environment.setName("Sandbox environment");
+        environment.setUser("");
+        environment.setAddress("");
+        environment.setPassword("");
         this.environmentRepository.save(environment);
     }
 

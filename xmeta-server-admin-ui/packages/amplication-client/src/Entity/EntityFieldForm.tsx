@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, {useMemo} from "react";
 import { Formik, FormikErrors } from "formik";
 import omit from "lodash.omit";
 import { isEmpty } from "lodash";
@@ -9,11 +9,11 @@ import { DisplayNameField } from "../Components/DisplayNameField";
 import { Form } from "../Components/Form";
 import NameField from "../Components/NameField";
 import OptionalDescriptionField from "../Components/OptionalDescriptionField";
-import FormikAutoSave from "../util/formikAutoSave";
 import { validate } from "../util/formikValidateJsonSchema";
 import { SYSTEM_DATA_TYPES } from "./constants";
 import DataTypeSelectField from "./DataTypeSelectField";
 import { SchemaFields } from "./SchemaFields";
+import {Button, EnumButtonStyle} from "../Components/Button";
 
 export type Values = {
   id: string; //the id field is required in the form context to be used in "DataTypeSelectField"
@@ -121,7 +121,7 @@ const EntityFieldForm = ({
 
         return (
           <Form childrenAsBlocks onKeyDown={onKeyDown}>
-            {!isDisabled && <FormikAutoSave debounceMS={1000} />}
+            {/*{!isDisabled && <FormikAutoSave debounceMS={1000} />}*/}
 
             <DisplayNameField
               name="displayName"
@@ -130,7 +130,7 @@ const EntityFieldForm = ({
               required
             />
             <NameField name="name" disabled={isDisabled} required />
-            <TextField name="column" label="Column" required />
+            <TextField name="column" label="Column" disabled={isDisabled} required />
             <OptionalDescriptionField
               name="description"
               label="Description"
@@ -142,19 +142,17 @@ const EntityFieldForm = ({
                 label="Unique Field"
                 disabled={isDisabled}
               />
-            </div>
-            <div>
               <ToggleField
-                name="required"
-                label="Required Field"
-                disabled={isDisabled}
+                  name="required"
+                  label="Required Field"
+                  disabled={isDisabled}
+                  style={{marginLeft: 20}}
               />
-            </div>
-            <div>
               <ToggleField
-                name="searchable"
-                label="Searchable"
-                disabled={isDisabled}
+                  name="searchable"
+                  label="Searchable"
+                  disabled={isDisabled}
+                  style={{marginLeft: 20}}
               />
             </div>
             {!SYSTEM_DATA_TYPES.has(formik.values.dataType) && (
@@ -166,6 +164,20 @@ const EntityFieldForm = ({
               applicationId={applicationId}
               entityDisplayName={entityDisplayName}
             />
+            <Button
+                type="submit"
+                buttonStyle={EnumButtonStyle.Primary}
+                disabled={ isDisabled || !formik.isValid || !formik.dirty }
+            >
+              Update
+            </Button>
+            <Button type="reset"
+                    buttonStyle={EnumButtonStyle.CallToAction}
+                    disabled={ isDisabled || !formik.dirty}
+                    style={{marginLeft:20}}
+            >
+              Reset
+            </Button>
           </Form>
         );
       }}

@@ -136,6 +136,7 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         newEntityVersion.setDisplayName(firstEntityVersion.getDisplayName());
         newEntityVersion.setPluralDisplayName(firstEntityVersion.getPluralDisplayName());
         newEntityVersion.setDescription(firstEntityVersion.getDescription());
+        newEntityVersion.setTable(firstEntityVersion.getTable());
 
         CommitEntity commit = new CommitEntity();
         commit.setId(commitId);

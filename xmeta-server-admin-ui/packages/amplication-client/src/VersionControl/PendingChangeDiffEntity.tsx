@@ -150,6 +150,7 @@ export const GET_ENTITY_VERSION = gql`
         displayName
         pluralDisplayName
         description
+        table
         permissions {
           action
           type
@@ -179,6 +180,8 @@ export const GET_ENTITY_VERSION = gql`
           required
           unique
           searchable
+          column
+          inputType
         }
       }
     }

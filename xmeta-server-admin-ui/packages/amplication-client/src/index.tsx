@@ -1,13 +1,17 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
+import LanguageProvider from './LanguageProvider';
 import {
   ApolloClient,
   InMemoryCache,
   createHttpLink,
   ApolloProvider,
+  from,
 } from "@apollo/client";
+import { onError } from "@apollo/client/link/error";
 import * as amplicationDesignSystem from "@amplication/design-system";
+import { SnackbarQueue, createSnackbarQueue } from '@rmwc/snackbar';
 import "@amplication/design-system/icons";
 import "./index.scss";
 import App from "./App";
@@ -15,11 +19,15 @@ import * as serviceWorker from "./serviceWorker";
 import { getToken, setToken } from "./authentication/authentication";
 import { setContext } from "@apollo/client/link/context";
 
+import { translationMessages } from './i18n';
+
 const params = new URLSearchParams(window.location.search);
 const token = params.get("token");
 if (token) {
   setToken(token);
 }
+
+export const queue = createSnackbarQueue()
 
 const httpLink = createHttpLink({
   uri: "/graphql",
@@ -37,21 +45,42 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors)
+    graphQLErrors.forEach(({ message, locations, path }) =>
+        queue.notify({
+          title: <b>Error</b>,
+          body: `${message}`,
+          icon: 'error',
+        })
+    );
+
+    if (networkError) {
+      queue.notify({
+        title: <b>Error</b>,
+        body: `${networkError}`,
+        icon: 'error',
+      })
+    };
+});
+
+
 const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
-  link: authLink.concat(httpLink),
+  link: from([errorLink, authLink.concat(httpLink)]),
 });
 
 ReactDOM.render(
-  <React.StrictMode>
-    <ApolloProvider client={apolloClient}>
+  <ApolloProvider client={apolloClient}>
+    <LanguageProvider messages={translationMessages}>
       <amplicationDesignSystem.Provider>
         <Router>
           <App />
+          <SnackbarQueue messages={queue.messages} />
         </Router>
       </amplicationDesignSystem.Provider>
-    </ApolloProvider>
-  </React.StrictMode>,
+    </LanguageProvider>
+  </ApolloProvider>,
   document.getElementById("root")
 );
 

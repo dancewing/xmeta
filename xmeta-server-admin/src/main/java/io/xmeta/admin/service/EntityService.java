@@ -1,20 +1,14 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.constants.EntityConst;
-import io.xmeta.admin.domain.AppEntity;
-import io.xmeta.admin.domain.EntityEntity;
-import io.xmeta.admin.domain.EntityVersionEntity;
-import io.xmeta.admin.domain.UserEntity;
-import io.xmeta.admin.mix.CreateOneEntityField;
-import io.xmeta.admin.mix.EntityDomain;
+import io.xmeta.admin.domain.*;
+import io.xmeta.admin.mapper.EntityMapper;
+import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.admin.repository.EntityVersionRepository;
 import io.xmeta.admin.util.Maps;
 import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.admin.util.SoftDelete;
-import io.xmeta.admin.domain.*;
-import io.xmeta.admin.mapper.EntityMapper;
-import io.xmeta.admin.model.*;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -86,15 +80,13 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             Entity entity = this.createOneEntity(entityTemplate);
             if (entityTemplate.getFields() != null) {
                 for (EntityFieldCreateInput field : entityTemplate.getFields()) {
-                    CreateOneEntityField createOneEntityField = new CreateOneEntityField();
                     field.setEntity(WhereParentIdInput.builder()
                             .setConnect(WhereUniqueInput.builder().setId(entity.getId()).build())
                             .build());
                     if (StringUtils.isEmpty(field.getColumn())) {
                         field.setColumn(field.getName());
                     }
-                    createOneEntityField.setData(field);
-                    this.entityFieldService.createField(createOneEntityField);
+                    this.entityFieldService.createEntityField(field, null, null);
                 }
             }
         }
@@ -119,7 +111,9 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<EntityEntity> result = null;
-        if (skip == null) skip = 0;
+        if (skip == null) {
+            skip = 0;
+        }
         if (take != null) {
             Pageable pageable = PageRequest.of(skip, take, sort);
             result = this.entityRepository.findAll(specification, pageable).getContent();
@@ -133,6 +127,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         return this.entities(null, where, orderBy, skip, take);
     }
 
+    /**
+     * 创建数据模型，并创建默认字段(ID, createAt, createBy)
+     * @param data
+     * @return
+     */
     @Transactional
     public Entity createOneEntity(EntityCreateInput data) {
         Set<ConstraintViolation<EntityCreateInput>> constraintViolations = validator.validate(data);
@@ -149,11 +148,16 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setCreatedAt(ZonedDateTime.now());
         entityEntity.setUpdatedAt(ZonedDateTime.now());
 
+        String table = data.getTable();
+        if (StringUtils.isEmpty(table)) {
+            table = data.getName();
+        }
+
         AppEntity appEntity = new AppEntity();
         appEntity.setId(data.getApp().getConnect().getId());
         entityEntity.setApp(appEntity);
         entityEntity.setName(data.getName());
-        entityEntity.setTable(data.getTable());
+        entityEntity.setTable(table);
         entityEntity.setDisplayName(data.getDisplayName());
         entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription("");
@@ -174,6 +178,8 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityVersionEntity.setDescription("");
         entityVersionEntity.setCommit(null);
         entityVersionEntity.setDeleted(null);
+        entityVersionEntity.setTable(table);
+
         //entityVersionEntity.setBuilds(Sets.newHashSet());
         this.entityVersionRepository.saveAndFlush(entityVersionEntity);
 
@@ -197,7 +203,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setSearchable(true)
                         .setColumn("id")
                         .setProperties(Maps.empty())
-                        .build(), entityEntity.getId(),
+                        .build(),
                 entityVersionEntity);
 
         this.entityFieldService.createDefaultField(EntityField.builder()
@@ -210,7 +216,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setSearchable(false)
                         .setColumn("created_at")
                         .setProperties(Maps.empty())
-                        .build(), entityEntity.getId(),
+                        .build(),
                 entityVersionEntity);
 
         this.entityFieldService.createDefaultField(EntityField.builder()
@@ -223,7 +229,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setSearchable(false)
                         .setColumn("updated_at")
                         .setProperties(Maps.empty())
-                        .build(), entityEntity.getId(),
+                        .build(),
                 entityVersionEntity);
 
         return this.entityMapper.toDto(entityEntity);
@@ -328,7 +334,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setDisplayName(data.getDisplayName());
         entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription(data.getDescription());
-        entityEntity.setTable(data.getName());
+        entityEntity.setTable(data.getTable());
 
         this.entityRepository.save(entityEntity);
 
@@ -340,6 +346,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             versionEntity.setDisplayName(data.getDisplayName());
             versionEntity.setPluralDisplayName(data.getPluralDisplayName());
             versionEntity.setDescription(data.getDescription());
+            versionEntity.setTable(data.getTable());
             this.entityVersionRepository.save(versionEntity);
         }
         return this.entityMapper.toDto(entityEntity);
@@ -369,12 +376,13 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         return this.entityMapper.toDto(this.lockService.acquireEntityLock(where.getId()));
     }
 
-    public List<EntityDomain> loadEntities(String appId) {
+    public List<io.xmeta.core.domain.Entity> loadEntities(String appId) {
         List<EntityEntity> entityEntities = this.entityRepository.findEntitiesByApp(appId);
-        List<EntityDomain> entityDomains = new ArrayList<>();
+        List<io.xmeta.core.domain.Entity> entityDomains = new ArrayList<>();
         for (EntityEntity entity: entityEntities) {
-            EntityDomain entityDomain = new EntityDomain();
+            io.xmeta.core.domain.Entity entityDomain = new io.xmeta.core.domain.Entity();
             entityDomain.setId(entity.getId());
+            entityDomain.setTable(entity.getTable());
             entityDomain.setName(entity.getName());
             entityDomain.setDisplayName(entity.getDisplayName());
             entityDomain.setPluralDisplayName(entity.getPluralDisplayName());
@@ -383,7 +391,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                     pageable);
             if (page.getContent().size() > 0) {
                 EntityVersionEntity entityVersionEntity = page.getContent().get(0);
-                entityDomain.setVersionNumber(entityVersionEntity.getVersionNumber());
                 entityDomain.setFields(this.entityFieldService.getFields(entityVersionEntity.getId()));
             }
             entityDomains.add(entityDomain);

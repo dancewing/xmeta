@@ -115,7 +115,6 @@ export const GET_FIELDS = gql`
         description
         properties
         column
-        javaType
         inputType
       }
     }

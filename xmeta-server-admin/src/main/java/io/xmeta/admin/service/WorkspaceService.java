@@ -115,6 +115,10 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
         return this.workspaceMapper.toDto(this.workspaceRepository.getById(id));
     }
 
+    /***
+     * 获取元数据库信息
+     * @return
+     */
     public List<WorkspaceDomain> metadata() {
         List<Workspace>  workspaces = this.getCurrentAccountWorkspaces();
         List<WorkspaceDomain> workspaceDomains = new ArrayList<>();

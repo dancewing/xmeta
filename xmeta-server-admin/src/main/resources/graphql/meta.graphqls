@@ -594,7 +594,6 @@ type EntityField {
   displayName: String!
   column: String
   dataType: EnumDataType!
-  javaType: String
   inputType: EnumInputType
   properties: JSONObject
   required: Boolean!
@@ -614,7 +613,6 @@ input EntityFieldCreateInput {
   name: String!
   displayName: String!
   dataType: EnumDataType!
-  javaType: String
   inputType: EnumInputType
   column: String
   properties: JSONObject!
@@ -656,7 +654,6 @@ input EntityFieldUpdateInput {
   unique: Boolean
   searchable: Boolean
   description: String
-  javaType: String
   inputType: EnumInputType
   column: String
   position: Int
@@ -1106,7 +1103,7 @@ type Environment {
   description: String
   address: String!
   user: String!
-  password: String!
+  password: String
 }
 
 enum EnumDatabaseType {

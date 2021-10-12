@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, {useState, useCallback} from "react";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import { Snackbar } from "@rmwc/snackbar";
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -26,8 +26,6 @@ type UpdateData = {
 
 const CLASS_NAME = "entity-list";
 
-const POLL_INTERVAL = 2000;
-
 const INITIAL_VALUES: models.DeploymentCreateInput = {
   buildId: "",
   environmentId: "",
@@ -41,24 +39,12 @@ const EnvironmentDeploy = ({ applicationId, buildId, onCompleted}: Props) => {
   const {
     data,
     loading,
-    error: errorLoading,
-    refetch,
-    stopPolling,
-    startPolling,
+    error: errorLoading
   } = useQuery<TData>(GET_ENTITIES, {
     variables: {
       id: applicationId,
     },
   });
-
-  //start polling with cleanup
-  useEffect(() => {
-    refetch().catch(console.error);
-    startPolling(POLL_INTERVAL);
-    return () => {
-      stopPolling();
-    };
-  }, [refetch, stopPolling, startPolling]);
 
   const [updateEntity] = useMutation<UpdateData>(
       DEPLOY_ENTITY,

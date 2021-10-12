@@ -17,10 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 @PreAuthorize("isAuthenticated()")
 public class EntityPermissionRoleService extends BaseService<EntityPermissionRoleRepository, EntityPermissionRoleEntity, String> {
 
-    private final EntityPermissionRoleRepository permissionroleRepository;
+    private final EntityPermissionRoleRepository permissionRoleRepository;
 
-    public EntityPermissionRoleService(EntityPermissionRoleRepository permissionroleRepository) {
-        super(permissionroleRepository);
-        this.permissionroleRepository = permissionroleRepository;
+    public EntityPermissionRoleService(EntityPermissionRoleRepository permissionRoleRepository) {
+        super(permissionRoleRepository);
+        this.permissionRoleRepository = permissionRoleRepository;
     }
 }

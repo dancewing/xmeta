@@ -25,6 +25,12 @@
 
         <dependency>
             <groupId>io.xmeta</groupId>
+            <artifactId>xmeta-core</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.xmeta</groupId>
             <artifactId>xmeta-server-security-jwt</artifactId>
             <version>0.3.1-SNAPSHOT</version>
         </dependency>

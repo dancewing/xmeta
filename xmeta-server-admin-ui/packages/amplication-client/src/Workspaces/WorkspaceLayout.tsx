@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import React from "react";
 import { Switch, match } from "react-router-dom";
+import { FormattedMessage } from 'react-intl';
 import MainLayout from "../Layout/MainLayout";
 import ScreenResolutionMessage from "../Layout/ScreenResolutionMessage";
 import * as models from "../models";
@@ -44,10 +45,10 @@ function WorkspaceLayout({ match }: Props) {
           <WorkspaceSelector />
           <div className={`${CLASS_NAME}__tabs`}>
             <InnerTabLink to={`/`} icon="grid">
-              Apps
+              <FormattedMessage id="apps" />
             </InnerTabLink>
             <InnerTabLink to={`/workspace/settings`} icon="settings">
-              Workspace Settings
+              <FormattedMessage id="workspace.settings" />
             </InnerTabLink>
           </div>
         </MenuItemWithFixedPanel>

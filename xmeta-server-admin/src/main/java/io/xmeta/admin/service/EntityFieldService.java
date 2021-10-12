@@ -1,19 +1,15 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.constants.FieldConstProperties;
-import io.xmeta.admin.domain.EntityEntity;
-import io.xmeta.admin.domain.EntityFieldEntity;
-import io.xmeta.admin.domain.EntityVersionEntity;
-import io.xmeta.admin.mix.CreateOneEntityField;
-import io.xmeta.admin.mix.FieldDomain;
+import io.xmeta.admin.domain.*;
+import io.xmeta.admin.mapper.EntityFieldMapper;
+import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.EntityFieldRepository;
 import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.admin.repository.EntityVersionRepository;
 import io.xmeta.admin.util.*;
-import io.xmeta.admin.domain.*;
-import io.xmeta.admin.mapper.EntityFieldMapper;
-import io.xmeta.admin.model.*;
-import io.xmeta.admin.util.*;
+import io.xmeta.core.domain.DataType;
+import io.xmeta.core.utils.EntityFieldUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
@@ -68,9 +64,14 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                 entityVersion.getVersionNumber(), where, orderBy, skip, take));
     }
 
-
+    /**
+     *  创建字段信息
+     * @param entityField
+     * @param entityVersion
+     * @return
+     */
     @Transactional
-    public EntityField createDefaultField(EntityField entityField, String entityId, EntityVersionEntity entityVersion) {
+    public EntityField createDefaultField(EntityField entityField, EntityVersionEntity entityVersion) {
         EntityFieldEntity fieldEntity = new EntityFieldEntity();
         fieldEntity.setCreatedAt(ZonedDateTime.now());
         fieldEntity.setUpdatedAt(ZonedDateTime.now());
@@ -86,8 +87,10 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setPosition(entityField.getPosition());
         fieldEntity.setUnique(entityField.getUnique());
         fieldEntity.setColumn(entityField.getColumn());
-        fieldEntity.setJavaType(entityField.getJavaType());
-        if (entityField.getInputType()!=null) {
+        if (entityField.getDataType()!= null) {
+            fieldEntity.setJavaType(EntityFieldUtils.determineJavaType(entityField.getDataType().name(), entityField.getProperties()));
+        }
+        if (entityField.getInputType() != null) {
             fieldEntity.setInputType(entityField.getInputType().name());
         }
 
@@ -96,13 +99,63 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         return this.entityFieldMapper.toDto(fieldEntity);
     }
 
+    /**
+     * 前台创建字段
+     * @param data
+     * @param relatedFieldName
+     * @param relatedFieldDisplayName
+     * @return
+     */
     @Transactional
     public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
-        CreateOneEntityField createOneEntityField = new CreateOneEntityField();
-        createOneEntityField.setData(data);
-        createOneEntityField.setRelatedFieldName(relatedFieldName);
-        createOneEntityField.setRelatedFieldDisplayName(relatedFieldDisplayName);
-        return this.createField(createOneEntityField);
+
+        EntityEntity entityEntity = this.lockService.acquireEntityLock(data.getEntity().getConnect().getId());
+
+        //this.validateFieldMutationArgs();
+        if (data.getDataType() == EnumDataType.Lookup) {
+            //生成relatedFieldId
+            data.getProperties().put("relatedFieldId", IDGenerator.nextId());
+        }
+        //this.validateFieldData();
+        String fieldId = IDGenerator.nextId();
+
+        if (data.getDataType() == EnumDataType.Lookup) {
+            this.createRelatedField(
+                    MapUtils.getString(data.getProperties(), "relatedFieldId"),
+                    relatedFieldName,
+                    relatedFieldDisplayName,
+                    !MapUtils.getBooleanValue(data.getProperties(), "allowMultipleSelection"),
+                    MapUtils.getString(data.getProperties(), "relatedEntityId"),
+                    entityEntity.getId(),
+                    fieldId
+            );
+        }
+
+        EntityVersionEntity entityVersion = this.entityVersionRepository.findEntityVersion(entityEntity.getId(), 0);
+        EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
+        entityFieldEntity.setId(fieldId);
+        entityFieldEntity.setCreatedAt(ZonedDateTime.now());
+        entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
+        entityFieldEntity.setEntityVersion(entityVersion);
+        entityFieldEntity.setPermanentId(fieldId);
+        entityFieldEntity.setName(data.getName());
+        entityFieldEntity.setColumn(data.getColumn());
+        if (data.getInputType() != null) {
+            entityFieldEntity.setInputType(data.getInputType().name());
+        }
+        entityFieldEntity.setJavaType(EntityFieldUtils.determineJavaType(data.getDataType().name(), data.getProperties()));
+        entityFieldEntity.setDisplayName(data.getDisplayName());
+        entityFieldEntity.setDataType(data.getDataType().name());
+        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
+        entityFieldEntity.setRequired(data.getRequired());
+        entityFieldEntity.setSearchable(data.getSearchable());
+        entityFieldEntity.setDescription(data.getDescription());
+        entityFieldEntity.setPosition(0);
+        entityFieldEntity.setUnique(data.getUnique());
+
+        this.entityFieldRepository.saveAndFlush(entityFieldEntity);
+
+        return this.entityFieldMapper.toDto(entityFieldEntity);
     }
 
     @Transactional
@@ -116,78 +169,24 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         createInput.setDisplayName(data.getDisplayName());
         createInput.setEntity(data.getEntity());
 
-        CreateOneEntityField createOneEntityField = new CreateOneEntityField();
-        createOneEntityField.setData(createInput);
+        String relatedFieldName = null;
+        String relatedFieldDisplayName = null;
 
         if (createInput.getDataType() == EnumDataType.Lookup) {
             //TODO allowMultipleSelection, 从properties 属性中获取
             boolean allowMultipleSelection =
                     createInput.getProperties() != null && MapUtils.getBooleanValue(createInput.getProperties(), "allowMultipleSelection",
                             false);
-            createOneEntityField.setRelatedFieldName(Inflector.getInstance().lowerCamelCase(
+
+            relatedFieldName = Inflector.getInstance().lowerCamelCase(
                     !allowMultipleSelection ? entityEntity.getPluralDisplayName() : entityEntity.getName()
-                    , ' '));
+                    , ' ');
 
-            createOneEntityField.setRelatedFieldDisplayName(!allowMultipleSelection
+            relatedFieldDisplayName = !allowMultipleSelection
                     ? entityEntity.getPluralDisplayName()
-                    : entityEntity.getDisplayName());
+                    : entityEntity.getDisplayName();
         }
-        return this.createField(createOneEntityField);
-    }
-
-    @Transactional
-    public EntityField createField(CreateOneEntityField createOneEntityField) {
-        EntityFieldCreateInput fieldData = createOneEntityField.getData();
-
-        EntityEntity entityEntity = this.lockService.acquireEntityLock(fieldData.getEntity().getConnect().getId());
-
-        //this.validateFieldMutationArgs();
-
-
-        if (fieldData.getDataType() == EnumDataType.Lookup) {
-            //生成relatedFieldId
-            fieldData.getProperties().put("relatedFieldId", IDGenerator.nextId());
-        }
-        //this.validateFieldData();
-        String fieldId = IDGenerator.nextId();
-
-        if (fieldData.getDataType() == EnumDataType.Lookup) {
-            this.createRelatedField(
-                    MapUtils.getString(fieldData.getProperties(), "relatedFieldId"),
-                    createOneEntityField.getRelatedFieldName(),
-                    createOneEntityField.getRelatedFieldDisplayName(),
-                    !MapUtils.getBooleanValue(fieldData.getProperties(), "allowMultipleSelection"),
-                    MapUtils.getString(fieldData.getProperties(), "relatedEntityId"),
-                    entityEntity.getId(),
-                    fieldId
-            );
-        }
-
-        EntityVersionEntity entityVersion = this.entityVersionRepository.findEntityVersion(entityEntity.getId(), 0);
-        EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
-        entityFieldEntity.setId(fieldId);
-        entityFieldEntity.setCreatedAt(ZonedDateTime.now());
-        entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
-        entityFieldEntity.setEntityVersion(entityVersion);
-        entityFieldEntity.setPermanentId(fieldId);
-        entityFieldEntity.setName(fieldData.getName());
-        entityFieldEntity.setColumn(fieldData.getColumn());
-        if (fieldData.getInputType()!=null) {
-            entityFieldEntity.setInputType(fieldData.getInputType().name());
-        }
-        entityFieldEntity.setJavaType(fieldData.getJavaType());
-        entityFieldEntity.setDisplayName(fieldData.getDisplayName());
-        entityFieldEntity.setDataType(fieldData.getDataType().name());
-        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(fieldData.getProperties()));
-        entityFieldEntity.setRequired(fieldData.getRequired());
-        entityFieldEntity.setSearchable(fieldData.getSearchable());
-        entityFieldEntity.setDescription(fieldData.getDescription());
-        entityFieldEntity.setPosition(0);
-        entityFieldEntity.setUnique(fieldData.getUnique());
-
-        this.entityFieldRepository.saveAndFlush(entityFieldEntity);
-
-        return this.entityFieldMapper.toDto(entityFieldEntity);
+        return this.createEntityField(createInput, relatedFieldName, relatedFieldDisplayName);
     }
 
     // 创建一个供存储用的EntityField 设置 name， dataType, properties
@@ -493,23 +492,23 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         this.entityFieldRepository.deleteByEntityVersionAndPermanentId(entityField.getEntityVersion().getId(), relatedEntityId);
     }
 
-    public List<FieldDomain> getFields(String versionId) {
+    public List<io.xmeta.core.domain.EntityField> getFields(String versionId) {
         List<EntityFieldEntity> fieldEntities = this.entityFieldRepository.getFields(versionId);
-        List<FieldDomain> fieldDomains = new ArrayList<>();
-        for (EntityFieldEntity fieldEntity : fieldEntities) {
-            FieldDomain fieldDomain = new FieldDomain();
-            fieldDomain.setId(fieldEntity.getId());
-            fieldDomain.setPermanentId(fieldEntity.getPermanentId());
-            fieldDomain.setName(fieldEntity.getName());
-            fieldDomain.setDisplayName(fieldEntity.getDisplayName());
-            fieldDomain.setDataType(fieldEntity.getDataType());
-            fieldDomain.setProperties(ObjectMapperUtils.toMap(fieldEntity.getProperties()));
-            fieldDomain.setRequired(fieldEntity.getRequired());
-            fieldDomain.setSearchable(fieldEntity.getSearchable());
-            fieldDomain.setDescription(fieldEntity.getDescription());
-            fieldDomain.setPosition(fieldEntity.getPosition());
-            fieldDomain.setUnique(fieldEntity.getUnique());
-            fieldDomains.add(fieldDomain);
+        List<io.xmeta.core.domain.EntityField> fieldDomains = new ArrayList<>();
+        for (EntityFieldEntity field : fieldEntities) {
+            io.xmeta.core.domain.EntityField entityField = new io.xmeta.core.domain.EntityField();
+            entityField.setId(field.getId());
+            entityField.setName(field.getName());
+            entityField.setColumn(field.getColumn());
+            entityField.setDisplayName(field.getDisplayName());
+            entityField.setDataType(DataType.valueOf(field.getDataType()));
+            entityField.setJavaType(field.getJavaType());
+            entityField.setProperties(ObjectMapperUtils.toMap(field.getProperties()));
+            entityField.setRequired(field.getRequired());
+            entityField.setSearchable(field.getSearchable());
+            entityField.setDescription(field.getDescription());
+            entityField.setUnique(field.getUnique());
+            fieldDomains.add(entityField);
         }
         return fieldDomains;
     }

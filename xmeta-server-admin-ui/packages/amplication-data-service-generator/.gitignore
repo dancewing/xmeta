@@ -1,8 +1,0 @@
-dist/
-node_modules/
-coverage/
-generated/
-*.d.ts
-*.map
-# ESLint
-.eslintcache

@@ -191,7 +191,6 @@ export const GET_ENTITY = gql`
         dataType
         description
         column
-        javaType
         inputType
       }
     }
@@ -224,7 +223,6 @@ const UPDATE_ENTITY = gql`
         dataType
         description
         column
-        javaType
         inputType
       }
     }

@@ -1,11 +1,13 @@
 package io.xmeta.admin.mix;
 
+import io.xmeta.core.domain.Entity;
+
 import java.util.List;
 
 public class AppDomain {
     private String id;
     private String name;
-    private List<EntityDomain> entities;
+    private List<Entity> entities;
 
     public String getId() {
         return id;
@@ -23,11 +25,11 @@ public class AppDomain {
         this.name = name;
     }
 
-    public List<EntityDomain> getEntities() {
+    public List<Entity> getEntities() {
         return entities;
     }
 
-    public void setEntities(List<EntityDomain> entities) {
+    public void setEntities(List<Entity> entities) {
         this.entities = entities;
     }
 }

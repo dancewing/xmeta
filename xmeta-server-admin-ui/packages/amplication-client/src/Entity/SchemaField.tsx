@@ -105,6 +105,15 @@ export const SchemaField = ({
             />
           );
         }
+        case "#/definitions/RelationType": {
+          return (
+              <RelationAllowMultipleField
+                  fieldName={fieldName}
+                  isDisabled={isDisabled}
+                  entityDisplayName={entityDisplayName}
+              />
+          );
+        }
       }
 
       throw new Error(`Unexpected propertySchema.type: ${propertySchema.type}`);

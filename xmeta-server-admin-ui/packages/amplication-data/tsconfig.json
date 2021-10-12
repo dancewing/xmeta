@@ -9,10 +9,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "strictNullChecks": false,
     "sourceMap": true,
     "outDir": "dist",
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["react", "jest"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/**.spec.ts"]
 }

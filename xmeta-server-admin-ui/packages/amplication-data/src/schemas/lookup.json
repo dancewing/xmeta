@@ -19,6 +19,11 @@
       "title": "Related Field",
       "$ref": "#/definitions/EntityFieldId",
       "default": null
+    },
+    "relationType": {
+      "title": "Relation Type",
+      "$ref": "#/definitions/RelationType",
+      "default": null
     }
   },
   "definitions": {
@@ -30,6 +35,9 @@
     },
     "RelationAllowMultiple": {
       "type": "boolean"
+    },
+    "RelationType": {
+      "type": "string"
     }
   }
 }

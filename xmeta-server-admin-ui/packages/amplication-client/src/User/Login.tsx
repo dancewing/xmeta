@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from "react";
 import { Location } from "history";
 import { useHistory, useLocation, Link } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
+import {useIntl} from 'react-intl';
 import { Formik } from "formik";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Snackbar } from "@rmwc/snackbar";
@@ -40,7 +41,7 @@ const Login = () => {
   const history = useHistory();
   const location = useLocation();
   const [login, { loading, data, error }] = useMutation(DO_LOGIN);
-
+  const intl = useIntl();
   const content = useMemo(() => {
     const s: LocationStateInterface | undefined | null = location.state;
     const urlParams = new URLSearchParams(s?.from?.search);
@@ -84,7 +85,7 @@ const Login = () => {
 
   return (
     <WelcomePage {...content}>
-      <span className={`${CLASS_NAME}__title`}>Hi There</span>
+      <span className={`${CLASS_NAME}__title`}>{intl.formatMessage({id: "welcome"})}</span>
       <Formik initialValues={INITIAL_VALUES} onSubmit={handleSubmit}>
         <Form childrenAsBlocks>
           {urlError && (
@@ -111,13 +112,13 @@ const Login = () => {
           ) : (
             <>
               <TextField
-                label="Email"
+                label={intl.formatMessage({id: "email"})}
                 name="email"
                 type="email"
                 autoComplete="email"
               />
               <TextField
-                label="Password"
+                label={intl.formatMessage({id: "password"})}
                 name="password"
                 type="password"
                 autoComplete="current-password"
@@ -129,25 +130,13 @@ const Login = () => {
                   eventName: "signInWithUserName",
                 }}
               >
-                Continue
+                {intl.formatMessage({id: "login"})}
               </Button>
               <div className={`${CLASS_NAME}__signup`}>
-                Do not have an account? <Link to="/signup">Sign up</Link>
+                {intl.formatMessage({id: "no-account"})} <Link to="/signup">{intl.formatMessage({id: "register"})}</Link>
               </div>
             </>
           )}
-
-          <div className={`${CLASS_NAME}__policy`}>
-            By signing up to {content.name}, you agree to our{" "}
-            <a href="https://amplication.com/terms" target="terms">
-              terms of service
-            </a>{" "}
-            and&nbsp;
-            <a href="https://amplication.com/privacy" target="privacy">
-              privacy policy
-            </a>
-            .
-          </div>
 
           {loading && <CircularProgress />}
           <Snackbar open={Boolean(error)} message={errorMessage} />

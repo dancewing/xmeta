@@ -560,7 +560,7 @@ type Entity {
   name: String!
   displayName: String!
   pluralDisplayName: String!
-  table: String!
+  table: String
   description: String
   versions(where: EntityVersionWhereInput, orderBy: EntityVersionOrderByInput, skip: Int, take: Int): [EntityVersion!]
   fields(where: EntityFieldWhereInput, orderBy: EntityFieldOrderByInput, skip: Int, take: Int): [EntityField!]

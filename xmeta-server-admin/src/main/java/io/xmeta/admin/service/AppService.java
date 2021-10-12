@@ -178,7 +178,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                 String displayName = StringUtils.trim(appEntityInput.getName());
                 String pluralDisplayName = Inflector.getInstance().pluralize(displayName);
                 String singularDisplayName = Inflector.getInstance().singularize(displayName);
-                String name = Inflector.getInstance().lowerCamelCase(singularDisplayName, ' ');
+                String name = Inflector.getInstance().upperCamelCase(singularDisplayName, ' ');
 
                 EntityCreateInput.Builder builder = EntityCreateInput.builder();
                 builder.setApp(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(app.getId()).build()).build());

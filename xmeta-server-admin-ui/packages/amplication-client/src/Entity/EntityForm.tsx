@@ -8,10 +8,12 @@ import { TextField } from "@amplication/design-system";
 import { DisplayNameField } from "../Components/DisplayNameField";
 import NameField from "../Components/NameField";
 import { Form } from "../Components/Form";
-import FormikAutoSave from "../util/formikAutoSave";
 import { USER_ENTITY } from "./constants";
 import { validate } from "../util/formikValidateJsonSchema";
 import { isEqual } from "../util/customValidations";
+import {Button, EnumButtonStyle} from "../Components/Button";
+import {CROSS_OS_CTRL_ENTER} from "../util/hotkeys";
+import {GlobalHotKeys} from "react-hotkeys";
 
 type EntityInput = Omit<models.Entity, "fields" | "versionNumber">;
 
@@ -56,6 +58,10 @@ const EQUAL_PLURAL_DISPLAY_NAME_AND_NAME_TEXT =
 
 const CLASS_NAME = "entity-form";
 
+const keyMap = {
+  SUBMIT: CROSS_OS_CTRL_ENTER,
+};
+
 const EntityForm = React.memo(({ entity, applicationId, onSubmit }: Props) => {
   const initialValues = useMemo(() => {
     const sanitizedDefaultValues = omitDeep(
@@ -83,35 +89,48 @@ const EntityForm = React.memo(({ entity, applicationId, onSubmit }: Props) => {
         onSubmit={onSubmit}
       >
         {(formik) => {
+          const handlers = {
+            SUBMIT: formik.submitForm,
+          };
           return (
             <Form childrenAsBlocks>
+              <GlobalHotKeys keyMap={keyMap} handlers={handlers} />
               <>
-                <FormikAutoSave debounceMS={1000} />
-
-                <DisplayNameField name="displayName" label="Display Name" />
-
                 <NameField
-                  name="name"
-                  disabled={USER_ENTITY === entity?.name}
-                  capitalized
+                    name="name"
+                    disabled={USER_ENTITY === entity?.name}
+                    capitalized
                 />
-
+                <DisplayNameField name="displayName" label="Display Name" />
+                <TextField
+                    name="pluralDisplayName"
+                    label="Plural Display Name"
+                />
                 <TextField
                     name="table"
                     label="Table"
                 />
-
-                <TextField
-                  name="pluralDisplayName"
-                  label="Plural Display Name"
-                />
                 <TextField
                   autoComplete="off"
                   textarea
-                  rows={3}
+                  rows={2}
                   name="description"
                   label="Description"
                 />
+                <Button
+                    type="submit"
+                    buttonStyle={EnumButtonStyle.Primary}
+                    disabled={!formik.isValid || !formik.dirty }
+                >
+                  Update
+                </Button>
+                <Button type="reset"
+                        buttonStyle={EnumButtonStyle.CallToAction}
+                        disabled={!formik.dirty}
+                        style={{marginLeft:20}}
+                >
+                  Reset
+                </Button>
               </>
             </Form>
           );

@@ -71,16 +71,18 @@ const apolloClient = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={apolloClient}>
-    <LanguageProvider messages={translationMessages}>
-      <amplicationDesignSystem.Provider>
-        <Router>
-          <App />
-          <SnackbarQueue messages={queue.messages} />
-        </Router>
-      </amplicationDesignSystem.Provider>
-    </LanguageProvider>
-  </ApolloProvider>,
+    <React.StrictMode>
+      <ApolloProvider client={apolloClient}>
+        <LanguageProvider messages={translationMessages}>
+          <amplicationDesignSystem.Provider>
+            <Router>
+              <App />
+              <SnackbarQueue messages={queue.messages} />
+            </Router>
+          </amplicationDesignSystem.Provider>
+        </LanguageProvider>
+      </ApolloProvider>
+    </React.StrictMode>,
   document.getElementById("root")
 );
 

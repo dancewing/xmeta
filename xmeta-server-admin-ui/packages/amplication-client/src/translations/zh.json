@@ -1,4 +1,16 @@
 {
+  "welcome": "欢迎使用",
+  "no-account": "没有账号?",
+  "have-account": "已有账号?",
+  "register": "注册",
+  "register.title": "欢迎注册",
+  "email": "电子邮件",
+  "password": "密码",
+  "confirm.password": "确认密码",
+  "firstName": "名",
+  "lastName": "姓",
+  "login": "登陆",
+  "workspace.title": "工作空间名称",
   "apps": "应用",
   "workspaces": "工作空间",
   "workspace.settings": "工作空间设置"

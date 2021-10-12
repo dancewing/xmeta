@@ -30,6 +30,7 @@
         <maven.version>3.3.9</maven.version>
         <java.version>11</java.version>
         <node.version>v14.17.1</node.version>
+        <yarn.version>1.22.11</yarn.version>
         <npm.version>7.18.1</npm.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -102,17 +103,17 @@
                     <execution>
                         <id>install-node-and-npm</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-yarn</goal>
                         </goals>
                         <configuration>
                             <nodeVersion>${node.version}</nodeVersion>
-                            <npmVersion>${npm.version}</npmVersion>
+                            <yarnVersion>${yarn.version}</yarnVersion>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>npm install</id>
+                        <id>yarn install</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
                         </goals>
                     </execution>
                     <execution>

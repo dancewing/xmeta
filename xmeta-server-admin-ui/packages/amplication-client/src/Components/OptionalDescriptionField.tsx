@@ -30,7 +30,7 @@ const OptionalDescriptionField = (props: Props) => {
       disabled={props.disabled}
       autoComplete="off"
       textarea
-      rows={3}
+      rows={2}
     />
   ) : (
     <Button onClick={handleClick} buttonStyle={EnumButtonStyle.Clear}>

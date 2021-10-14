@@ -1,5 +1,5 @@
 {
-  "name": "@amplication/design-system",
+  "name": "@xmeta/design-system",
   "version": "0.9.0",
   "main": "dist/index.js",
   "scripts": {

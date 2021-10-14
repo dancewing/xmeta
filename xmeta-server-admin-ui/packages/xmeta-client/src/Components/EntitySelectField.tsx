@@ -31,7 +31,7 @@ const EntitySelectField = ({ applicationId, ...props }: Props) => {
       : [];
   }, [entityList]);
 
-  return <SelectField {...props} options={entityListOptions} />;
+  return <SelectField {...props} options={entityListOptions}/>;
 };
 
 export default EntitySelectField;

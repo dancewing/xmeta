@@ -11,13 +11,10 @@ public class FieldProperties {
     public static final String NUMBER_MAXIMUM_VALUE = "maximumValue";
     public static final String NUMBER_PRECISION = "precision";
 
-   private final Map<String, Object> properties;
+    private final Map<String, Object> properties;
 
     public FieldProperties(Map<String, Object> properties) {
         this.properties = properties;
     }
-
-
-
 
 }

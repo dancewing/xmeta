@@ -36,6 +36,7 @@ type Props = {
   isDisabled?: boolean;
   defaultValues?: Partial<models.EntityField>;
   applicationId: string;
+  entityId: string;
   entityDisplayName: string;
 };
 
@@ -73,6 +74,7 @@ const EntityFieldForm = ({
   defaultValues = {},
   isDisabled,
   applicationId,
+  entityId,
   entityDisplayName,
 }: Props) => {
   const [activeTab, setActiveTab] = React.useState(0);
@@ -143,7 +145,7 @@ const EntityFieldForm = ({
               </GridRow>
               <GridRow>
                 <GridCell span={6}>
-                  <TextField name="column" label="Column" disabled={isDisabled || formik.values.dataType === 'Lookup'} required />
+                  <TextField name="column" label="Column" disabled={isDisabled} />
                 </GridCell>
                 <GridCell span={6}>
                   <TextField name="description"
@@ -174,42 +176,45 @@ const EntityFieldForm = ({
               </GridRow>
               <GridRow>
                 <GridCell span={12}>
-                  <TabBar style={{borderBottom: '2px #6200ee solid'}}
-                      activeTabIndex={activeTab}
-                      onActivate={evt => setActiveTab(evt.detail.index)}
-                  >
-                    <Tab>Data Type</Tab>
-                    <Tab>Input Type</Tab>
-                  </TabBar>
-                  <Panel style={{padding: "12px 0", margin: 0}}>
-                    <div style={{display: activeTab===0?'block':'none'}}>
-                      {!SYSTEM_DATA_TYPES.has(formik.values.dataType) && (
-                          <DataTypeSelectField label="" disabled={isDisabled} />
-                      )}
-                      <SchemaFields
-                          schema={schema}
-                          isDisabled={isDisabled}
-                          applicationId={applicationId}
-                          entityDisplayName={entityDisplayName}
-                      />
-                    </div>
-                    <div style={{display: activeTab===1?'block':'none'}}>
-                      <EnumSelectField
-                          label=""
-                          name="inputType"
-                          disabled={isDisabled}
-                          options={[]}
-                      />
+                  <Panel style={{padding: "12px 0", margin: 0}} className="options-panel">
+                    <TabBar
+                            activeTabIndex={activeTab}
+                            onActivate={evt => setActiveTab(evt.detail.index)}
+                    >
+                      <Tab>Data Type</Tab>
+                      <Tab>Input Type</Tab>
+                    </TabBar>
+                    <div style={{paddingTop:12}}>
+                      <div style={{display: activeTab===0?'block':'none'}}>
+                        {!SYSTEM_DATA_TYPES.has(formik.values.dataType) && (
+                            <DataTypeSelectField label="DataType" disabled={isDisabled || formik.values.properties?.dominant} />
+                        )}
+                        <SchemaFields
+                            schema={schema}
+                            isDisabled={isDisabled || formik.values.properties?.dominant}
+                            applicationId={applicationId}
+                            entityId={entityId}
+                            entityDisplayName={entityDisplayName}
+                        />
+                      </div>
+                      <div style={{display: activeTab===1?'block':'none'}}>
+                        <EnumSelectField
+                            label=""
+                            name="inputType"
+                            disabled={isDisabled}
+                            options={[]}
+                        />
+                      </div>
                     </div>
                   </Panel>
                 </GridCell>
               </GridRow>
             </Grid>
-
+            {/*{ || !formik.isValid}*/}
             <Button
                 type="submit"
                 buttonStyle={EnumButtonStyle.Primary}
-                disabled={ isDisabled || !formik.isValid || !formik.dirty }
+                disabled={ isDisabled || !formik.dirty }
             >
               {intl.formatMessage({id: "update"})}
             </Button>

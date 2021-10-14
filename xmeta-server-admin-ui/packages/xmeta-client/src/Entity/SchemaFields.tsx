@@ -6,6 +6,7 @@ type Props = {
   schema: Schema;
   isDisabled?: boolean;
   applicationId: string;
+  entityId: string;
   entityDisplayName: string;
 };
 
@@ -13,6 +14,7 @@ export const SchemaFields = ({
   schema,
   isDisabled,
   applicationId,
+  entityId,
   entityDisplayName,
 }: Props) => {
   if (schema === null) {
@@ -36,6 +38,7 @@ export const SchemaFields = ({
               propertySchema={property as Schema}
               isDisabled={isDisabled}
               applicationId={applicationId}
+              entityId={entityId}
               entityDisplayName={entityDisplayName}
             />
           </div>

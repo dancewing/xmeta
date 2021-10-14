@@ -1,8 +1,7 @@
 package io.xmeta.core.utils;
 
-import io.xmeta.core.domain.DataType;
-import io.xmeta.core.domain.Entity;
-import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.domain.*;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.jaxb.hbm.spi.*;
 
@@ -14,6 +13,8 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * 工具类，将数据模型转成可部署xml 描述文件
@@ -39,15 +40,17 @@ public final class EntityConverter {
 
         System.out.println(sw.toString());
 
-        InputStream inputStream = new ByteArrayInputStream(sw.toString().getBytes(StandardCharsets.UTF_8));
-        return inputStream;
+        return new ByteArrayInputStream(sw.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     private static JaxbHbmHibernateMapping createRootMapping(List<Entity> entities) {
         JaxbHbmHibernateMapping hibernateMapping = new JaxbHbmHibernateMapping();
         hibernateMapping.getClazz().addAll(createEntityMapping(entities));
+        MetaMappingGenernator.createMetaMapping(hibernateMapping);
         return hibernateMapping;
     }
+
+
 
     private static List<JaxbHbmRootEntityType> createEntityMapping(List<Entity> entities) {
         List<JaxbHbmRootEntityType> rootEntityTypes = new ArrayList<>();
@@ -62,15 +65,17 @@ public final class EntityConverter {
             entityType.setEntityName(entity.getName());
             entityType.setComment(entity.getDescription());
 
-            processFields(entityType, entity.getFields());
-
-            rootEntityTypes.add(entityType);
+            //有field 的数据才处理
+            if (entity.getFields()!=null && entity.getFields().size()>0) {
+                processFields(entityType, entity.getFields(), entities);
+                rootEntityTypes.add(entityType);
+            }
         }
 
         return rootEntityTypes;
     }
 
-    private static void processFields(JaxbHbmRootEntityType rootEntityType, List<EntityField> fields) {
+    private static void processFields(JaxbHbmRootEntityType rootEntityType, List<EntityField> fields, List<Entity> entities) {
         for (EntityField entityField : fields) {
 
             if (DataType.Id.equals(entityField.getDataType())) {
@@ -79,7 +84,60 @@ public final class EntityConverter {
                 simpleIdType.setName(entityField.getName());
                 simpleIdType.setType(createTypeSpecificationType(String.class));
                 rootEntityType.setId(simpleIdType);
+            } else if (DataType.Lookup.equals(entityField.getDataType())) {
+                RelationType relationType = EntityFieldUtils.getRelationType(entityField.getProperties());
+                String relatedEntityId = MapUtils.getString(entityField.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID);
+                if ( relationType == null || StringUtils.isEmpty(relatedEntityId)) {
+                    throw new RuntimeException("");
+                }
+                List<Entity> relationEntities = entities.stream().filter(entity -> StringUtils.equals(relatedEntityId, entity.getId())).collect(Collectors.toList());
+                if (relationEntities.size()!=1) {
+                    throw new RuntimeException("");
+                }
+                String relatedEntityName = relationEntities.get(0).getName();
+                if (relationType.equals(RelationType.manyToOne)) {
+                    JaxbHbmManyToOneType manyToOneType = new JaxbHbmManyToOneType();
+                    manyToOneType.setName(entityField.getName());
+                    manyToOneType.setColumnAttribute(entityField.getColumn());
+                    manyToOneType.setFetch(JaxbHbmFetchStyleEnum.JOIN);
+                    manyToOneType.setEntityName(relatedEntityName);
+                    rootEntityType.getAttributes().add(manyToOneType);
+                } else if (relationType.equals(RelationType.manyToMany)) {
+
+                    String relatedFieldId = MapUtils.getString(entityField.getProperties(), RelationTypeConstants.RELATED_FIELD_ID);
+                    if (StringUtils.isEmpty(relatedFieldId)) {
+                        throw new RuntimeException("");
+                    }
+                    List<EntityField> entityFieldList = relationEntities.get(0).getFields().stream().filter(targetField -> StringUtils.equals(targetField.getId(), relatedFieldId)).collect(Collectors.toList());
+                    if (entityFieldList.size()!=1) {
+                        throw new RuntimeException("");
+                    }
+                    boolean dominant = MapUtils.getBooleanValue(entityField.getProperties(), RelationTypeConstants.RELATION_DOMINANT, false);
+                    EntityField targetEntityField = entityFieldList.get(0);
+
+                    JaxbHbmSetType setType = new JaxbHbmSetType();
+                    setType.setInverse(!dominant);
+                    setType.setName(entityField.getName());
+                    setType.setTable(getJoinTable(rootEntityType.getTable(), relationEntities.get(0).getTable()  , setType.isInverse()));
+                    setType.setLazy(JaxbHbmLazyWithExtraEnum.TRUE);
+                    setType.setFetch(JaxbHbmFetchStyleWithSubselectEnum.SELECT);
+
+                    JaxbHbmKeyType keyType = new JaxbHbmKeyType();
+                    keyType.setNotNull(Boolean.TRUE);
+                    keyType.setColumnAttribute(entityField.getColumn());
+                    setType.setKey(keyType);
+
+                    JaxbHbmManyToManyCollectionElementType manyToManyCollectionElementType = new JaxbHbmManyToManyCollectionElementType();
+                    manyToManyCollectionElementType.setEntityName(relatedEntityName);
+                    manyToManyCollectionElementType.setColumnAttribute(targetEntityField.getColumn());
+
+                    setType.setManyToMany(manyToManyCollectionElementType);
+
+                    rootEntityType.getAttributes().add(setType);
+                }
+
             } else {
+
                 // 基础字段
                 JaxbHbmBasicAttributeType basicAttributeType = new JaxbHbmBasicAttributeType();
                 basicAttributeType.setColumnAttribute(entityField.getColumn());
@@ -98,6 +156,17 @@ public final class EntityConverter {
         }
     }
 
+    private static String getJoinTable(String source, String target, boolean inverse) {
+        String table = null;
+        if (inverse) {
+            table = target + "_" + source;
+        } else {
+            table = source + "_" + target;
+        }
+        table = StringUtils.replace(table, "-", "_");
+        return table.toLowerCase(Locale.ROOT);
+    }
+
     private static JaxbHbmTypeSpecificationType createTypeSpecificationType(String typeName) {
         if (typeName == null) {
             typeName = "java.lang.String";
@@ -111,9 +180,10 @@ public final class EntityConverter {
         return createTypeSpecificationType(cls);
     }
 
-    private static JaxbHbmTypeSpecificationType createTypeSpecificationType(Class<?> typeClass) {
+    public static JaxbHbmTypeSpecificationType createTypeSpecificationType(Class<?> typeClass) {
         JaxbHbmTypeSpecificationType specificationType = new JaxbHbmTypeSpecificationType();
         specificationType.setName(typeClass.getName());
         return specificationType;
     }
+
 }

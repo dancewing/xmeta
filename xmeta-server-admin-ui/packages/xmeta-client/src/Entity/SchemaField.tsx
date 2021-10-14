@@ -13,12 +13,14 @@ export const SchemaField = ({
   propertySchema,
   isDisabled,
   applicationId,
+  entityId,
   entityDisplayName,
 }: {
   propertyName: string;
   propertySchema: Schema;
   isDisabled?: boolean;
   applicationId: string;
+  entityId: string;
   entityDisplayName: string;
 }) => {
   const fieldName = `properties.${propertyName}`;
@@ -93,7 +95,7 @@ export const SchemaField = ({
         }
         case "#/definitions/EntityFieldId": {
           return (
-            <RelatedEntityFieldField entityDisplayName={entityDisplayName} />
+            <RelatedEntityFieldField entityId={entityId} entityDisplayName={entityDisplayName} />
           );
         }
         case "#/definitions/RelationAllowMultiple": {
@@ -104,6 +106,9 @@ export const SchemaField = ({
               entityDisplayName={entityDisplayName}
             />
           );
+        }
+        case "#/definitions/Dominant": {
+          return null;
         }
       }
 

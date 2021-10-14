@@ -67,6 +67,7 @@ public class AuthService {
         return tokenProvider.createToken(authentication, rememberMe);
     }
 
+    @Transactional
     public Auth login(LoginInput data) {
         try {
             return new Auth(createToken(data.getEmail(), data.getPassword(), true));

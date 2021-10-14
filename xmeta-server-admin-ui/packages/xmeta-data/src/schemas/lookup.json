@@ -4,7 +4,7 @@
   "title": "lookup",
   "type": "object",
   "additionalProperties": false,
-  "required": ["relatedEntityId", "relatedFieldId", "allowMultipleSelection"],
+  "required": ["relatedEntityId", "relatedFieldId", "relationType"],
   "properties": {
     "relatedEntityId": {
       "title": "Related Entity",
@@ -14,11 +14,12 @@
     "relationType": {
       "title": "Relation Type",
       "type": "string",
-      "enum": ["oneWay", "oneToMany", "manyToOne", "manyToMany", "manyWay"],
-      "default": "oneWay"
+      "enum": ["manyToOne", "oneWay", "oneToMany", "manyToMany"],
+      "default": "manyToOne"
     },
-    "allowMultipleSelection": {
-      "$ref": "#/definitions/RelationAllowMultiple",
+    "dominant": {
+      "title": "dominant",
+      "$ref": "#/definitions/Dominant",
       "default": false
     },
     "relatedFieldId": {
@@ -34,7 +35,7 @@
     "EntityFieldId": {
       "type": "string"
     },
-    "RelationAllowMultiple": {
+    "Dominant": {
       "type": "boolean"
     }
   }

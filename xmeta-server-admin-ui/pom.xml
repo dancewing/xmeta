@@ -30,7 +30,7 @@
         <maven.version>3.3.9</maven.version>
         <java.version>11</java.version>
         <node.version>v14.17.1</node.version>
-        <yarn.version>1.22.11</yarn.version>
+        <yarn.version>v1.22.11</yarn.version>
         <npm.version>7.18.1</npm.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

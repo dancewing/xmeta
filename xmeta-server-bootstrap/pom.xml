@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>xmeta-server-bootstrap</artifactId>
+    <packaging>jar</packaging>
+
+    <parent>
+        <groupId>io.xmeta</groupId>
+        <artifactId>xmeta-parent</artifactId>
+        <version>0.3.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <skipTests>true</skipTests>
+        <graphql.spring.version>11.1.0</graphql.spring.version>
+    </properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.xmeta</groupId>
+			<artifactId>xmeta-server-admin</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>io.xmeta.chassis.XMetaApp</mainClass>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+	</build>
+
+
+</project>

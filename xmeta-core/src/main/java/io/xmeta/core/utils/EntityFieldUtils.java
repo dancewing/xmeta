@@ -1,6 +1,9 @@
 package io.xmeta.core.utils;
 
 import io.xmeta.core.domain.DataType;
+import io.xmeta.core.domain.RelationType;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 import java.util.Map;
@@ -36,5 +39,31 @@ public final class EntityFieldUtils {
             default:
                 return null;
         }
+    }
+
+    public static RelationType getRelationType(Map<String, Object> properties) {
+        String relationType = MapUtils.getString(properties, "relationType");
+        if (StringUtils.isNotEmpty(relationType)) {
+            return RelationType.valueOf(relationType);
+        }
+        return null;
+    }
+
+    public static RelationType getTargetRelationType(RelationType relationType) {
+        switch (relationType) {
+            case manyToOne:
+                return RelationType.oneToMany;
+            case oneToMany:
+                return RelationType.manyToOne;
+            case manyToMany:
+                return RelationType.manyToMany;
+            default:
+                throw new RuntimeException("un-support relation type convert");
+        }
+    }
+
+    public static boolean allowMultipleSelection(RelationType relationType) {
+        Assert.notNull(relationType, "relationType can not be null");
+        return (relationType == RelationType.manyToOne || relationType == RelationType.manyToMany);
     }
 }

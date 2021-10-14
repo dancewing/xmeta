@@ -1,22 +1,19 @@
-import React, {useCallback, useMemo, useState} from "react";
+import React, {useCallback, useContext, useMemo, useState} from "react";
 
 import { Link } from "react-router-dom";
-import { isEmpty } from "lodash";
 import { Icon } from "@rmwc/icon";
-import { useQuery } from "@apollo/client";
 import { Dialog } from "@xmeta/design-system";
 import * as models from "../models";
 import { EnumButtonStyle, Button } from "../Components/Button";
-import { downloadArchive } from "./BuildSteps";
 
 import useBuildWatchStatus from "./useBuildWatchStatus";
 import { BuildStepsStatus } from "./BuildStepsStatus";
 import { HelpPopover } from "../Components/HelpPopover";
-import { GET_APPLICATION } from "../Application/ApplicationHome";
 import EnvironmentDeploy from '../Environment/EnvironmentDeploy';
 import useLocalStorage from "react-use-localstorage";
 
 import "./BuildSummary.scss";
+import PendingChangesContext from "./PendingChangesContext";
 
 const CLASS_NAME = "build-summary";
 
@@ -38,11 +35,11 @@ type Props = {
   onError: (error: Error) => void;
 };
 
-const LOCAL_STORAGE_KEY_SHOW_GITHUB_HELP = "ShowGitHubContextHelp";
 const LOCAL_STORAGE_KEY_SHOW_SANDBOX_HELP = "ShowGSandboxContextHelp";
 
 const BuildSummary = ({ build, onError }: Props) => {
   const { data } = useBuildWatchStatus(build);
+  const pendingChangesContext = useContext(PendingChangesContext);
 
   const [newDeploy, setNewDeploy] = useState<boolean>(false);
 
@@ -50,48 +47,14 @@ const BuildSummary = ({ build, onError }: Props) => {
     setNewDeploy(!newDeploy);
   }, [newDeploy, setNewDeploy]);
 
-
-  const [showGitHelp, setShowGitHubHelp] = useLocalStorage(
-    LOCAL_STORAGE_KEY_SHOW_GITHUB_HELP,
-    "true"
-  );
-
   const [showSandboxHelp, setShowSandboxHelp] = useLocalStorage(
     LOCAL_STORAGE_KEY_SHOW_SANDBOX_HELP,
     "false"
   );
 
-  const { data: appData } = useQuery<{
-    app: models.App;
-  }>(GET_APPLICATION, {
-    variables: {
-      id: build.appId,
-    },
-  });
-
-  const handleDownloadClick = useCallback(() => {
-    downloadArchive(data.build.archiveURI).catch(onError);
-  }, [data.build.archiveURI, onError]);
-
-  const handleDismissHelpGitHub = useCallback(() => {
-    setShowGitHubHelp("false");
-    setShowSandboxHelp("true");
-  }, [setShowGitHubHelp, setShowSandboxHelp]);
-
   const handleDismissHelpSandbox = useCallback(() => {
     setShowSandboxHelp("false");
   }, [setShowSandboxHelp]);
-
-  const stepGenerateCode = useMemo(() => {
-    if (!data.build.action?.steps?.length) {
-      return EMPTY_STEP;
-    }
-    return (
-      data.build.action.steps.find(
-        (step) => step.name === GENERATE_STEP_NAME
-      ) || EMPTY_STEP
-    );
-  }, [data.build.action]);
 
   const stepBuildDocker = useMemo(() => {
     if (!data.build.action?.steps?.length) {
@@ -114,21 +77,6 @@ const BuildSummary = ({ build, onError }: Props) => {
     );
   }, [data.build.action]);
 
-  const githubUrl = useMemo(() => {
-    if (!data.build.action?.steps?.length) {
-      return null;
-    }
-    const stepGithub = data.build.action.steps.find(
-      (step) => step.name === PUSH_TO_GITHUB_STEP_NAME
-    );
-
-    const log = stepGithub?.logs?.find(
-      (log) => !isEmpty(log.meta) && !isEmpty(log.meta.githubUrl)
-    );
-
-    return log?.meta?.githubUrl || null;
-  }, [data.build.action]);
-
   const deployment =
     data.build.deployments &&
     data.build.deployments.length &&
@@ -145,80 +93,12 @@ const BuildSummary = ({ build, onError }: Props) => {
         <EnvironmentDeploy applicationId={build.appId} buildId={build.id} onCompleted={handleNewDeployClick}  />
       </Dialog>
       <div className={`${CLASS_NAME}__download`}>
-        {githubUrl ? ( //code was synced to github
-          <a
-            href={githubUrl}
-            target="github"
-            className={`${CLASS_NAME}__open-github`}
-          >
-            <Button
-              buttonStyle={EnumButtonStyle.Primary}
-              icon="github"
-              eventData={{
-                eventName: "openGithubPullRequest",
-              }}
-            >
-              Open GitHub
-            </Button>
-          </a>
-        ) : !appData?.app.githubSyncEnabled ? ( //app is not connected to github
-          <HelpPopover
-            onDismiss={handleDismissHelpGitHub}
-            content={
-              <div>
-                Enable sync with GitHub to automatically push the generated code
-                of your application and create a Pull Request in your GitHub
-                repository every time you commit your changes.
-              </div>
-            }
-            open={showGitHelp === "false" ? false : true}
-            align={"topLeft"}
-          >
-            <Link
-              to={`/${build.appId}/github`}
-              className={`${CLASS_NAME}__open-github`}
-            >
-              <Button
-                buttonStyle={EnumButtonStyle.Primary}
-                icon="github"
-                onClick={handleNewDeployClick}
-                eventData={{
-                  eventName: "buildConnectToGithub",
-                }}
-              >
-                Deploy to environment
-              </Button>
-            </Link>
-          </HelpPopover>
-        ) : (
-          //app was connected after this build was created
-          <div className={`${CLASS_NAME}__message`}>
-            <Icon icon={{ size: "xsmall", icon: "info_circle" }} />
-            <span>
-              You are now connected to GitHub. Future builds will create a Pull
-              Request in your repo.
-            </span>
-          </div>
-        )}
         <Button
-            buttonStyle={EnumButtonStyle.Secondary}
+            buttonStyle={EnumButtonStyle.Primary}
             onClick={handleNewDeployClick}
+            disabled={pendingChangesContext.pendingChanges.length > 0}
         >
           Deploy to environment
-        </Button>
-        <Button
-          buttonStyle={EnumButtonStyle.Secondary}
-          disabled={
-            stepGenerateCode.status !== models.EnumActionStepStatus.Success
-          }
-          onClick={handleDownloadClick}
-          icon="download1"
-          eventData={{
-            eventName: "downloadBuild",
-            versionNumber: data.build.version,
-          }}
-        >
-          Download Code
         </Button>
       </div>
 
@@ -280,7 +160,6 @@ const BuildSummary = ({ build, onError }: Props) => {
             ) : (
               <>
                 <Icon icon={{ size: "xsmall", icon: "info_circle" }} />
-
                 <span>Commit changes to start deployment to sandbox. </span>
               </>
             )}

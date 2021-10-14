@@ -102,7 +102,6 @@ public class TokenProvider {
         AuthUserDetail principal = new AuthUserDetail(accountId, claims.getSubject(), "", authorities);
         principal.setUserId(userId);
         principal.setWorkspaceId(workspaceId);
-        log.info("current user context, accountId: {}, userId: {}, workspaceId: {}", accountId, userId, workspaceId);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 

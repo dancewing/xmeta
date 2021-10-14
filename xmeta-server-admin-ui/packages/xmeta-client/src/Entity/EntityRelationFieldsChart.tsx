@@ -74,19 +74,19 @@ export const EntityRelationFieldsChart = ({
           <div className={`${CLASS_NAME}__status`}>
             <span
               className={`${CLASS_NAME}__status__cardinality--source ${CLASS_NAME}__status__cardinality--${
-                relatedField?.properties?.allowMultipleSelection
+                ['oneWay', 'manyToOne', 'manyToMany'].includes(field?.properties?.relationType)
                   ? "many"
                   : "one"
               }`}
             />
-            {relatedFieldIsMissing ? (
+            { (relatedFieldIsMissing || isEmpty(field?.properties?.relationType)) ? (
               <Icon icon="info_circle" />
             ) : (
               <Icon icon="check_circle" />
             )}
             <span
               className={`${CLASS_NAME}__status__cardinality--target ${CLASS_NAME}__status__cardinality--${
-                field.properties.allowMultipleSelection ? "many" : "one"
+                ['oneToMany', 'manyToMany'].includes(field?.properties?.relationType) ? "many" : "one"
               }`}
             />
           </div>

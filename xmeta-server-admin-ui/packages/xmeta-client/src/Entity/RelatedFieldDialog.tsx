@@ -6,6 +6,7 @@ import {
   DialogProps,
   EnumButtonStyle,
 } from "@xmeta/design-system";
+import {types} from  "@xmeta/data";
 import { camelCase } from "camel-case";
 import { Formik, useFormikContext } from "formik";
 import { DisplayNameField } from "../Components/DisplayNameField";
@@ -22,7 +23,7 @@ export type Values = {
 export type Props = Omit<DialogProps, "title"> & {
   onSubmit: (data: Values) => void;
   relatedEntityId: string | undefined;
-  allowMultipleSelection: boolean;
+  relationType: types.RelationType;
   entity: models.Entity;
 };
 
@@ -39,7 +40,7 @@ export const RelatedFieldDialog = ({
   onSubmit,
   entity,
   relatedEntityId,
-  allowMultipleSelection,
+  relationType,
 }: Props): React.ReactElement => {
   const { data, loading } = useQuery<{ entity: models.Entity }>(
     GET_RELATED_ENTITY_FIELDS,
@@ -50,7 +51,8 @@ export const RelatedFieldDialog = ({
       skip: !relatedEntityId,
     }
   );
-
+  //TODO update here
+  const allowMultipleSelection = true;
   const valuesSuggestion = allowMultipleSelection
     ? {
         relatedFieldName: camelCase(entity.pluralDisplayName),

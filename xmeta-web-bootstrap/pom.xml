@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>xmeta-server-chassis</artifactId>
+    <artifactId>xmeta-web-bootstrap</artifactId>
     <packaging>jar</packaging>
 
     <parent>
@@ -24,7 +24,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.xmeta</groupId>
-			<artifactId>xmeta-server-admin</artifactId>
+			<artifactId>xmeta-web</artifactId>
             <version>0.3.1-SNAPSHOT</version>
         </dependency>
 

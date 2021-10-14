@@ -9,6 +9,8 @@ import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.admin.repository.EntityVersionRepository;
 import io.xmeta.admin.util.*;
 import io.xmeta.core.domain.DataType;
+import io.xmeta.core.domain.RelationType;
+import io.xmeta.core.domain.RelationTypeConstants;
 import io.xmeta.core.utils.EntityFieldUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
@@ -100,7 +102,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
     }
 
     /**
-     * 前台创建字段
+     * 创建字段
      * @param data
      * @param relatedFieldName
      * @param relatedFieldDisplayName
@@ -114,26 +116,34 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         //this.validateFieldMutationArgs();
         if (data.getDataType() == EnumDataType.Lookup) {
             //生成relatedFieldId
-            data.getProperties().put("relatedFieldId", IDGenerator.nextId());
+            data.getProperties().put(RelationTypeConstants.RELATED_FIELD_ID, IDGenerator.nextId());
         }
         //this.validateFieldData();
-        String fieldId = IDGenerator.nextId();
+        String fieldId = IDGenerator.nextId(); //永久id
 
+        //TODO
         if (data.getDataType() == EnumDataType.Lookup) {
-            this.createRelatedField(
-                    MapUtils.getString(data.getProperties(), "relatedFieldId"),
-                    relatedFieldName,
-                    relatedFieldDisplayName,
-                    !MapUtils.getBooleanValue(data.getProperties(), "allowMultipleSelection"),
-                    MapUtils.getString(data.getProperties(), "relatedEntityId"),
-                    entityEntity.getId(),
-                    fieldId
-            );
+            RelationType relationType = EntityFieldUtils.getRelationType(data.getProperties());
+            if (relationType == null) {
+                throw new RuntimeException("relation type is null");
+            }
+            boolean needCreateRelation =  relationType != RelationType.oneWay;
+            if (needCreateRelation) {
+                RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
+                this.createRelatedField(
+                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_FIELD_ID),
+                        relatedFieldName,
+                        relatedFieldDisplayName,
+                        targetRelationType,
+                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID),
+                        entityEntity.getId(),
+                        fieldId
+                );
+            }
         }
 
         EntityVersionEntity entityVersion = this.entityVersionRepository.findEntityVersion(entityEntity.getId(), 0);
         EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
-        entityFieldEntity.setId(fieldId);
         entityFieldEntity.setCreatedAt(ZonedDateTime.now());
         entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
         entityFieldEntity.setEntityVersion(entityVersion);
@@ -158,6 +168,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         return this.entityFieldMapper.toDto(entityFieldEntity);
     }
 
+    /***
+     * 前台输入displayName快捷创建字段
+     * @param data
+     * @return
+     */
     @Transactional
     public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
         // validate the entity
@@ -173,10 +188,10 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         String relatedFieldDisplayName = null;
 
         if (createInput.getDataType() == EnumDataType.Lookup) {
-            //TODO allowMultipleSelection, 从properties 属性中获取
-            boolean allowMultipleSelection =
-                    createInput.getProperties() != null && MapUtils.getBooleanValue(createInput.getProperties(), "allowMultipleSelection",
-                            false);
+
+            RelationType relationType = EntityFieldUtils.getRelationType(createInput.getProperties());
+
+            boolean allowMultipleSelection = EntityFieldUtils.allowMultipleSelection(relationType);
 
             relatedFieldName = Inflector.getInstance().lowerCamelCase(
                     !allowMultipleSelection ? entityEntity.getPluralDisplayName() : entityEntity.getName()
@@ -189,7 +204,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         return this.createEntityField(createInput, relatedFieldName, relatedFieldDisplayName);
     }
 
-    // 创建一个供存储用的EntityField 设置 name， dataType, properties
+    /**
+     * 创建一个供存储用的EntityField 设置 name， dataType, properties
+     * @param data
+     * @return
+     */
     public EntityFieldCreateInput createFieldCreateInputByDisplayName(EntityFieldCreateByDisplayNameInput data) {
 
         EntityFieldCreateInput.Builder builder = EntityFieldCreateInput.builder();
@@ -220,12 +239,16 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                     lowerCaseName.contains("quantity") ||
                             lowerCaseName.contains("qty")
             ) {
-                dataType = EnumDataType.WholeNumber;
+                dataType = EnumDataType.SingleLineText;
             }
         }
 
+        builder.setName(name);
+        builder.setEntity(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(entityId).build()).build());
+        builder.setColumn(name);
+
         if (dataType == EnumDataType.Lookup || dataType == null) {
-            List<EntityEntity> entities = this.entityRepository.findEntityByNames(name, entity.getApp().getId());
+            List<EntityEntity> entities = this.entityRepository.findEntitiesByName(name, entity.getApp().getId());
             if (entities != null && entities.size() > 0) {
                 EntityEntity relatedEntity = entities.get(0);
                 // The created field would be multiple selection if its name is equal to
@@ -243,22 +266,25 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                                 : entity.getPluralDisplayName(), ' ');
                 if (isFieldNameAvailable(relatedFieldName, relatedEntity.getId())) {
                     //TODO relation 类型需要重新处理
-                    builder.setName(name)
-                            .setDataType(EnumDataType.Lookup)
+                    builder.setDataType(EnumDataType.Lookup)
                             .setProperties(
-                                    Maps.of("relatedEntityId", relatedEntity.getId())
-                                            .and("allowMultipleSelection", true)
-                                            .build());
+                                    Maps.of(RelationTypeConstants.RELATED_ENTITY_ID, relatedEntity.getId())
+                                            .and(RelationTypeConstants.RELATION_TYPE, RelationType.manyToOne.name())
+                                            .build()
+                            )
+                            .setColumn(name);
                     return builder.build();
                 }
 
             }
         }
 
-        builder.setName(name).setDataType(dataType == null ? EnumDataType.SingleLineText : dataType)
+        if (dataType == null)  {
+            dataType = EnumDataType.SingleLineText; // 保存dataType 不为空
+        }
+
+        builder.setDataType(dataType)
                 .setProperties(getDefaultFieldProperties(dataType));
-        builder.setColumn(name);
-        builder.setEntity(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(entityId).build()).build());
 
         return builder.build();
     }
@@ -361,7 +387,9 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<EntityFieldEntity> result = null;
-        if (skip == null) skip = 0;
+        if (skip == null) {
+            skip = 0;
+        }
         if (take != null) {
             Pageable pageable = PageRequest.of(skip, take, sort);
             result = this.entityFieldRepository.findAll(specification, pageable).getContent();
@@ -378,8 +406,8 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         this.lockService.acquireEntityLock(entityFieldEntity.getEntityVersion().getEntityId());
         if (EnumDataType.Lookup.name().equals(entityFieldEntity.getDataType())) {
             Map<String, Object> properties = ObjectMapperUtils.toMap(entityFieldEntity.getProperties());
-            String relatedFieldId = MapUtils.getString(properties, "relatedFieldId");
-            String relatedEntityId = MapUtils.getString(properties, "relatedEntityId");
+            String relatedFieldId = MapUtils.getString(properties, RelationTypeConstants.RELATED_FIELD_ID);
+            String relatedEntityId = MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID);
             this.deleteRelatedField(relatedFieldId, relatedEntityId);
         }
         this.entityFieldRepository.deleteById(entityFieldEntity.getId());
@@ -391,48 +419,88 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         EntityFieldEntity field = this.entityFieldRepository.getById(where.getId());
 
         Map<String, Object> properties = ObjectMapperUtils.toMap(field.getProperties());
+        //将提交数据与数据库中数据对比，判断是否需要更新关联字段
         // isSystemDataType
         // Delete related field in case field data type is changed from lookup
-        boolean shouldDeleteRelated = StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name()) &&
-                data.getDataType() != EnumDataType.Lookup;
+        boolean shouldDeleteRelated = (StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name()) &&
+                data.getDataType() != EnumDataType.Lookup) ||
+                (StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name()) && data.getDataType() == EnumDataType.Lookup &&
+                        !StringUtils.equals(MapUtils.getString(properties, RelationTypeConstants.RELATION_TYPE), RelationType.oneWay.name()) &&
+                        StringUtils.equals(MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATION_TYPE), RelationType.oneWay.name()));
 
         // Create related field in case field data type is changed to lookup
         boolean shouldCreateRelated = data.getDataType() == EnumDataType.Lookup &&
                 !StringUtils.equals(field.getDataType(), EnumDataType.Lookup.name());
 
         boolean shouldChangeRelated = !shouldCreateRelated &&
-                !shouldDeleteRelated && !StringUtils.equals(MapUtils.getString(properties, "relatedEntityId"),
-                MapUtils.getString(data.getProperties(), "relatedEntityId"));
+                !shouldDeleteRelated && (!StringUtils.equals(MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID),
+                MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID)));
+
+        //是否需要更新关联属性
+        boolean shouldUpdateRelated = !shouldCreateRelated &&
+                !shouldDeleteRelated && StringUtils.equals(MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID),
+                MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID)) && !StringUtils.equals(
+                        MapUtils.getString(properties, RelationTypeConstants.RELATION_TYPE),
+                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATION_TYPE)
+                );
+
+        log.info("shouldDeleteRelated: {}, shouldCreateRelated: {}, shouldChangeRelated: {}, shouldUpdateRelated: {}",
+                shouldDeleteRelated, shouldCreateRelated, shouldChangeRelated, shouldUpdateRelated);
 
         EntityEntity entity = this.lockService.acquireEntityLock(field.getEntityVersion().getEntityId());
 
         //this.validateFieldMutationArgs
-
         if (shouldCreateRelated || shouldChangeRelated) {
-            data.getProperties().put("relatedFieldId", IDGenerator.nextId());
+            data.getProperties().put(RelationTypeConstants.RELATED_FIELD_ID, IDGenerator.nextId());
         }
 
         //this.validateFieldData
         if (shouldDeleteRelated || shouldChangeRelated) {
-            this.deleteRelatedField(MapUtils.getString(data.getProperties(), "relatedFieldId"),
-                    MapUtils.getString(data.getProperties(), "relatedEntityId"));
+            this.deleteRelatedField(MapUtils.getString(properties, RelationTypeConstants.RELATED_FIELD_ID),
+                    MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID));
         }
 
         if (shouldCreateRelated || shouldChangeRelated) {
 
-            this.createRelatedField(
-                    MapUtils.getString(data.getProperties(), "relatedFieldId"),
-                    relatedFieldName,
-                    relatedFieldDisplayName,
-                    !MapUtils.getBooleanValue(data.getProperties(), "allowMultipleSelection"),
-                    MapUtils.getString(data.getProperties(), "relatedEntityId"),
-                    entity.getId(),
-                    field.getPermanentId()
-            );
+            RelationType relationType = EntityFieldUtils.getRelationType(data.getProperties());
+            if (relationType == null) {
+                throw new RuntimeException("relation type is null");
+            }
+            boolean needCreateRelation =  relationType != RelationType.oneWay;
+            if (needCreateRelation) {
+                RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
+                this.createRelatedField(
+                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_FIELD_ID),
+                        relatedFieldName,
+                        relatedFieldDisplayName,
+                        targetRelationType,
+                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID),
+                        entity.getId(),
+                        field.getPermanentId()
+                );
+            }
+        }
+        if (shouldUpdateRelated) {
+            RelationType relationType = EntityFieldUtils.getRelationType(data.getProperties());
+            if (relationType == null) {
+                throw new RuntimeException("relation type is null");
+            }
+            boolean needUpdateRelation =  relationType != RelationType.oneWay;
+            if (needUpdateRelation) {
+                RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
+                this.updateRelatedField(MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID),
+                        MapUtils.getString(properties, RelationTypeConstants.RELATED_FIELD_ID),
+                        targetRelationType);
+            }
+        }
+
+        //update dominant
+        if (data.getDataType() == EnumDataType.Lookup &&
+                StringUtils.equals(MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATION_TYPE), RelationType.manyToMany.name())) {
+            data.getProperties().put(RelationTypeConstants.RELATION_DOMINANT, true);
         }
 
         field.setUpdatedAt(ZonedDateTime.now());
-        // field.setPermanentId("");
         field.setName(data.getName());
         field.setDisplayName(data.getDisplayName());
         field.setDataType(data.getDataType().name());
@@ -448,8 +516,18 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
     }
 
 
+    /**
+     * 创建关联字段
+     * @param permanentId
+     * @param name
+     * @param displayName
+     * @param relationType
+     * @param entityId
+     * @param relatedEntityId
+     * @param relatedFieldId
+     */
     @Transactional
-    public void createRelatedField(String id, String name, String displayName, boolean allowMultipleSelection,
+    public void createRelatedField(String permanentId, String name, String displayName, RelationType relationType,
                                    String entityId, String relatedEntityId, String relatedFieldId) {
         this.lockService.acquireEntityLock(entityId);
 
@@ -457,17 +535,22 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         if (!entityVersionEntity.isPresent()) {
             throw new RuntimeException("can't find entity version");
         }
+        Maps.MapBuilder<String, Object> propertyBuilder = Maps.of(RelationTypeConstants.RELATION_TYPE, relationType.name())
+                .and(RelationTypeConstants.RELATED_ENTITY_ID, relatedEntityId)
+                .and(RelationTypeConstants.RELATED_FIELD_ID, relatedFieldId);
+        if (relationType == RelationType.manyToMany) {
+            propertyBuilder.and(RelationTypeConstants.RELATION_DOMINANT, false);
+        }
         EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
         entityFieldEntity.setCreatedAt(ZonedDateTime.now());
         entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
         entityFieldEntity.setEntityVersion(entityVersionEntity.get());
-        entityFieldEntity.setPermanentId(id);
+        entityFieldEntity.setPermanentId(permanentId);
         entityFieldEntity.setName(name);
         entityFieldEntity.setDisplayName(displayName);
+        entityFieldEntity.setColumn(name);
         entityFieldEntity.setDataType(EnumDataType.Lookup.name());
-        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(Maps.of("allowMultipleSelection", allowMultipleSelection)
-                .and("relatedEntityId", relatedEntityId)
-                .and("relatedFieldId", relatedFieldId).build()));
+        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(propertyBuilder.build()));
         entityFieldEntity.setRequired(false);
         entityFieldEntity.setSearchable(true);
         entityFieldEntity.setDescription("");
@@ -476,9 +559,30 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         this.entityFieldRepository.save(entityFieldEntity);
     }
 
-    @Transactional
-    public void deleteRelatedField(String relatedFieldId, String relatedEntityId) {
+    public void updateRelatedField(String relatedEntityId, String relatedFieldId, RelationType relationType) {
+
+        Optional<EntityVersionEntity> entityVersionEntity = this.entityVersionRepository.getCurrentVersion(relatedEntityId);
+        if (!entityVersionEntity.isPresent()) {
+            throw new RuntimeException("can't find entity version");
+        }
+
         this.lockService.acquireEntityLock(relatedEntityId);
+
+        EntityFieldEntity entityFieldEntity = getRelatedField(relatedFieldId, relatedEntityId);
+        entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
+        entityFieldEntity.setEntityVersion(entityVersionEntity.get());
+        Map<String, Object> properties = ObjectMapperUtils.toMap(entityFieldEntity.getProperties());
+        properties.put(RelationTypeConstants.RELATION_TYPE, relationType.name());
+        if (relationType == RelationType.manyToMany) {
+            properties.put(RelationTypeConstants.RELATION_DOMINANT, false);
+        } else {
+            properties.remove(RelationTypeConstants.RELATION_DOMINANT);
+        }
+        entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(properties));
+        this.entityFieldRepository.save(entityFieldEntity);
+    }
+
+    public EntityFieldEntity getRelatedField(String relatedFieldId, String relatedEntityId) {
         EntityFieldWhereInput.Builder builder = EntityFieldWhereInput.builder();
         builder.setPermanentId(StringFilter.builder().setEq(relatedFieldId).build());
         List<EntityFieldEntity> versionFields = this.getVersionFields(relatedEntityId, 0, builder.build(), null, null, null);
@@ -488,8 +592,18 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         if (versionFields.size() > 1) {
             throw new RuntimeException("more than one relation fields founded");
         }
-        EntityFieldEntity entityField = versionFields.get(0);
-        this.entityFieldRepository.deleteByEntityVersionAndPermanentId(entityField.getEntityVersion().getId(), relatedEntityId);
+        return versionFields.get(0);
+    }
+
+    @Transactional
+    public void deleteRelatedField(String relatedFieldId, String relatedEntityId) {
+        this.lockService.acquireEntityLock(relatedEntityId);
+        EntityFieldEntity entityField = getRelatedField(relatedFieldId, relatedEntityId);
+        int count = this.entityFieldRepository.deleteByEntityVersionAndPermanentId(entityField.getEntityVersion().getId(), relatedFieldId);
+        if (count == 0) {
+            log.error("can't remove entity field: {}", entityField.getName());
+            throw new RuntimeException("can't remove entity field: " + entityField.getName());
+        }
     }
 
     public List<io.xmeta.core.domain.EntityField> getFields(String versionId) {
@@ -497,7 +611,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         List<io.xmeta.core.domain.EntityField> fieldDomains = new ArrayList<>();
         for (EntityFieldEntity field : fieldEntities) {
             io.xmeta.core.domain.EntityField entityField = new io.xmeta.core.domain.EntityField();
-            entityField.setId(field.getId());
+            entityField.setId(field.getPermanentId());
             entityField.setName(field.getName());
             entityField.setColumn(field.getColumn());
             entityField.setDisplayName(field.getDisplayName());

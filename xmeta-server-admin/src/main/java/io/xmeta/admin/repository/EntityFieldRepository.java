@@ -25,8 +25,7 @@ public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, 
 
     @Query("delete from EntityFieldEntity ef where ef.entityVersion.id  = :entityVersionId and ef.permanentId = :permanentId")
     @Modifying(flushAutomatically = true, clearAutomatically = true)
-    void deleteByEntityVersionAndPermanentId(@Param("permanentId") String permanentId,
-                                             @Param("entityVersionId") String entityVersionId);
+    int deleteByEntityVersionAndPermanentId( @Param("entityVersionId") String entityVersionId, @Param("permanentId") String permanentId);
 
     @Query("from EntityFieldEntity ef where ef.entityVersion.id = :entityVersionId order by ef.createdAt asc ")
     List<EntityFieldEntity> getFields(@Param("entityVersionId") String entityVersionId);

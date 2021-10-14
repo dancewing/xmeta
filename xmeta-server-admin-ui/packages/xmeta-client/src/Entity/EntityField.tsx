@@ -191,6 +191,7 @@ const EntityField = () => {
             onSubmit={handleSubmit}
             defaultValues={defaultValues}
             applicationId={application}
+            entityId={entity}
             entityDisplayName={entityDisplayName || ""}
           />
         </>
@@ -201,8 +202,8 @@ const EntityField = () => {
           onDismiss={hideRelatedFieldDialog}
           onSubmit={handleRelatedFieldFormSubmit}
           relatedEntityId={lookupPendingData?.properties?.relatedEntityId}
-          allowMultipleSelection={
-            !lookupPendingData?.properties?.allowMultipleSelection
+          relationType={
+            !lookupPendingData?.properties?.relationType
           }
           entity={data.entity}
         />

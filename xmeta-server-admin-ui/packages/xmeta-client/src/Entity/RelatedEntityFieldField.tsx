@@ -8,10 +8,11 @@ import "./RelatedEntityFieldField.scss";
 const CLASS_NAME = "related-entity-field-field";
 
 type Props = {
+  entityId: string;
   entityDisplayName: string;
 };
 
-const RelatedEntityFieldField = ({ entityDisplayName }: Props) => {
+const RelatedEntityFieldField = ({ entityId, entityDisplayName }: Props) => {
   const formik = useFormikContext<models.EntityField>();
 
   const { data } = useQuery<{ entity: models.Entity }>(
@@ -35,11 +36,11 @@ const RelatedEntityFieldField = ({ entityDisplayName }: Props) => {
     <div className={CLASS_NAME}>
       {data && relatedField && (
         <EntityRelationFieldsChart
-          fixInPlace={false}
+          fixInPlace
           applicationId={data.entity.appId}
-          entityId={data.entity.id}
-          field={formik.values}
+          entityId={entityId}
           entityName={entityDisplayName}
+          field={formik.values}
           relatedField={relatedField}
           relatedEntityName={data.entity.displayName}
           onSubmit={() => {}}

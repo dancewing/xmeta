@@ -20,7 +20,7 @@ import java.util.List;
 public interface EntityRepository extends JpaRepository<EntityEntity, String>, JpaSpecificationExecutor<EntityEntity> {
 
     @Query("from EntityEntity et where et.name =:name and et.app.id = :appId")
-    List<EntityEntity> findEntityByNames(@Param("name") String name, @Param("appId") String appId);
+    List<EntityEntity> findEntitiesByName(@Param("name") String name, @Param("appId") String appId);
 
     @Query("select distinct b from EntityEntity b where b.lockedByUser.id = :userId and b.app.id " +
             "= :appId")

@@ -578,7 +578,7 @@ input EntityAddPermissionFieldInput {
 
 input EntityCreateInput {
   name: String!
-  table: String!
+  table: String
   displayName: String!
   pluralDisplayName: String!
   description: String

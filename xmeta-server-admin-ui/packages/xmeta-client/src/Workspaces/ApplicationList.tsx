@@ -17,6 +17,7 @@ import * as models from "../models";
 import ApplicationListItem from "./ApplicationListItem";
 import MobileMessage from "../Layout/MobileMessage";
 import "./ApplicationList.scss";
+import {useIntl} from "react-intl";
 
 type TData = {
   apps: Array<models.App>;
@@ -30,6 +31,7 @@ const CLASS_NAME = "application-list";
 
 function ApplicationList() {
   const { trackEvent } = useTracking();
+  const intl = useIntl();
   const [searchPhrase, setSearchPhrase] = useState<string>("");
   const [error, setError] = useState<Error | null>(null);
 
@@ -104,7 +106,7 @@ function ApplicationList() {
       <div className={`${CLASS_NAME}__header`}>
         <SearchField
           label="search"
-          placeholder="search"
+          placeholder={intl.formatMessage({id: 'search'})}
           onChange={handleSearchChange}
         />
 
@@ -114,18 +116,18 @@ function ApplicationList() {
             buttonStyle={EnumButtonStyle.Primary}
             icon="plus"
           >
-            New app
+            {intl.formatMessage({id: 'app.create'})}
           </Button>
         </Link>
       </div>
-      <div className={`${CLASS_NAME}__title`}>{data?.apps.length} Apps</div>
+      <div className={`${CLASS_NAME}__title`}>{data?.apps.length} {intl.formatMessage({id: 'apps'})}</div>
       {loading && <CircularProgress />}
 
       {isEmpty(data?.apps) && !loading ? (
         <div className={`${CLASS_NAME}__empty-state`}>
           <SvgThemeImage image={EnumImages.AddApp} />
           <div className={`${CLASS_NAME}__empty-state__title`}>
-            There are no apps to show
+            {intl.formatMessage({id: 'app.no-results'})}
           </div>
         </div>
       ) : (

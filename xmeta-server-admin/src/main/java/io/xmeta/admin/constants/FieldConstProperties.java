@@ -1,6 +1,8 @@
 package io.xmeta.admin.constants;
 
 import io.xmeta.admin.util.Maps;
+import io.xmeta.core.domain.RelationType;
+import io.xmeta.core.domain.RelationTypeConstants;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -13,7 +15,7 @@ public abstract class FieldConstProperties {
             999999999).and("precision", 2).build();
     public static Map<String, Object> DateTime = Maps.of("timeZone", "localTime").and("dateOnly", false).build();
     public static Map<String, Object> Lookup =
-            Maps.of("relatedEntityId", "").and("allowMultipleSelection", false).and("relatedFieldId", "").build();
+            Maps.of(RelationTypeConstants.RELATED_ENTITY_ID, "").and(RelationTypeConstants.RELATION_TYPE, RelationType.manyToOne.name()).and(RelationTypeConstants.RELATED_FIELD_ID, "").build();
     public static Map<String, Object> OptionSet =
             Maps.of("options", Arrays.asList(Maps.of("label", "Option 1").and("value", "Option1").build())).build();
 

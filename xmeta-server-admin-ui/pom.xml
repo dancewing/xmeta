@@ -119,16 +119,14 @@
                     <execution>
                         <id>webapp build dev</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>yarn</goal>
                         </goals>
-<!--                        <phase>generate-resources</phase>-->
                         <phase>package</phase>
                         <configuration>
                             <arguments>run build</arguments>
                             <environmentVariables>
                                 <APP_VERSION>${project.version}</APP_VERSION>
                             </environmentVariables>
-                            <npmInheritsProxyConfigFromMaven>false</npmInheritsProxyConfigFromMaven>
                         </configuration>
                     </execution>
                 </executions>

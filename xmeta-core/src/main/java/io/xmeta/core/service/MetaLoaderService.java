@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface MetaLoaderService {
     List<Entity> load(DataSource dataSource);
+    void save(DataSource dataSource, List<Entity> entities);
 }

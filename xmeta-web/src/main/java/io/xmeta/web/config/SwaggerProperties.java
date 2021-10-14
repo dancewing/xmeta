@@ -4,11 +4,6 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * @author liuzhe.
- * @date 2021/9/20.
- * @time 下午4:18.
- */
 @Data
 @Component
 @ConfigurationProperties("swagger")
@@ -16,7 +11,7 @@ public class SwaggerProperties {
     /**
      * 是否开启swagger，生产环境一般关闭，所以这里定义一个变量
      */
-    private boolean enable;
+    private boolean enable = true;
 
     /**
      * 项目应用名
@@ -37,10 +32,5 @@ public class SwaggerProperties {
      * 接口调试地址
      */
     private String tryHost;
-
-    /**
-     * api存在的包路径
-     */
-    private String basePackge;
 
 }

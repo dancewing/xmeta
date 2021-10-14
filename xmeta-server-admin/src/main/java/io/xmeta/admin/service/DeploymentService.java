@@ -69,7 +69,8 @@ public class DeploymentService extends BaseService<DeploymentRepository, Deploym
 
         Map<String, Object> settings = new HashMap<>();
 
-        this.deployService.deploy(entities, createDataSource(environment), settings, true, false);
+        HikariDataSource dataSource = createDataSource(environment);
+        this.deployService.deploy(entities, dataSource, settings, true, false);
 
         deploymentEntity.setCreatedAt(ZonedDateTime.now());
         deploymentEntity.setUserId(userId);
@@ -77,17 +78,15 @@ public class DeploymentService extends BaseService<DeploymentRepository, Deploym
         deploymentEntity.setEnvironment(environment);
         deploymentEntity.setStatus(EnumDeploymentStatus.Completed.name());
         deploymentEntity.setMessage(data.getMessage());
-//        deploymentEntity.setActionId();
-//        deploymentEntity.setAction();
         deploymentEntity.setStatusQuery("");
         deploymentEntity.setStatusUpdatedAt(ZonedDateTime.now());
 
-
+        dataSource.close();
 
         return this.deploymentMapper.toDto(this.deploymentRepository.save(deploymentEntity));
     }
 
-    private DataSource createDataSource(EnvironmentEntity environment) {
+    private HikariDataSource createDataSource(EnvironmentEntity environment) {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(environment.getAddress());
         dataSource.setUsername(environment.getUser());

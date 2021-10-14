@@ -1,6 +1,7 @@
 package io.xmeta.core.domain;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ public class Entity implements java.io.Serializable {
     @javax.validation.constraints.NotNull
     private String table;
     private String description;
-    private List<EntityField> fields;
+    private List<EntityField> fields = new ArrayList<>();
 
     public Entity() {
     }

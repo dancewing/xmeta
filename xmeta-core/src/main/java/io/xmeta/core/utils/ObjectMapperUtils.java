@@ -1,9 +1,8 @@
-package io.xmeta.admin.util;
+package io.xmeta.core.utils;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.xmeta.admin.model.IBlock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -19,7 +18,7 @@ public abstract class ObjectMapperUtils {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static <T extends IBlock> T toBlock(byte[] bytes, Class<T> block) {
+    public static <T> T toClass(byte[] bytes, Class<T> block) {
         if (bytes != null) {
             try {
                 return objectMapper.readValue(bytes, block);
@@ -29,6 +28,7 @@ public abstract class ObjectMapperUtils {
         }
         return null;
     }
+
 
     public static byte[] toBytes(Map<String, Object> value) {
         if (value != null) {

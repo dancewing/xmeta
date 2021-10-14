@@ -7,7 +7,7 @@ import io.xmeta.admin.domain.UserEntity;
 import io.xmeta.admin.repository.BlockRepository;
 import io.xmeta.admin.repository.BlockVersionRepository;
 import io.xmeta.admin.util.Maps;
-import io.xmeta.admin.util.ObjectMapperUtils;
+import io.xmeta.core.utils.ObjectMapperUtils;
 import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.BlockMapper;
@@ -174,7 +174,7 @@ public class BlockService extends BaseService<BlockRepository, BlockEntity, Stri
                                                 Class<T> blockClass) {
 
         byte[] settings = blockVersionEntity.getSettings();
-        T block = ObjectMapperUtils.toBlock(settings, blockClass);
+        T block = ObjectMapperUtils.toClass(settings, blockClass);
         if (block == null) {
             throw new RuntimeException("can't convert block");
         }

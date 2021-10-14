@@ -17,11 +17,14 @@ public class EntityField implements java.io.Serializable {
     private boolean unique;
     private boolean searchable;
     private String description;
+    private String entityId;
 
     public EntityField() {
     }
 
-    public EntityField(String id, String name, String displayName, String column, DataType dataType, String javaType, java.util.Map<String, Object> properties, boolean required, boolean unique, boolean searchable, String description) {
+    public EntityField(String id, String name, String displayName, String column, DataType dataType, String javaType,
+                       java.util.Map<String, Object> properties, boolean required, boolean unique, boolean searchable,
+                       String description, String entityId) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
@@ -33,6 +36,7 @@ public class EntityField implements java.io.Serializable {
         this.unique = unique;
         this.searchable = searchable;
         this.description = description;
+        this.entityId = entityId;
     }
 
     public String getId() {
@@ -113,6 +117,15 @@ public class EntityField implements java.io.Serializable {
         this.dataType = dataType;
     }
 
+    public String getEntityId() {
+        return entityId;
+    }
+
+    public EntityField setEntityId(String entityId) {
+        this.entityId = entityId;
+        return this;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -129,6 +142,7 @@ public class EntityField implements java.io.Serializable {
         private boolean unique;
         private boolean searchable;
         private String description;
+        private String entityId;
 
         public Builder() {
         }
@@ -189,8 +203,13 @@ public class EntityField implements java.io.Serializable {
             return this;
         }
 
+        public Builder setEntityId(String entityId) {
+            this.entityId = entityId;
+            return this;
+        }
+
         public EntityField build() {
-            return new EntityField(id, name, displayName, column, dataType, javaType, properties, required, unique, searchable, description);
+            return new EntityField(id, name, displayName, column, dataType, javaType, properties, required, unique, searchable, description, entityId);
         }
     }
 }

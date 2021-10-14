@@ -2,6 +2,7 @@ package io.xmeta.core.service.impl;
 
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.service.DeployService;
+import io.xmeta.core.service.MetaLoaderService;
 import io.xmeta.core.utils.EntityConverter;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -19,6 +20,12 @@ import java.util.Map;
 
 @Service
 public class DeployServiceImpl implements DeployService {
+
+    private MetaLoaderService metaLoaderService;
+
+    public DeployServiceImpl(MetaLoaderService metaLoaderService) {
+        this.metaLoaderService = metaLoaderService;
+    }
 
     /**
      * @param entities 数据模型
@@ -45,17 +52,11 @@ public class DeployServiceImpl implements DeployService {
        // schemaExport.setOutputFile("hbm2schema.sql");
         schemaExport.create(EnumSet.of(TargetType.DATABASE), metadata);
         serviceRegistry.close();
-        close(dataSource);
-    }
 
-    private void close(DataSource dataSource) {
-        if (dataSource instanceof AutoCloseable) {
-            try {
-                ((AutoCloseable) dataSource).close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (saveMeta) {
+            this.metaLoaderService.save(dataSource, entities);
         }
+
     }
 
     public static ServiceRegistry buildCfg(Map<String, Object> settings) {

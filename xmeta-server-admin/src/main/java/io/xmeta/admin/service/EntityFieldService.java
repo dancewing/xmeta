@@ -12,6 +12,7 @@ import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.domain.RelationTypeConstants;
 import io.xmeta.core.utils.EntityFieldUtils;
+import io.xmeta.core.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;

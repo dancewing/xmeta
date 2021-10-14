@@ -1,0 +1,44 @@
+server:
+  port: 9880
+
+logging:
+  level:
+    org.hibernate.internal: DEBUG
+
+
+spring:
+  application:
+    name: chassis-server
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/test_deploy?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    driverClassName: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123
+    hikari:
+      connection-timeout: 2000
+      initialization-fail-timeout: 0
+      auto-commit: false
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+      hibernate.id.new_generator_mappings: true
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      # modify batch size as necessary
+      hibernate.jdbc.batch_size: 25
+      hibernate.order_inserts: true
+      hibernate.order_updates: true
+      hibernate.query.fail_on_pagination_over_collection_fetch: true
+      hibernate.query.in_clause_parameter_padding: true
+      hibernate.show_sql: false
+      hibernate.format_sql: false
+      hibernate.use_sql_comments: false
+    hibernate:
+      ddl-auto: update

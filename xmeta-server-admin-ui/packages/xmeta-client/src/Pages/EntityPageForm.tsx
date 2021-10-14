@@ -15,7 +15,7 @@ import {
   TextField,
   CheckboxField,
   MultiStateToggleField,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import PageSelectField from "./PageSelectField";
 import EntityFieldMultiSelect from "./EntityFieldMultiSelect";
 import { HeaderToolbar } from "../util/teleporter";

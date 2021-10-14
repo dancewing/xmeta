@@ -11,7 +11,7 @@ import {
   MultiStateToggle,
   PanelCollapsible,
   Toggle,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import { ActionRoleList } from "./ActionRoleList";
 import { EntityPermissionFields } from "./EntityPermissionFields";
 import { GET_ENTITY_PERMISSIONS } from "./PermissionsForm";

@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import classNames from "classnames";
-import { CircleBadge } from "@amplication/design-system";
+import { CircleBadge } from "@xmeta/design-system";
 import "./ApplicationBadge.scss";
 
 type Props = {

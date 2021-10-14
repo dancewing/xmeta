@@ -7,7 +7,7 @@ import { History } from "history";
 import { Icon } from "@rmwc/icon";
 
 import { useHistory, useRouteMatch } from "react-router-dom";
-import { CircleBadge } from "@amplication/design-system";
+import { CircleBadge } from "@xmeta/design-system";
 
 import * as models from "../models";
 import "./CommandPalette.scss";

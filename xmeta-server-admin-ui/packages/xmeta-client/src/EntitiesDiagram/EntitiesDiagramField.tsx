@@ -1,4 +1,4 @@
-import { SelectField, TextField } from "@amplication/design-system";
+import { SelectField, TextField } from "@xmeta/design-system";
 import { Icon } from "@rmwc/icon";
 import classNames from "classnames";
 import React, { useCallback } from "react";

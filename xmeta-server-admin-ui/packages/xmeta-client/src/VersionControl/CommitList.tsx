@@ -7,7 +7,7 @@ import { CircularProgress } from "@rmwc/circular-progress";
 import { formatError } from "../util/error";
 import * as models from "../models";
 
-import { SearchField } from "@amplication/design-system";
+import { SearchField } from "@xmeta/design-system";
 
 import { CommitListItem } from "./CommitListItem";
 import PageContent from "../Layout/PageContent";

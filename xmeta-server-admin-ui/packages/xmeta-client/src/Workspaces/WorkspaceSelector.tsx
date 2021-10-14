@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { useHistory } from "react-router-dom";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import { setToken } from "../authentication/authentication";
-import { CircleBadge, Dialog } from "@amplication/design-system";
+import { CircleBadge, Dialog } from "@xmeta/design-system";
 import * as models from "../models";
 import WorkspaceSelectorList from "./WorkspaceSelectorList";
 import NewWorkspace from "./NewWorkspace";

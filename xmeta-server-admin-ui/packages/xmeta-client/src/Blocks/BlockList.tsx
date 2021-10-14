@@ -17,7 +17,7 @@ import {
   SelectMenuModal,
   SelectMenuItem,
   SelectMenuList,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import { paramCase } from "param-case";
 
 import pluralize from "pluralize";

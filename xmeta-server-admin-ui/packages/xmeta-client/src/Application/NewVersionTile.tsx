@@ -1,4 +1,4 @@
-import { EnumPanelStyle, Panel } from "@amplication/design-system";
+import { EnumPanelStyle, Panel } from "@xmeta/design-system";
 import { useQuery } from "@apollo/client";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Icon } from "@rmwc/icon";

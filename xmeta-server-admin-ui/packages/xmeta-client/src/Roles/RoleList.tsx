@@ -6,7 +6,7 @@ import { Snackbar } from "@rmwc/snackbar";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { formatError } from "../util/error";
 import * as models from "../models";
-import { SearchField } from "@amplication/design-system";
+import { SearchField } from "@xmeta/design-system";
 import NewRole from "./NewRole";
 import InnerTabLink from "../Layout/InnerTabLink";
 import "./RoleList.scss";

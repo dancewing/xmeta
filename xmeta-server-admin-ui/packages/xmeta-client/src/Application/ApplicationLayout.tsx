@@ -19,7 +19,7 @@ import * as models from "../models";
 
 import MenuItem from "../Layout/MenuItem";
 import MainLayout from "../Layout/MainLayout";
-import { CircleBadge } from "@amplication/design-system";
+import { CircleBadge } from "@xmeta/design-system";
 import LastCommit from "../VersionControl/LastCommit";
 
 import PendingChangesContext, {

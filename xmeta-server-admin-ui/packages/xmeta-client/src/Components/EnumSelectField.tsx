@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { capitalCase } from "capital-case";
-import { SelectField, SelectFieldProps } from "@amplication/design-system";
+import { SelectField, SelectFieldProps } from "@xmeta/design-system";
 
 type Props = Omit<SelectFieldProps, "options"> & {
   options: string[];

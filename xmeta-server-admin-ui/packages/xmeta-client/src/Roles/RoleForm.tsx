@@ -5,7 +5,7 @@ import omit from "lodash.omit";
 import * as models from "../models";
 import { DisplayNameField } from "../Components/DisplayNameField";
 import NameField from "../Components/NameField";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { validate } from "../util/formikValidateJsonSchema";
 
 import FormikAutoSave from "../util/formikAutoSave";

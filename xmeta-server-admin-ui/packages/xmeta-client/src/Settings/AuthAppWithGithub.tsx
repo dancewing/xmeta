@@ -17,7 +17,7 @@ import {
   Toggle,
   Dialog,
   ConfirmationDialog,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import "./AuthAppWithGithub.scss";
 
 type DType = {

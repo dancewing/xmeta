@@ -15,7 +15,7 @@ import {
   CircleBadge,
   EnumPanelStyle,
   Panel,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 
 type Props = {
   app: models.App;

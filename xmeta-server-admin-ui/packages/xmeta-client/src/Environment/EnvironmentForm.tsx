@@ -4,7 +4,7 @@ import { Formik } from "formik";
 import omitDeep from "deepdash-es/omitDeep";
 
 import * as models from "../models";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { Form } from "../Components/Form";
 import { validate } from "../util/formikValidateJsonSchema";
 import {Button, EnumButtonStyle} from "../Components/Button";

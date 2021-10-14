@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useContext } from "react";
 import { gql, useMutation, Reference } from "@apollo/client";
 import * as models from "../models";
-import { ConfirmationDialog } from "@amplication/design-system";
+import { ConfirmationDialog } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import { SYSTEM_DATA_TYPES } from "./constants";
 import PendingChangesContext from "../VersionControl/PendingChangesContext";

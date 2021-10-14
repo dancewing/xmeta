@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { isEmpty } from "lodash";
 import * as models from "../models";
-import { Panel, EnumPanelStyle } from "@amplication/design-system";
+import { Panel, EnumPanelStyle } from "@xmeta/design-system";
 import { Link, useHistory } from "react-router-dom";
 import { Icon } from "@rmwc/icon";
 import { DATA_TYPE_TO_LABEL_AND_ICON } from "./constants";

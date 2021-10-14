@@ -1,5 +1,5 @@
 import React from "react";
-import { TextField, TextFieldProps } from "@amplication/design-system";
+import { TextField, TextFieldProps } from "@xmeta/design-system";
 import classNames from "classnames";
 import "./EditableLabelField.scss";
 

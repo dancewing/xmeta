@@ -5,7 +5,7 @@ import { isEmpty } from "lodash";
 import { formatError } from "../util/error";
 import { CircularProgress } from "@rmwc/circular-progress";
 import * as models from "../models";
-import { UserAndTime } from "@amplication/design-system";
+import { UserAndTime } from "@xmeta/design-system";
 import { Tooltip } from "@primer/components";
 import { ClickableId } from "../Components/ClickableId";
 import BuildSummary from "./BuildSummary";

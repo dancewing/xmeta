@@ -7,7 +7,7 @@ import { GlobalHotKeys } from "react-hotkeys";
 import { pascalCase } from "pascal-case";
 import { formatError } from "../util/error";
 import * as models from "../models";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import {
   generatePluralDisplayName,

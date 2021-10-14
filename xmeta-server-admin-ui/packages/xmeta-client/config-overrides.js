@@ -6,13 +6,13 @@
 
 const path = require("path");
 const { set } = require("lodash");
-const designSystemPkg = require("@amplication/design-system/package.json");
+const designSystemPkg = require("@xmetadesign-system/package.json");
 
 module.exports = function override(config, env) {
   /**
    * Force Webpack to resolve peer dependencies to the version in node_modules top level
    * This has to be done because, correct to November 2020, when using Lerna
-   * with npm Webpack sees peer dependencies in @amplication/design-system as
+   * with npm Webpack sees peer dependencies in @xmetadesign-system as
    * different packages (even if their versions match)
    * @see https://stackoverflow.com/a/31170775/5798553
    */

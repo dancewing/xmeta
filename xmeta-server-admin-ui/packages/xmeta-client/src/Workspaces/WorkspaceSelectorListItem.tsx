@@ -1,4 +1,4 @@
-import { CircleBadge } from "@amplication/design-system";
+import { CircleBadge } from "@xmeta/design-system";
 import classNames from "classnames";
 import React, { useCallback } from "react";
 import * as models from "../models";

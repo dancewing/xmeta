@@ -22,7 +22,7 @@ Before starting the client you need to setup the server and database. You can fo
 After that you have to build dependencies of the client:
 
 ```
-npm run build -- --scope @amplication/client --include-dependencies
+npm run build -- --scope @xmetaclient --include-dependencies
 ```
 
 ## Available Scripts

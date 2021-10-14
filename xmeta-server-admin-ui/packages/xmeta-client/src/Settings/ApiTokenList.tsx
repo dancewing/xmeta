@@ -1,4 +1,4 @@
-import { Dialog, EnumPanelStyle, Panel } from "@amplication/design-system";
+import { Dialog, EnumPanelStyle, Panel } from "@xmeta/design-system";
 import { gql, useQuery } from "@apollo/client";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Snackbar } from "@rmwc/snackbar";

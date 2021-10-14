@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { PopoverProps, Popover } from "@amplication/design-system";
+import { PopoverProps, Popover } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "./Button";
 import "./HelpPopover.scss";
 import { Icon } from "@rmwc/icon";

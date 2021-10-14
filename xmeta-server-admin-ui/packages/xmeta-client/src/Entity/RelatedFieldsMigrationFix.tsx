@@ -1,4 +1,4 @@
-import { Panel, PanelHeader } from "@amplication/design-system";
+import { Panel, PanelHeader } from "@xmeta/design-system";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { CircularProgress } from "@rmwc/circular-progress";
 import { Snackbar } from "@rmwc/snackbar";

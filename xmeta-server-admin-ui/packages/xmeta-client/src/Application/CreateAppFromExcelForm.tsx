@@ -1,4 +1,4 @@
-import { Panel } from "@amplication/design-system";
+import { Panel } from "@xmeta/design-system";
 import { Icon } from "@rmwc/icon";
 import { Formik } from "formik";
 import React from "react";

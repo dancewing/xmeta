@@ -7,7 +7,7 @@ import { formatError } from "../util/error";
 import * as models from "../models";
 import PageContent from "../Layout/PageContent";
 import "./EnvironmentList.scss";
-import {SelectField, TextField} from "@amplication/design-system";
+import {SelectField, TextField} from "@xmeta/design-system";
 import {Button, EnumButtonStyle} from "../Components/Button";
 
 type TData = {

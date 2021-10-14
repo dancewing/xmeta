@@ -5,7 +5,7 @@ import {
   ConfirmationDialog,
   Panel,
   EnumPanelStyle,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import { Link, useHistory } from "react-router-dom";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import PendingChangesContext from "../VersionControl/PendingChangesContext";

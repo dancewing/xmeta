@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Popover } from "@amplication/design-system";
+import { Popover } from "@xmeta/design-system";
 import classNames from "classnames";
 import MenuItemWithFixedPanel from "../Layout/MenuItemWithFixedPanel";
 import PendingChangesBar from "../VersionControl/PendingChangesBar";

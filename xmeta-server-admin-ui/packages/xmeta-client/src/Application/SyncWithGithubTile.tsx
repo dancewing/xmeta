@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { Panel, EnumPanelStyle } from "@amplication/design-system";
+import { Panel, EnumPanelStyle } from "@xmeta/design-system";
 import { Icon } from "@rmwc/icon";
 import { CircularProgress } from "@rmwc/circular-progress";
 

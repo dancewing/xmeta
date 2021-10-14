@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { camelCase } from "camel-case";
 import { Snackbar } from "@rmwc/snackbar";
 import "@rmwc/snackbar/styles";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { formatError } from "../util/error";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import * as models from "../models";

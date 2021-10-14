@@ -9,7 +9,7 @@ import { formatError } from "../util/error";
 import { isMobileOnly } from "react-device-detect";
 import { useTracking } from "../util/analytics";
 
-import { SearchField } from "@amplication/design-system";
+import { SearchField } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import { SvgThemeImage, EnumImages } from "../Components/SvgThemeImage";
 

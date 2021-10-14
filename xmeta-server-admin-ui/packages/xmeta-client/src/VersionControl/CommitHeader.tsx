@@ -1,7 +1,7 @@
 import React from "react";
 import * as models from "../models";
 
-import { UserAndTime } from "@amplication/design-system";
+import { UserAndTime } from "@xmeta/design-system";
 import { ClickableId } from "../Components/ClickableId";
 import { TruncatedId } from "../Components/TruncatedId";
 

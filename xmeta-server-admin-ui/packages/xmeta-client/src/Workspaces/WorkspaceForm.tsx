@@ -7,7 +7,7 @@ import { Snackbar } from "@rmwc/snackbar";
 import "@rmwc/snackbar/styles";
 import * as models from "../models";
 import { formatError } from "../util/error";
-import {EnumButtonStyle, TextField} from "@amplication/design-system";
+import {EnumButtonStyle, TextField} from "@xmeta/design-system";
 import { useTracking } from "../util/analytics";
 import { GET_CURRENT_WORKSPACE } from "./WorkspaceSelector";
 import "./WorkspaceForm.scss";

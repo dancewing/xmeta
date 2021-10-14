@@ -7,7 +7,7 @@ import { GlobalHotKeys } from "react-hotkeys";
 
 import { gql, useMutation } from "@apollo/client";
 import { formatError } from "../util/error";
-import { MultiStateToggle, TextField } from "@amplication/design-system";
+import { MultiStateToggle, TextField } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import * as models from "../models";
 import { CROSS_OS_CTRL_ENTER } from "../util/hotkeys";

@@ -7,7 +7,7 @@ import PendingChangesContext from "./PendingChangesContext";
 import { formatError } from "../util/error";
 import { GET_PENDING_CHANGES } from "./PendingChanges";
 import { GET_LAST_COMMIT } from "./LastCommit";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { CROSS_OS_CTRL_ENTER } from "../util/hotkeys";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import CommitValidation from "./CommitValidation";

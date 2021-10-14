@@ -1,6 +1,6 @@
 import React from "react";
 import { SchemaField } from "./SchemaField";
-import { Schema } from "@amplication/data";
+import { Schema } from "@xmeta/data";
 
 type Props = {
   schema: Schema;

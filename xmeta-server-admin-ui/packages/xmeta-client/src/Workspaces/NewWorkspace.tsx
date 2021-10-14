@@ -1,4 +1,4 @@
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { gql, Reference, useMutation } from "@apollo/client";
 import { Snackbar } from "@rmwc/snackbar";
 import { Form, Formik } from "formik";

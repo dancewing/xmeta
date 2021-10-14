@@ -14,7 +14,7 @@ import * as models from "../models";
 import logsImage from "../assets/images/logs.svg";
 
 import "./ActionLog.scss";
-import { CircleIcon, EnumCircleIconSize } from "@amplication/design-system";
+import { CircleIcon, EnumCircleIconSize } from "@xmeta/design-system";
 import { STEP_STATUS_TO_STYLE, STEP_STATUS_TO_ICON } from "./constants";
 
 type Props = {

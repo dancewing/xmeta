@@ -6,7 +6,7 @@ import { CircularProgress } from "@rmwc/circular-progress";
 import { Icon } from "@rmwc/icon";
 
 import * as models from "../models";
-import { Panel, EnumPanelStyle } from "@amplication/design-system";
+import { Panel, EnumPanelStyle } from "@xmeta/design-system";
 
 import { GET_ENTITIES } from "../Entity/EntityList";
 import { useTracking, Event as TrackEvent } from "../util/analytics";

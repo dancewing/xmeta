@@ -1,7 +1,7 @@
 import React from "react";
 import { isEmpty } from "lodash";
 import "./PageContent.scss";
-import { Panel } from "@amplication/design-system";
+import { Panel } from "@xmeta/design-system";
 import "./WelcomePage.scss";
 
 const CLASS_NAME = "welcome-page";

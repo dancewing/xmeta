@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import * as models from "../models";
 import { useHistory } from "react-router-dom";
 
-import { UserAndTime, Panel, EnumPanelStyle } from "@amplication/design-system";
+import { UserAndTime, Panel, EnumPanelStyle } from "@xmeta/design-system";
 
 import { ClickableId } from "../Components/ClickableId";
 

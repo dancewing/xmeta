@@ -6,7 +6,7 @@ import {
   Panel,
   EnumPanelStyle,
   PanelHeader,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 
 import useBuildWatchStatus from "./useBuildWatchStatus";
 import BuildSteps from "./BuildSteps";

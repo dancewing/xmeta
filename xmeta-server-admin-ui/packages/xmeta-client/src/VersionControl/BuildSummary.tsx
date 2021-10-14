@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { isEmpty } from "lodash";
 import { Icon } from "@rmwc/icon";
 import { useQuery } from "@apollo/client";
-import { Dialog } from "@amplication/design-system";
+import { Dialog } from "@xmeta/design-system";
 import * as models from "../models";
 import { EnumButtonStyle, Button } from "../Components/Button";
 import { downloadArchive } from "./BuildSteps";

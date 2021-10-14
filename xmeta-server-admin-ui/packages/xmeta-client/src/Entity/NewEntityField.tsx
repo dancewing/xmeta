@@ -4,7 +4,7 @@ import { Formik, Form } from "formik";
 import classNames from "classnames";
 import { Snackbar } from "@rmwc/snackbar";
 import "@rmwc/snackbar/styles";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { formatError } from "../util/error";
 import * as models from "../models";
 import PendingChangesContext from "../VersionControl/PendingChangesContext";

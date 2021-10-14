@@ -10,7 +10,7 @@ import "@rmwc/snackbar/styles";
 import * as models from "../models";
 import { formatError } from "../util/error";
 import FormikAutoSave from "../util/formikAutoSave";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { COLORS } from "./constants";
 import { ColorSelectButton } from "../Components/ColorSelectButton";
 import { useTracking } from "../util/analytics";

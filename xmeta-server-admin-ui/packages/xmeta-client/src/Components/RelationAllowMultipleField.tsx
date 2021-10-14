@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { useFormikContext } from "formik";
-import { RadioButtonField } from "@amplication/design-system";
+import { RadioButtonField } from "@xmeta/design-system";
 
 type Props = {
   fieldName: string;

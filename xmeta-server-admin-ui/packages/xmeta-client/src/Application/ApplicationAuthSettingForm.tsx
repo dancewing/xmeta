@@ -1,4 +1,4 @@
-import { Snackbar, ToggleField } from "@amplication/design-system";
+import { Snackbar, ToggleField } from "@xmeta/design-system";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import "@rmwc/snackbar/styles";
 import { Form, Formik } from "formik";

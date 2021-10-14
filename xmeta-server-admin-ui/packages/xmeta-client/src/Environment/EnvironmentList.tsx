@@ -6,7 +6,7 @@ import { CircularProgress } from "@rmwc/circular-progress";
 
 import { formatError } from "../util/error";
 import * as models from "../models";
-import { Dialog } from "@amplication/design-system";
+import { Dialog } from "@xmeta/design-system";
 import useNavigationTabs from "../Layout/UseNavigationTabs";
 
 import NewEntity from "./NewEntity";

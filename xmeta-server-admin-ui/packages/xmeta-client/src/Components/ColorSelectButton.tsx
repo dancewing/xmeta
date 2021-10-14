@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Tooltip } from "@primer/components";
-import * as designSystem from "@amplication/design-system";
+import * as designSystem from "@xmeta/design-system";
 import "./ColorSelectButton.scss";
 
 export type Props = {

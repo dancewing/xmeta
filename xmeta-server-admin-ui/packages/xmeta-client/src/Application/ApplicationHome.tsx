@@ -7,7 +7,7 @@ import classNames from "classnames";
 import * as models from "../models";
 import { formatError } from "../util/error";
 import PageContent from "../Layout/PageContent";
-import { CircleBadge } from "@amplication/design-system";
+import { CircleBadge } from "@xmeta/design-system";
 import ApplicationForm from "./ApplicationForm";
 import SyncWithGithubPage from "../Settings/SyncWithGithubPage";
 import "./ApplicationHome.scss";

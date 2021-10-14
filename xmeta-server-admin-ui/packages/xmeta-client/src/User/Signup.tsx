@@ -10,7 +10,7 @@ import { setToken } from "../authentication/authentication";
 import { formatError } from "../util/error";
 import { Formik, Form } from "formik";
 import WelcomePage from "../Layout/WelcomePage";
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { Button } from "../Components/Button";
 import { SIGN_IN_PAGE_CONTENT, DEFAULT_PAGE_SOURCE } from "./constants";
 import "./Signup.scss";

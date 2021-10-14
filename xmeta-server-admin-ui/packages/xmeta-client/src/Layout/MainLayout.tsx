@@ -14,7 +14,7 @@ import CommandPalette from "../CommandPalette/CommandPalette";
 import MenuItem from "./MenuItem";
 import UserBadge from "../Components/UserBadge";
 import { MenuFixedPanel } from "../util/teleporter";
-import { Popover } from "@amplication/design-system";
+import { Popover } from "@xmeta/design-system";
 import SupportMenu from "./SupportMenu";
 import { useTracking } from "../util/analytics";
 import DarkModeToggle from "./DarkModeToggle";

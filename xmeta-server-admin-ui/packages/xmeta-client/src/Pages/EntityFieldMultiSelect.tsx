@@ -3,7 +3,7 @@ import { gql, useQuery } from "@apollo/client";
 import {
   CheckboxListField,
   CheckboxListFieldProps,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 
 type TPages = {
   entity: {

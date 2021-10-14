@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
-import { SelectFieldProps, SelectField } from "@amplication/design-system";
+import { SelectFieldProps, SelectField } from "@xmeta/design-system";
 
 type TPages = {
   blocks: [

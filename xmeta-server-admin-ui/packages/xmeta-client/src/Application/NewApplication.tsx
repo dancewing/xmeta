@@ -14,7 +14,7 @@ import * as models from "../models";
 import { useTracking } from "../util/analytics";
 import { validate } from "../util/formikValidateJsonSchema";
 
-import { TextField } from "@amplication/design-system";
+import { TextField } from "@xmeta/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import { CROSS_OS_CTRL_ENTER } from "../util/hotkeys";
 import { SvgThemeImage, EnumImages } from "../Components/SvgThemeImage";

@@ -7,7 +7,7 @@ import * as models from "../models";
 import { EnumButtonStyle, Button } from "../Components/Button";
 
 import useBuildWatchStatus from "./useBuildWatchStatus";
-import { Panel, EnumPanelStyle } from "@amplication/design-system";
+import { Panel, EnumPanelStyle } from "@xmeta/design-system";
 
 import { BuildStepsStatus } from "./BuildStepsStatus";
 

@@ -8,7 +8,7 @@ import {
   CircleIcon,
   EnumCircleIconStyle,
   EnumCircleIconSize,
-} from "@amplication/design-system";
+} from "@xmeta/design-system";
 import ProgressBar from "../Components/ProgressBar";
 import "./Deployment.scss";
 

@@ -5,4 +5,8 @@
     @include flexFullRowWithSpacing;
     margin-bottom: var(--default-spacing);
   }
+
+  .mdc-layout-grid {
+    padding: 0;
+  }
 }

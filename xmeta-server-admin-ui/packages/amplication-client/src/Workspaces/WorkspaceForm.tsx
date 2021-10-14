@@ -7,11 +7,12 @@ import { Snackbar } from "@rmwc/snackbar";
 import "@rmwc/snackbar/styles";
 import * as models from "../models";
 import { formatError } from "../util/error";
-import FormikAutoSave from "../util/formikAutoSave";
-import { TextField } from "@amplication/design-system";
+import {EnumButtonStyle, TextField} from "@amplication/design-system";
 import { useTracking } from "../util/analytics";
 import { GET_CURRENT_WORKSPACE } from "./WorkspaceSelector";
 import "./WorkspaceForm.scss";
+import {useIntl} from "react-intl";
+import {Button} from "../Components/Button";
 
 type TData = {
   updateWorkspace: models.Workspace;
@@ -30,6 +31,7 @@ const FORM_SCHEMA = {
 const CLASS_NAME = "workspace-form";
 
 function WorkspaceForm() {
+  const intl = useIntl();
   const { data, error } = useQuery<{
     currentWorkspace: models.Workspace;
   }>(GET_CURRENT_WORKSPACE);
@@ -61,7 +63,7 @@ function WorkspaceForm() {
   const errorMessage = formatError(error || updateError);
   return (
     <div className={CLASS_NAME}>
-      <h2>Workspace Settings</h2>
+      <h2>{intl.formatMessage({id: "workspace.settings"})}</h2>
       {data?.currentWorkspace && (
         <Formik
           initialValues={data.currentWorkspace}
@@ -72,8 +74,21 @@ function WorkspaceForm() {
           {(formik) => {
             return (
               <Form>
-                <FormikAutoSave debounceMS={1000} />
-                <TextField name="name" label="Workspace Name" />
+                <TextField name="name" label={intl.formatMessage({id: "workspace.name"})} />
+                <Button
+                    type="submit"
+                    buttonStyle={EnumButtonStyle.Primary}
+                    disabled={ !formik.isValid || !formik.dirty }
+                >
+                  {intl.formatMessage({id: "update"})}
+                </Button>
+                <Button type="reset"
+                        buttonStyle={EnumButtonStyle.CallToAction}
+                        disabled={ !formik.dirty}
+                        style={{marginLeft:20}}
+                >
+                  {intl.formatMessage({id: "reset"})}
+                </Button>
               </Form>
             );
           }}

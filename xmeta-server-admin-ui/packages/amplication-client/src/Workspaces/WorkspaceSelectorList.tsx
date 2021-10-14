@@ -4,6 +4,7 @@ import React from "react";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import * as models from "../models";
 import WorkspaceSelectorListItem from "./WorkspaceSelectorListItem";
+import {useIntl} from "react-intl";
 
 type TData = {
   workspaces: models.Workspace[];
@@ -23,7 +24,7 @@ function WorkspaceSelectorList({
   onNewWorkspaceClick,
 }: Props) {
   const { data, loading } = useQuery<TData>(GET_WORKSPACES);
-
+  const intl = useIntl();
   return (
     <div className={CLASS_NAME}>
       {loading ? (
@@ -46,7 +47,7 @@ function WorkspaceSelectorList({
               icon="plus"
               onClick={onNewWorkspaceClick}
             >
-              Create new workspace
+              {intl.formatMessage({id: "workspace.create"})}
             </Button>
           </div>
         </>

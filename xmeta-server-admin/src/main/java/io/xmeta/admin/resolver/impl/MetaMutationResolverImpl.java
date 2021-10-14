@@ -37,7 +37,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Workspace updateWorkspace(WorkspaceUpdateInput data, WhereUniqueInput where) {
-        return null;
+        return this.workspaceService.updateWorkspace(data, where);
     }
 
     @Override

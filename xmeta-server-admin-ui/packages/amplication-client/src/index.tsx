@@ -13,6 +13,7 @@ import { onError } from "@apollo/client/link/error";
 import * as amplicationDesignSystem from "@amplication/design-system";
 import { SnackbarQueue, createSnackbarQueue } from '@rmwc/snackbar';
 import "@amplication/design-system/icons";
+import "@rmwc/grid/styles";
 import "./index.scss";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";

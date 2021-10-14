@@ -7,13 +7,10 @@ import io.xmeta.admin.domain.WorkspaceEntity;
 import io.xmeta.admin.mapper.UserMapper;
 import io.xmeta.admin.mapper.WorkspaceMapper;
 import io.xmeta.admin.mix.WorkspaceDomain;
+import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.UserRepository;
 import io.xmeta.admin.repository.UserRoleRepository;
 import io.xmeta.admin.repository.WorkspaceRepository;
-import io.xmeta.admin.model.Role;
-import io.xmeta.admin.model.User;
-import io.xmeta.admin.model.Workspace;
-import io.xmeta.admin.model.WorkspaceCreateInput;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import org.springframework.stereotype.Service;
@@ -113,6 +110,14 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
 
     public Workspace getWorkspace(String id) {
         return this.workspaceMapper.toDto(this.workspaceRepository.getById(id));
+    }
+
+    @Transactional
+    public Workspace updateWorkspace(WorkspaceUpdateInput data, WhereUniqueInput where) {
+        WorkspaceEntity workspaceEntity = this.workspaceRepository.getById(where.getId());
+        workspaceEntity.setUpdatedAt(ZonedDateTime.now());
+        workspaceEntity.setName(data.getName());
+        return this.workspaceMapper.toDto(this.workspaceRepository.save(workspaceEntity));
     }
 
     /***

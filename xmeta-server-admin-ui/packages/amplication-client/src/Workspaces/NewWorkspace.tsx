@@ -12,6 +12,7 @@ import { formatError } from "../util/error";
 import { validate } from "../util/formikValidateJsonSchema";
 import { CROSS_OS_CTRL_ENTER } from "../util/hotkeys";
 import "./NewWorkspace.scss";
+import {useIntl} from "react-intl";
 
 type CreateWorkspaceType = models.WorkspaceCreateInput;
 
@@ -44,7 +45,7 @@ type Props = {
 
 const NewWorkspace = ({ onWorkspaceCreated }: Props) => {
   const { trackEvent } = useTracking();
-
+  const intl = useIntl();
   const [createWorkspace, { error, loading }] = useMutation<DType>(
     CREATE_WORKSPACE,
     {
@@ -102,7 +103,7 @@ const NewWorkspace = ({ onWorkspaceCreated }: Props) => {
     <div className={CLASS_NAME}>
       <SvgThemeImage image={EnumImages.Entities} />
       <div className={`${CLASS_NAME}__instructions`}>
-        Give your new workspace a descriptive name.
+        {intl.formatMessage({id: "workspace.create.title"})}
       </div>
       <Formik
         initialValues={INITIAL_VALUES}
@@ -121,11 +122,11 @@ const NewWorkspace = ({ onWorkspaceCreated }: Props) => {
               <GlobalHotKeys keyMap={keyMap} handlers={handlers} />
               <TextField
                 name="name"
-                label="New Workspace Name"
+                label={intl.formatMessage({id: 'workspace.name'})}
                 disabled={loading}
                 autoFocus
                 hideLabel
-                placeholder="Type New Workspace Name"
+                placeholder={intl.formatMessage({id: 'workspace.name.placeholder'})}
                 autoComplete="off"
               />
               <Button
@@ -133,7 +134,7 @@ const NewWorkspace = ({ onWorkspaceCreated }: Props) => {
                 buttonStyle={EnumButtonStyle.Primary}
                 disabled={!formik.isValid || loading}
               >
-                Create Workspace
+                {intl.formatMessage({id: 'save'})}
               </Button>
             </Form>
           );

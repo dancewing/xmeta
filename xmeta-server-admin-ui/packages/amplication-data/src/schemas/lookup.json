@@ -11,6 +11,12 @@
       "$ref": "#/definitions/EntityId",
       "default": null
     },
+    "relationType": {
+      "title": "Relation Type",
+      "type": "string",
+      "enum": ["oneWay", "oneToMany", "manyToOne", "manyToMany", "manyWay"],
+      "default": "oneWay"
+    },
     "allowMultipleSelection": {
       "$ref": "#/definitions/RelationAllowMultiple",
       "default": false
@@ -18,11 +24,6 @@
     "relatedFieldId": {
       "title": "Related Field",
       "$ref": "#/definitions/EntityFieldId",
-      "default": null
-    },
-    "relationType": {
-      "title": "Relation Type",
-      "$ref": "#/definitions/RelationType",
       "default": null
     }
   },
@@ -35,9 +36,6 @@
     },
     "RelationAllowMultiple": {
       "type": "boolean"
-    },
-    "RelationType": {
-      "type": "string"
     }
   }
 }

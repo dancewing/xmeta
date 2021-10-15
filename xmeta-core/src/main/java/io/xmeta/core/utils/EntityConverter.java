@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * 工具类，将数据模型转成可部署xml 描述文件
+ *
  * @author jeff_qian
  */
 public final class EntityConverter {
@@ -51,7 +52,6 @@ public final class EntityConverter {
     }
 
 
-
     private static List<JaxbHbmRootEntityType> createEntityMapping(List<Entity> entities) {
         List<JaxbHbmRootEntityType> rootEntityTypes = new ArrayList<>();
         for (Entity entity : entities) {
@@ -66,7 +66,7 @@ public final class EntityConverter {
             entityType.setComment(entity.getDescription());
 
             //有field 的数据才处理
-            if (entity.getFields()!=null && entity.getFields().size()>0) {
+            if (entity.getFields() != null && entity.getFields().size() > 0) {
                 processFields(entityType, entity.getFields(), entities);
                 rootEntityTypes.add(entityType);
             }
@@ -87,11 +87,11 @@ public final class EntityConverter {
             } else if (DataType.Lookup.equals(entityField.getDataType())) {
                 RelationType relationType = EntityFieldUtils.getRelationType(entityField.getProperties());
                 String relatedEntityId = MapUtils.getString(entityField.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID);
-                if ( relationType == null || StringUtils.isEmpty(relatedEntityId)) {
+                if (relationType == null || StringUtils.isEmpty(relatedEntityId)) {
                     throw new RuntimeException("");
                 }
                 List<Entity> relationEntities = entities.stream().filter(entity -> StringUtils.equals(relatedEntityId, entity.getId())).collect(Collectors.toList());
-                if (relationEntities.size()!=1) {
+                if (relationEntities.size() != 1) {
                     throw new RuntimeException("");
                 }
                 String relatedEntityName = relationEntities.get(0).getName();
@@ -109,7 +109,7 @@ public final class EntityConverter {
                         throw new RuntimeException("");
                     }
                     List<EntityField> entityFieldList = relationEntities.get(0).getFields().stream().filter(targetField -> StringUtils.equals(targetField.getId(), relatedFieldId)).collect(Collectors.toList());
-                    if (entityFieldList.size()!=1) {
+                    if (entityFieldList.size() != 1) {
                         throw new RuntimeException("");
                     }
                     boolean dominant = MapUtils.getBooleanValue(entityField.getProperties(), RelationTypeConstants.RELATION_DOMINANT, false);
@@ -118,7 +118,7 @@ public final class EntityConverter {
                     JaxbHbmSetType setType = new JaxbHbmSetType();
                     setType.setInverse(!dominant);
                     setType.setName(entityField.getName());
-                    setType.setTable(getJoinTable(rootEntityType.getTable(), relationEntities.get(0).getTable()  , setType.isInverse()));
+                    setType.setTable(getJoinTable(rootEntityType.getTable(), relationEntities.get(0).getTable(), setType.isInverse()));
                     setType.setLazy(JaxbHbmLazyWithExtraEnum.TRUE);
                     setType.setFetch(JaxbHbmFetchStyleWithSubselectEnum.SELECT);
 

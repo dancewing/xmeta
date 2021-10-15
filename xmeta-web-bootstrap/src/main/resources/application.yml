@@ -42,3 +42,8 @@ spring:
       hibernate.use_sql_comments: false
     hibernate:
       ddl-auto: update
+
+springdoc:
+  packages-to-scan: io.xmeta.web.controller
+  swagger-ui:
+    disable-swagger-default-url: true

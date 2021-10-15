@@ -1,8 +1,6 @@
 package io.xmeta.core.service.impl;
-import io.xmeta.core.domain.DataType;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Lists;
 
+import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
 import io.xmeta.core.service.MetaLoaderService;
@@ -15,7 +13,6 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
-import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,11 +28,11 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
             + " FROM " + ENTITY_TABLE_NAME;
 
     private static final String UPDATE_ENTITY_SQL = "UPDATE " + ENTITY_TABLE_NAME +
-            " SET name=?, displayName=?, pluralDisplayName=?, table_= ?, description= ?" +
+            " SET lastSyncTime=?, name=?, displayName=?, pluralDisplayName=?, table_= ?, description= ?" +
             "WHERE id= ?";
     private static final String INSERT_ENTITY_SQL = "INSERT INTO " + ENTITY_TABLE_NAME +
-            " (name, displayName, pluralDisplayName, table_, description, id) " +
-            "VALUES(?, ?, ?, ?, ?, ?);";
+            " (lastSyncTime, name, displayName, pluralDisplayName, table_, description, id) " +
+            "VALUES(?, ?, ?, ?, ?, ?, ?);";
 
     private static final String ENTITY_FIELD_COLUMN_NAMES = "id, name, displayName, column_, dataType, javaType, required, unique_, searchable, description, properties, entity_id";
     private static final String ENTITY_FIELD_TABLE_NAME = "xmeta_entity_field";
@@ -48,6 +45,9 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     private static final String INSERT_ENTITY_FIELD_SQL = "INSERT INTO " + ENTITY_FIELD_TABLE_NAME +
             " (name, displayName, column_, dataType, javaType, required, unique_, searchable, description, properties, entity_id, id)" +
             "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+
+    private static final String GET_LAST_SYNC_TIME = "select max(lastSyncTime) from " + ENTITY_TABLE_NAME;
 
     private final LobHandler lobHandler;
     protected RowMapper<Entity> entityRowMapper;
@@ -83,11 +83,23 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     }
 
     @Override
+    public long getLastSyncTime(DataSource dataSource) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        Long lastSyncTime = jdbcTemplate.queryForObject(GET_LAST_SYNC_TIME, Long.class);
+        if (lastSyncTime != null) {
+            return lastSyncTime;
+        }
+        return 0;
+    }
+
+    @Override
     public void save(DataSource dataSource, List<Entity> entities) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         List<Entity> existingEntities = load(dataSource);
 
-        Map<String,EntityField> existingEntityFields = new HashMap<>();
+        long currTime = System.currentTimeMillis();
+
+        Map<String, EntityField> existingEntityFields = new HashMap<>();
         existingEntities.forEach(entity -> {
             entity.getFields().forEach(entityField -> {
                 existingEntityFields.put(entityField.getId(), entityField);
@@ -95,10 +107,10 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
 
         });
         for (Entity entity : entities) {
-            if (existingEntities.stream().anyMatch(e->StringUtils.equals(e.getId(), entity.getId()))) {
-                updateEntity(jdbcTemplate, entity);
+            if (existingEntities.stream().anyMatch(e -> StringUtils.equals(e.getId(), entity.getId()))) {
+                updateEntity(jdbcTemplate, entity, currTime);
             } else {
-                saveEntity(jdbcTemplate, entity);
+                saveEntity(jdbcTemplate, entity, currTime);
             }
             entity.getFields().forEach(entityField -> {
                 entityField.setEntityId(entity.getId());
@@ -131,9 +143,10 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
         }
     }
 
-    private void saveEntity(JdbcTemplate jdbcTemplate, Entity entity) {
+    private void saveEntity(JdbcTemplate jdbcTemplate, Entity entity, long currTime) {
         List<SqlParameterValue> parameters = this.entityParametersMapper
                 .apply(entity);
+        parameters.add(0, new SqlParameterValue(Types.BIGINT, currTime));
         try (LobCreator lobCreator = this.lobHandler.getLobCreator()) {
             PreparedStatementSetter pss = new LobCreatorArgumentPreparedStatementSetter(lobCreator,
                     parameters.toArray());
@@ -141,9 +154,10 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
         }
     }
 
-    private void updateEntity(JdbcTemplate jdbcTemplate, Entity entity) {
+    private void updateEntity(JdbcTemplate jdbcTemplate, Entity entity, long currTime) {
         List<SqlParameterValue> parameters = this.entityParametersMapper
                 .apply(entity);
+        parameters.add(0, new SqlParameterValue(Types.BIGINT, currTime));
         try (LobCreator lobCreator = this.lobHandler.getLobCreator()) {
             PreparedStatementSetter pss = new LobCreatorArgumentPreparedStatementSetter(lobCreator,
                     parameters.toArray());
@@ -183,14 +197,14 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
             entityField.setName(rs.getString("name"));
             entityField.setDisplayName(rs.getString("displayName"));
             entityField.setColumn(rs.getString("column_"));
-            entityField.setJavaType(rs.getString("dataType"));
+            entityField.setJavaType(rs.getString("javaType"));
 
             entityField.setRequired(rs.getBoolean("required"));
             entityField.setUnique(rs.getBoolean("unique_"));
             entityField.setSearchable(rs.getBoolean("searchable"));
             entityField.setDescription(rs.getString("description"));
             String dataType = rs.getString("dataType");
-            if (dataType!=null) {
+            if (dataType != null) {
                 entityField.setDataType(DataType.valueOf(dataType));
             }
             entityField.setEntityId(rs.getString("entity_id"));
@@ -218,6 +232,7 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
             return parameterValues;
         }
     }
+
     public static class EntityFieldParametersMapper
             implements Function<EntityField, List<SqlParameterValue>> {
         @Override

@@ -48,6 +48,12 @@ public final class MetaMappingGenernator {
         basicAttributeType.setType(createTypeSpecificationType(String.class));
         entityType.getAttributes().add(basicAttributeType);
 
+        basicAttributeType = new JaxbHbmBasicAttributeType();
+        basicAttributeType.setColumnAttribute("lastSyncTime");
+        basicAttributeType.setName("lastSyncTime");
+        basicAttributeType.setType(createTypeSpecificationType(Long.class));
+        entityType.getAttributes().add(basicAttributeType);
+
         hibernateMapping.getClazz().add(entityType);
 
 

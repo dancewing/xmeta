@@ -28,14 +28,14 @@ public class DeployServiceImpl implements DeployService {
     }
 
     /**
-     * @param entities 数据模型
+     * @param entities   数据模型
      * @param dataSource 数据源
-     * @param settings 配置
-     * @param saveMeta 数据定义到远程数据源
-     * @param forceNull 强制字段使用null
+     * @param settings   配置
+     * @param saveMeta   数据定义到远程数据源
+     * @param forceNull  强制字段使用null
      */
     @Override
-    public void deploy(List<Entity> entities, DataSource dataSource, Map<String, Object> settings,boolean saveMeta, boolean forceNull) {
+    public void deploy(List<Entity> entities, DataSource dataSource, Map<String, Object> settings, boolean saveMeta, boolean forceNull) {
         if (settings == null) {
             settings = new HashMap<>();
         }
@@ -49,7 +49,7 @@ public class DeployServiceImpl implements DeployService {
         }
         MetadataImplementor metadata = (MetadataImplementor) metadataSources.buildMetadata();
         SchemaExport schemaExport = new SchemaExport();
-       // schemaExport.setOutputFile("hbm2schema.sql");
+        // schemaExport.setOutputFile("hbm2schema.sql");
         schemaExport.create(EnumSet.of(TargetType.DATABASE), metadata);
         serviceRegistry.close();
 

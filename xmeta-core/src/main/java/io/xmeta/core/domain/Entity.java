@@ -45,6 +45,7 @@ public class Entity implements java.io.Serializable {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -52,6 +53,7 @@ public class Entity implements java.io.Serializable {
     public String getDisplayName() {
         return displayName;
     }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -59,6 +61,7 @@ public class Entity implements java.io.Serializable {
     public String getPluralDisplayName() {
         return pluralDisplayName;
     }
+
     public void setPluralDisplayName(String pluralDisplayName) {
         this.pluralDisplayName = pluralDisplayName;
     }
@@ -66,6 +69,7 @@ public class Entity implements java.io.Serializable {
     public String getTable() {
         return table;
     }
+
     public void setTable(String table) {
         this.table = table;
     }
@@ -73,6 +77,7 @@ public class Entity implements java.io.Serializable {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -80,6 +85,7 @@ public class Entity implements java.io.Serializable {
     public List<EntityField> getFields() {
         return fields;
     }
+
     public void setFields(List<EntityField> fields) {
         this.fields = fields;
     }

@@ -42,6 +42,7 @@ public class EntityField implements java.io.Serializable {
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -49,6 +50,7 @@ public class EntityField implements java.io.Serializable {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -56,6 +58,7 @@ public class EntityField implements java.io.Serializable {
     public String getDisplayName() {
         return displayName;
     }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
@@ -63,6 +66,7 @@ public class EntityField implements java.io.Serializable {
     public String getColumn() {
         return column;
     }
+
     public void setColumn(String column) {
         this.column = column;
     }
@@ -70,6 +74,7 @@ public class EntityField implements java.io.Serializable {
     public String getJavaType() {
         return javaType;
     }
+
     public void setJavaType(String javaType) {
         this.javaType = javaType;
     }
@@ -77,6 +82,7 @@ public class EntityField implements java.io.Serializable {
     public java.util.Map<String, Object> getProperties() {
         return properties;
     }
+
     public void setProperties(java.util.Map<String, Object> properties) {
         this.properties = properties;
     }
@@ -84,6 +90,7 @@ public class EntityField implements java.io.Serializable {
     public boolean getRequired() {
         return required;
     }
+
     public void setRequired(boolean required) {
         this.required = required;
     }
@@ -91,6 +98,7 @@ public class EntityField implements java.io.Serializable {
     public boolean getUnique() {
         return unique;
     }
+
     public void setUnique(boolean unique) {
         this.unique = unique;
     }
@@ -98,6 +106,7 @@ public class EntityField implements java.io.Serializable {
     public boolean getSearchable() {
         return searchable;
     }
+
     public void setSearchable(boolean searchable) {
         this.searchable = searchable;
     }
@@ -105,6 +114,7 @@ public class EntityField implements java.io.Serializable {
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }

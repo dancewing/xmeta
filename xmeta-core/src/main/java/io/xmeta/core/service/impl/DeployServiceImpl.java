@@ -20,13 +20,6 @@ import java.util.Map;
 
 @Service
 public class DeployServiceImpl implements DeployService {
-
-    private MetaLoaderService metaLoaderService;
-
-    public DeployServiceImpl(MetaLoaderService metaLoaderService) {
-        this.metaLoaderService = metaLoaderService;
-    }
-
     /**
      * @param entities   数据模型
      * @param dataSource 数据源
@@ -54,7 +47,8 @@ public class DeployServiceImpl implements DeployService {
         serviceRegistry.close();
 
         if (saveMeta) {
-            this.metaLoaderService.save(dataSource, entities);
+            MetaLoaderService metaLoaderService = new JdbcMetaLoaderService(dataSource);
+            metaLoaderService.save(entities);
         }
 
     }

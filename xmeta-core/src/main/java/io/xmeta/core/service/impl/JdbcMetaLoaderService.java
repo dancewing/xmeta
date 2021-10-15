@@ -50,12 +50,14 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     private static final String GET_LAST_SYNC_TIME = "select max(lastSyncTime) from " + ENTITY_TABLE_NAME;
 
     private final LobHandler lobHandler;
+    private JdbcTemplate jdbcTemplate;
     protected RowMapper<Entity> entityRowMapper;
     protected RowMapper<EntityField> entityFieldRowMapper;
     protected Function<Entity, List<SqlParameterValue>> entityParametersMapper;
     protected Function<EntityField, List<SqlParameterValue>> entityFieldParametersMapper;
 
-    public JdbcMetaLoaderService() {
+    public JdbcMetaLoaderService(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.lobHandler = new DefaultLobHandler();
         this.entityRowMapper = new EntityRowMapper();
         this.entityFieldRowMapper = new EntityFieldRowMapper(this.lobHandler);
@@ -64,8 +66,7 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     }
 
     @Override
-    public List<Entity> load(DataSource dataSource) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    public List<Entity> load() {
         List<Entity> entities = jdbcTemplate.query(LOAD_ALL_ENTITY_SQL, this.entityRowMapper);
         List<EntityField> entityFields = jdbcTemplate.query(LOAD_ALL_ENTITY_FIELD_SQL, this.entityFieldRowMapper);
 
@@ -83,8 +84,7 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     }
 
     @Override
-    public long getLastSyncTime(DataSource dataSource) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    public long getLastSyncTime() {
         Long lastSyncTime = jdbcTemplate.queryForObject(GET_LAST_SYNC_TIME, Long.class);
         if (lastSyncTime != null) {
             return lastSyncTime;
@@ -93,9 +93,8 @@ public class JdbcMetaLoaderService implements MetaLoaderService {
     }
 
     @Override
-    public void save(DataSource dataSource, List<Entity> entities) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        List<Entity> existingEntities = load(dataSource);
+    public void save(List<Entity> entities) {
+        List<Entity> existingEntities = load();
 
         long currTime = System.currentTimeMillis();
 

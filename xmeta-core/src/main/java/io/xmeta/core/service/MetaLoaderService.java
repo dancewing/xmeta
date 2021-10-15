@@ -2,13 +2,12 @@ package io.xmeta.core.service;
 
 import io.xmeta.core.domain.Entity;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 public interface MetaLoaderService {
-    List<Entity> load(DataSource dataSource);
+    List<Entity> load();
 
-    void save(DataSource dataSource, List<Entity> entities);
+    void save(List<Entity> entities);
 
-    long getLastSyncTime(DataSource dataSource);
+    long getLastSyncTime();
 }

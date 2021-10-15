@@ -4,6 +4,7 @@ import com.zaxxer.hikari.util.UtilityElf;
 import io.xmeta.core.service.MetaLoaderService;
 import io.xmeta.core.service.MetaRefreshService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.*;
 
@@ -13,9 +14,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 public class MetaRefreshServiceImpl implements MetaRefreshService {
 
-    private static final String POOL_NAME = "meta refresh";
+    private static final String POOL_NAME = "Meta refresh - ";
 
-    private MetaLoaderService metaLoaderService;
+    private final MetaLoaderService metaLoaderService;
 
     private final ScheduledExecutorService houseKeepingExecutorService;
     private ScheduledFuture<?> houseKeeperTask;
@@ -23,7 +24,7 @@ public class MetaRefreshServiceImpl implements MetaRefreshService {
     public MetaRefreshServiceImpl(MetaLoaderService metaLoaderService) {
         this.metaLoaderService = metaLoaderService;
         this.houseKeepingExecutorService = initializeHouseKeepingExecutorService();
-        this.houseKeeperTask = houseKeepingExecutorService.scheduleWithFixedDelay(new HouseKeeper(), 100L, SECONDS.toMillis(30), MILLISECONDS);
+        this.houseKeeperTask = houseKeepingExecutorService.scheduleWithFixedDelay(new HouseKeeper(), 100L, SECONDS.toMillis(10), MILLISECONDS);
     }
 
     private ScheduledExecutorService initializeHouseKeepingExecutorService() {

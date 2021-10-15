@@ -1,6 +1,8 @@
 package io.xmeta.web;
 
-public class ApiException extends RuntimeException {
+import io.xmeta.core.MetaException;
+
+public class ApiException extends MetaException {
 
     public ApiException() {
     }

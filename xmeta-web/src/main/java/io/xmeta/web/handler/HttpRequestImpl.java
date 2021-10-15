@@ -1,6 +1,5 @@
-package io.xmeta.web.handler.internal;
+package io.xmeta.web.handler;
 
-import io.xmeta.web.handler.Request;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
@@ -8,10 +7,10 @@ import java.util.Map;
 
 public class HttpRequestImpl implements Request {
 
-    private HttpHeaders headers;
-    private HttpMethod method;
-    private Map<String, Object> parameters;
-    private Map<String, Object> requestBody;
+    private final HttpHeaders headers;
+    private final HttpMethod method;
+    private final Map<String, Object> parameters;
+    private final Map<String, Object> requestBody;
 
     public HttpRequestImpl(HttpHeaders headers, HttpMethod method, Map<String, Object> parameters, Map<String, Object> requestBody) {
         this.headers = headers;

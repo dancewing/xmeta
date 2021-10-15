@@ -88,10 +88,25 @@ public class MetaSwaggerApiService {
         operation.setSummary("create new record for " + entity.getName());
         operation.setOperationId("save" + entity.getName());
         operation.addTagsItem(entity.getName());
+
+        operation.setRequestBody(createRequestBody(entity));
+
         operation.setResponses(createEntityResponse(entity));
         List<Parameter> parameters = new ArrayList<>();
         operation.setParameters(parameters);
         return operation;
+    }
+
+
+    private RequestBody createRequestBody(Entity entity) {
+        RequestBody requestBody = new RequestBody();
+        Content content = new Content();
+        content.put(org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+                new MediaType()
+                        .schema(new ObjectSchema().$ref("#/components/schemas/" + entity.getName())));
+        requestBody.content(content);
+        requestBody.required(true);
+        return requestBody;
     }
 
     private ApiResponses createEntityResponse(Entity entity) {
@@ -101,8 +116,8 @@ public class MetaSwaggerApiService {
         content.put(org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
                 new MediaType()
                         .schema(new ObjectSchema().$ref("#/components/schemas/" + entity.getName())));
-        apiResponses.addApiResponse("200", new ApiResponse()
-                .content(content));
+
+        apiResponses.addApiResponse("200", new ApiResponse().content(content));
 
         return apiResponses;
     }
@@ -151,6 +166,7 @@ public class MetaSwaggerApiService {
         operation.setOperationId("update" + entity.getName());
         operation.addTagsItem(entity.getName());
 
+        operation.setRequestBody(createRequestBody(entity));
         operation.setResponses(createEntityResponse(entity));
 
         List<Parameter> parameters = new ArrayList<>();
@@ -201,7 +217,17 @@ public class MetaSwaggerApiService {
             if (StringUtils.isNotEmpty(javaType)) {
                 try {
                     Class<?> cls = Class.forName(javaType);
-                    objectSchema.addProperties(entityField.getName(), getFieldSchema(cls.getName()));
+                    Schema<?> fieldSchema = getFieldSchema(cls.getName());
+                    if (fieldSchema!=null) {
+                        if (entityField.getRequired()) {
+                            //fieldSchema.required(true);
+                            objectSchema.addRequiredItem(entityField.getName());
+                        }
+                        objectSchema.addProperties(entityField.getName(), fieldSchema);
+                    } else {
+                        log.error("can't get field schema for :{},{} ", entity.getName(), entityField.getName());
+                    }
+
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }
@@ -234,7 +260,7 @@ public class MetaSwaggerApiService {
             } else {
                 String typeName = pd.getPropertyType().getName();
                 Schema<?> schema = getFieldSchema(typeName);
-                if (schema!=null) {
+                if (schema != null) {
                     objectSchema.addProperties(name, schema);
                 }
             }

@@ -26,4 +26,8 @@ public interface Request {
 
     Map<String, Object> requestBody();
 
+    static Request of(HttpHeaders headers, HttpMethod method, Map<String, Object> parameters, Map<String, Object> requestBody) {
+        return new HttpRequestImpl(headers, method, parameters, requestBody);
+    }
+
 }

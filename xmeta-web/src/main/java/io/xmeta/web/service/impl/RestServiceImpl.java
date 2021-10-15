@@ -7,13 +7,11 @@ import io.xmeta.web.ApiException;
 import io.xmeta.web.handler.ActionInterceptor;
 import io.xmeta.web.handler.Context;
 import io.xmeta.web.handler.Response;
-import io.xmeta.web.handler.internal.HttpResponseImpl;
-import io.xmeta.web.registrar.ActionHandler;
+import io.xmeta.web.handler.HttpResponseImpl;
 import io.xmeta.web.registrar.EntityHandler;
 import io.xmeta.web.registrar.PluginActionManager;
 import io.xmeta.web.registrar.PostActionHandler;
 import io.xmeta.web.service.RestService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -33,7 +31,12 @@ public class RestServiceImpl implements RestService {
         this.actionInterceptor = actionInterceptor;
     }
 
-    @Transactional
+    /**
+     *
+     * @param context 需要处理的上下文数据
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void process(Context context) {
         Assert.notNull(context, "context can't be null");
         Entity entity = this.metaEntityService.getEntity(context.getEntityId());
@@ -53,13 +56,9 @@ public class RestServiceImpl implements RestService {
         entityHandler.process(context);
 
         R result = context.getData();
-        if (result.getCode() != 200) {
+        if (result == null || result.getCode() != 200) {
             throw new ApiException("处理异常");
         }
-
-//        if (ObjectUtils.isNotEmpty(postActionHandler)) {
-//            postActionHandler.process(context);
-//        }
 
         Response response = new HttpResponseImpl();
         context.setResponse(response);

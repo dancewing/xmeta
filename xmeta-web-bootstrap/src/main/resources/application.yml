@@ -3,7 +3,7 @@ server:
 
 logging:
   level:
-    org.hibernate.internal: DEBUG
+    org.springframework.transaction: TRACE
 
 
 spring:
@@ -24,24 +24,6 @@ spring:
         bootstrap-mode: deferred
   jpa:
     open-in-view: false
-    properties:
-      hibernate.jdbc.time_zone: UTC
-      hibernate.id.new_generator_mappings: true
-      hibernate.connection.provider_disables_autocommit: true
-      hibernate.cache.use_second_level_cache: false
-      hibernate.cache.use_query_cache: false
-      hibernate.generate_statistics: false
-      # modify batch size as necessary
-      hibernate.jdbc.batch_size: 25
-      hibernate.order_inserts: true
-      hibernate.order_updates: true
-      hibernate.query.fail_on_pagination_over_collection_fetch: true
-      hibernate.query.in_clause_parameter_padding: true
-      hibernate.show_sql: false
-      hibernate.format_sql: false
-      hibernate.use_sql_comments: false
-    hibernate:
-      ddl-auto: update
 
 springdoc:
   packages-to-scan: io.xmeta.web.controller

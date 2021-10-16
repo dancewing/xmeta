@@ -25,7 +25,7 @@
 
         <dependency>
             <groupId>io.xmeta</groupId>
-            <artifactId>xmeta-core</artifactId>
+            <artifactId>xmeta-deploy</artifactId>
             <version>0.3.1-SNAPSHOT</version>
         </dependency>
 

@@ -14,7 +14,7 @@ import io.xmeta.core.filter.BooleanFilter;
 import io.xmeta.core.filter.DateTimeFilter;
 import io.xmeta.core.filter.IntFilter;
 import io.xmeta.core.filter.StringFilter;
-import io.xmeta.core.service.MetaLoaderService;
+import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.web.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -31,17 +31,17 @@ import java.util.List;
 @Slf4j
 public class MetaSwaggerApiService {
 
-    private MetaLoaderService metaLoaderService;
+    private MetaEntityService metaEntityService;
 
     @Value(Constants.META_API_URL)
     private String apiDocPath;
 
-    public MetaSwaggerApiService(MetaLoaderService metaLoaderService) {
-        this.metaLoaderService = metaLoaderService;
+    public MetaSwaggerApiService(MetaEntityService metaEntityService) {
+        this.metaEntityService = metaEntityService;
     }
 
     public OpenAPI load() {
-        List<Entity> entities = this.metaLoaderService.load();
+        List<Entity> entities = this.metaEntityService.load();
 
         OpenAPI openApi = new OpenAPI()
                 .info(new Info().title("SpringShop API")

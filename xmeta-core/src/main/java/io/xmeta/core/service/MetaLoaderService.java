@@ -4,10 +4,10 @@ import io.xmeta.core.domain.Entity;
 
 import java.util.List;
 
-public interface MetaLoaderService {
+/***
+ *
+ */
+interface MetaLoaderService {
     List<Entity> load();
-
     void save(List<Entity> entities);
-
-    long getLastSyncTime();
 }

@@ -1,8 +1,8 @@
-package io.xmeta.core.utils;
+package io.xmeta.deploy.utils;
 
 import org.hibernate.boot.jaxb.hbm.spi.*;
 
-import static io.xmeta.core.utils.EntityConverter.createTypeSpecificationType;
+import static io.xmeta.deploy.utils.EntityConverter.createTypeSpecificationType;
 
 public final class MetaMappingGenernator {
     public static void createMetaMapping(JaxbHbmHibernateMapping hibernateMapping) {

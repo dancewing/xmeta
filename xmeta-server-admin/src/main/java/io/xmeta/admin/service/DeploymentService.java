@@ -12,15 +12,12 @@ import io.xmeta.admin.repository.BuildRepository;
 import io.xmeta.admin.repository.DeploymentRepository;
 import io.xmeta.admin.repository.EnvironmentRepository;
 import io.xmeta.core.domain.Entity;
-import io.xmeta.core.service.DeployService;
+import io.xmeta.deploy.DeployService;
 import io.xmeta.security.SecurityUtils;
-import org.hibernate.cfg.AvailableSettings;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;

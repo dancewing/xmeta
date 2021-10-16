@@ -1,9 +1,10 @@
-package io.xmeta.core.service.impl;
+package io.xmeta.deploy.impl;
 
 import io.xmeta.core.domain.Entity;
-import io.xmeta.core.service.DeployService;
-import io.xmeta.core.service.MetaLoaderService;
-import io.xmeta.core.utils.EntityConverter;
+import io.xmeta.core.service.MetaDatabaseLoaderService;
+import io.xmeta.deploy.DeployService;
+import io.xmeta.core.service.impl.JdbcMetaLoaderService;
+import io.xmeta.deploy.utils.EntityConverter;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
@@ -47,7 +48,7 @@ public class DeployServiceImpl implements DeployService {
         serviceRegistry.close();
 
         if (saveMeta) {
-            MetaLoaderService metaLoaderService = new JdbcMetaLoaderService(dataSource);
+            MetaDatabaseLoaderService metaLoaderService = new JdbcMetaLoaderService(dataSource);
             metaLoaderService.save(entities);
         }
 

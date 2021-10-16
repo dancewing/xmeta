@@ -1,6 +1,7 @@
-package io.xmeta.core.utils;
+package io.xmeta.deploy.utils;
 
 import io.xmeta.core.domain.*;
+import io.xmeta.core.utils.EntityFieldUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.boot.jaxb.hbm.spi.*;

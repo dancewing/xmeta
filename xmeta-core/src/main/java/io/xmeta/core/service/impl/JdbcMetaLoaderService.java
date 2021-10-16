@@ -3,7 +3,7 @@ package io.xmeta.core.service.impl;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
-import io.xmeta.core.service.MetaLoaderService;
+import io.xmeta.core.service.MetaDatabaseLoaderService;
 import io.xmeta.core.utils.ObjectMapperUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.*;
@@ -20,7 +20,7 @@ import java.sql.Types;
 import java.util.*;
 import java.util.function.Function;
 
-public class JdbcMetaLoaderService implements MetaLoaderService {
+public class JdbcMetaLoaderService implements MetaDatabaseLoaderService {
 
     private static final String ENTITY_COLUMN_NAMES = "id, name, displayName, pluralDisplayName, table_, description";
     private static final String ENTITY_TABLE_NAME = "xmeta_entity";

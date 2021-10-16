@@ -4,9 +4,8 @@ import io.xmeta.core.domain.Entity;
 
 import java.util.List;
 
-public interface EntityCacheService {
-    List<Entity> load();
-    void put(List<Entity> entities);
+public interface MetaCacheLoaderService extends MetaLoaderService {
+
     Entity getEntity(String entityId);
     boolean hasValue();
 }

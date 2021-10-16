@@ -1,4 +1,4 @@
-package io.xmeta.admin.util;
+package io.xmeta.core.utils;
 
 import java.io.Serializable;
 import java.text.MessageFormat;

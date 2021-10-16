@@ -1,6 +1,7 @@
 package io.xmeta.admin.util;
 
 import io.xmeta.admin.domain.BaseEntity;
+import io.xmeta.core.utils.IDGenerator;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.PrePersist;

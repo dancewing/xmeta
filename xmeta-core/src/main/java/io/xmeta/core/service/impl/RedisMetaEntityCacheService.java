@@ -1,7 +1,7 @@
 package io.xmeta.core.service.impl;
 
 import io.xmeta.core.domain.Entity;
-import io.xmeta.core.service.EntityCacheService;
+import io.xmeta.core.service.MetaCacheLoaderService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.Map;
  *
  */
 @Service
-public class RedisEntityCacheService implements EntityCacheService {
+public class RedisMetaEntityCacheService implements MetaCacheLoaderService {
 
     static String ENTITY_REDIS_CACHE_KEY = "ENTITY_REDIS_CACHE_KEY";
 
@@ -38,7 +38,7 @@ public class RedisEntityCacheService implements EntityCacheService {
     }
 
     @Override
-    public void put(List<Entity> entities) {
+    public void save(List<Entity> entities) {
         Assert.notNull(entities, "entities, can not be null");
         //clear current
         this.redisTemplate.delete(ENTITY_REDIS_CACHE_KEY);

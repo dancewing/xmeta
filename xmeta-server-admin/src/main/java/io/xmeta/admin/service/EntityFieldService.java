@@ -12,6 +12,7 @@ import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.domain.RelationTypeConstants;
 import io.xmeta.core.utils.EntityFieldUtils;
+import io.xmeta.core.utils.IDGenerator;
 import io.xmeta.core.utils.ObjectMapperUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
@@ -505,6 +506,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         field.setName(data.getName());
         field.setDisplayName(data.getDisplayName());
         field.setDataType(data.getDataType().name());
+        field.setJavaType(EntityFieldUtils.determineJavaType(data.getDataType().name(), data.getProperties()));
         field.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
         field.setRequired(data.getRequired());
         field.setSearchable(data.getSearchable());

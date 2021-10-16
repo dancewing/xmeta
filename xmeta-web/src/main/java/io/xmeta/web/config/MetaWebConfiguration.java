@@ -1,6 +1,8 @@
 package io.xmeta.web.config;
 
-import io.xmeta.core.service.MetaLoaderService;
+import io.xmeta.core.service.MetaCacheLoaderService;
+import io.xmeta.core.service.MetaDatabaseLoaderService;
+import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.core.service.MetaRefreshService;
 import io.xmeta.core.service.impl.JdbcMetaLoaderService;
 import io.xmeta.core.service.impl.MetaRefreshServiceImpl;
@@ -23,12 +25,12 @@ public class MetaWebConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(JdbcMetaLoaderService.class)
-    public MetaLoaderService metaLoaderService(DataSource dataSource) {
+    public MetaDatabaseLoaderService metaLoaderService(DataSource dataSource) {
         return new JdbcMetaLoaderService(dataSource);
     }
 
     @Bean
-    public MetaRefreshService metaRefreshService(MetaLoaderService metaLoaderService) {
-        return new MetaRefreshServiceImpl(metaLoaderService);
+    public MetaRefreshService metaRefreshService(MetaDatabaseLoaderService metaLoaderService, MetaCacheLoaderService metaCacheLoaderService) {
+        return new MetaRefreshServiceImpl(metaLoaderService, metaCacheLoaderService);
     }
 }

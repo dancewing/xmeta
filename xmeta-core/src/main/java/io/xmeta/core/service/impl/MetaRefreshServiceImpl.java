@@ -1,10 +1,10 @@
 package io.xmeta.core.service.impl;
 
 import com.zaxxer.hikari.util.UtilityElf;
-import io.xmeta.core.service.MetaLoaderService;
+import io.xmeta.core.service.MetaCacheLoaderService;
+import io.xmeta.core.service.MetaDatabaseLoaderService;
 import io.xmeta.core.service.MetaRefreshService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.*;
 
@@ -16,13 +16,15 @@ public class MetaRefreshServiceImpl implements MetaRefreshService {
 
     private static final String POOL_NAME = "Meta refresh - ";
 
-    private final MetaLoaderService metaLoaderService;
+    private final MetaDatabaseLoaderService metaAdminService;
+    private final MetaCacheLoaderService metaCacheLoaderService;
 
     private final ScheduledExecutorService houseKeepingExecutorService;
     private ScheduledFuture<?> houseKeeperTask;
 
-    public MetaRefreshServiceImpl(MetaLoaderService metaLoaderService) {
-        this.metaLoaderService = metaLoaderService;
+    public MetaRefreshServiceImpl(MetaDatabaseLoaderService metaLoaderService, MetaCacheLoaderService metaCacheLoaderService) {
+        this.metaAdminService = metaLoaderService;
+        this.metaCacheLoaderService = metaCacheLoaderService;
         this.houseKeepingExecutorService = initializeHouseKeepingExecutorService();
         this.houseKeeperTask = houseKeepingExecutorService.scheduleWithFixedDelay(new HouseKeeper(), 100L, SECONDS.toMillis(10), MILLISECONDS);
     }
@@ -41,13 +43,15 @@ public class MetaRefreshServiceImpl implements MetaRefreshService {
         @Override
         public void run() {
             try {
-                long currentTime = metaLoaderService.getLastSyncTime();
+                long currentTime = metaAdminService.getLastSyncTime();
                 if (previous == 0L) {
+                    log.info("Load entities to cache");
+                    metaCacheLoaderService.save(metaAdminService.load());
                     previous = currentTime;
                 } else if (currentTime > previous) {
-                    log.warn("need to refresh meta");
-
-                    //previous = currentTime;
+                    log.warn("Need to refresh meta");
+                    metaCacheLoaderService.save(metaAdminService.load());
+                    previous = currentTime;
                 }
             } catch (Exception e) {
                 log.error("Unexpected exception in housekeeping task", e);

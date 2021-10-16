@@ -1,15 +1,18 @@
 package io.xmeta.web.controller;
 
-import io.swagger.v3.oas.annotations.Hidden;
 import io.xmeta.core.ActionType;
+import io.xmeta.core.MetaException;
+import io.xmeta.core.domain.DataType;
+import io.xmeta.core.domain.Entity;
+import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.service.MetaEntityService;
+import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.web.handler.Context;
 import io.xmeta.web.handler.Request;
-import io.xmeta.web.handler.HttpRequestImpl;
 import io.xmeta.web.service.RestService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +24,15 @@ import java.util.Map;
 import static io.xmeta.web.Constants.META_API_URL;
 
 @RestController
-@Hidden
-@RequestMapping(value = META_API_URL, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = META_API_URL)
 public class MetaDataController {
 
     private final RestService restService;
+    private final MetaEntityService metaEntityService;
 
-    public MetaDataController(RestService restService) {
+    public MetaDataController(RestService restService, MetaEntityService metaEntityService) {
         this.restService = restService;
+        this.metaEntityService = metaEntityService;
     }
 
     @GetMapping("/{entityId}")
@@ -56,10 +60,17 @@ public class MetaDataController {
         return ResponseEntity.ok(Page.empty());
     }
 
-    @PostMapping("/{entityId}")
-    public ResponseEntity<TestRestController.User> createUser(@PathVariable String entityId,
-                                                              @RequestBody TestRestController.User user) {
-        return ResponseEntity.ok(user);
+    @PostMapping(value = "/{entityId}")
+    public ResponseEntity<Object> createUser(@PathVariable String entityId,
+                                                              @RequestHeader(required = false) HttpHeaders headers,
+                                                              @RequestParam(required = false) Map<String, Object> params,
+                                                              @RequestBody(required = false) Map<String, Object> body,
+                                                              HttpServletRequest servletRequest) {
+
+        Request request = Request.of(headers, HttpMethod.resolve(servletRequest.getMethod()), params, body);
+        Context context = new Context(request, entityId, ActionType.CREATE);
+        this.restService.process(context);
+        return ResponseEntity.ok(context.getData());
     }
 
     @GetMapping("/{entityId}/{id}")
@@ -68,8 +79,21 @@ public class MetaDataController {
     }
 
     @PostMapping("/{entityId}/{id}")
-    public ResponseEntity<TestRestController.User> updateUser(@PathVariable String entityId, @PathVariable String id, @RequestBody TestRestController.User user) {
-        return ResponseEntity.ok(user);
+    public ResponseEntity<Object> updateUser(@PathVariable String entityId, @PathVariable String id,
+                                             @RequestHeader(required = false) HttpHeaders headers,
+                                             @RequestParam(required = false) Map<String, Object> params,
+                                             @RequestBody(required = false) Map<String, Object> body,
+                                             HttpServletRequest servletRequest) {
+        Entity entity = metaEntityService.getEntity(entityId);
+        if (entity == null) {
+            throw new MetaException("找不到对应的数据模型: " + entityId);
+        }
+        EntityField pk = EntityFieldUtils.findPK(entity).orElseThrow(MetaException::new);
+        body.put(pk.getName(), id);
+        Request request = Request.of(headers, HttpMethod.resolve(servletRequest.getMethod()), params, body);
+        Context context = new Context(request, entityId, ActionType.UPDATE);
+        this.restService.process(context);
+        return ResponseEntity.ok(context.getData());
     }
 
     @DeleteMapping("/{entityId}/{id}")

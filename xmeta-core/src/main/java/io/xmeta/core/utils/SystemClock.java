@@ -1,4 +1,4 @@
-package io.xmeta.admin.util;
+package io.xmeta.core.utils;
 
 
 import java.sql.Timestamp;

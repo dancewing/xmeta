@@ -1,4 +1,4 @@
-package io.xmeta.core.service;
+package io.xmeta.deploy;
 
 import io.xmeta.core.domain.Entity;
 

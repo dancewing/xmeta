@@ -1,4 +1,4 @@
-package io.xmeta.admin.util;
+package io.xmeta.core.utils;
 
 public final class IDGenerator {
     private static final Snowflake SNOWFLAKE = new Snowflake(10, 10);

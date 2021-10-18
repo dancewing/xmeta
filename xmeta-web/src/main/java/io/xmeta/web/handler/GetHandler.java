@@ -3,19 +3,11 @@ package io.xmeta.web.handler;
 import io.xmeta.core.ActionType;
 import io.xmeta.core.MetaHandler;
 import io.xmeta.core.service.MetaDataService;
-import io.xmeta.web.registrar.ActionHandler;
 import io.xmeta.web.registrar.EntityHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * @projectName xmetadata
- * @class: ListHandler
- * @author: DuChenYang
- * @datetime: 2021/5/21 11:17
- * @description:
- */
-@MetaHandler(description = "通用查列表", supports = ActionType.LIST)
-public class ListHandler implements EntityHandler {
+@MetaHandler(description = "通用查单条", supports = ActionType.Get)
+public class GetHandler implements EntityHandler {
 
     private MetaDataService metadataService;
 
@@ -26,6 +18,7 @@ public class ListHandler implements EntityHandler {
 
     @Override
     public void process(Context context) {
-
+//        Map<String, ?> map = this.metadataService.get(context.getUuid(), (String) context.getRequest().parameters().get("id"));
+//        context.setData(R.data(map));
     }
 }

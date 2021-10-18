@@ -242,4 +242,9 @@ public final class EntityFieldUtils {
     public static boolean isSystemControl(DataType dataType) {
         return (DataType.CreatedAt == dataType || DataType.UpdatedAt == dataType);
     }
+
+    public static boolean isSelectable(EntityField field) {
+        DataType dataType = field.getDataType();
+        return (DataType.Lookup != dataType);
+    }
 }

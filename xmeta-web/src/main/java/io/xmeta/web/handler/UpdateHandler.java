@@ -16,7 +16,7 @@ import java.util.Map;
  * @datetime: 2021/5/21 11:18
  * @description:
  */
-@MetaHandler(description = "通用更新", supports = ActionType.UPDATE)
+@MetaHandler(description = "通用更新", supports = ActionType.Update)
 public class UpdateHandler implements EntityHandler {
 
     private MetaDataService metadataService;

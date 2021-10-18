@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-@MetaHandler(description = "通用新增", supports = ActionType.CREATE)
+@MetaHandler(description = "通用新增", supports = ActionType.Create)
 public class CreateHandler implements EntityHandler {
 
     private MetaDataService metadataService;

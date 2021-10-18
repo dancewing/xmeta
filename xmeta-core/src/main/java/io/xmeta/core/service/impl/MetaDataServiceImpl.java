@@ -12,11 +12,15 @@ import io.xmeta.core.utils.IDGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +40,31 @@ public class MetaDataServiceImpl implements MetaDataService {
         this.metaRuntime = metaRuntime;
         this.metaEntityService = metaEntityService;
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
+
+    public List<Map<String, Object>> query(String entityId, Integer page, Integer size) {
+        Entity entity = this.metaEntityService.getEntity(entityId);
+        Assert.notNull(entity, "未知的entityId");
+
+        SelectCreator selectCreator = new SelectCreator(entity);
+        selectCreator.from(entity.getTable());
+
+        entity.getFields().forEach(field -> {
+            if (EntityFieldUtils.isSelectable(field)) {
+                selectCreator.column(field.getColumn() + " as " + field.getName());
+            }
+        });
+
+        log(selectCreator.createSqlParameterSource(), selectCreator.getSQL());
+
+        List<Map<String, Object>> results = this.namedParameterJdbcTemplate.query(selectCreator.getSQL(), selectCreator.createSqlParameterSource(), new RowMapper<Map<String, Object>>() {
+            @Override
+            public Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Map<String, Object> row = new HashMap<>();
+                return row;
+            }
+        });
+        return results;
     }
 
     @Override
@@ -130,17 +159,13 @@ public class MetaDataServiceImpl implements MetaDataService {
 
         Map<String, Object> toDeleted = convertParamsToEntityData(entity, data, false);
 
-        DeleteCreator deleteCreator = new DeleteCreator(entity);
+        DeleteCreator deleteCreator = new DeleteCreator(entity.getTable());
 
-      //  deleteCreator.whereEquals(id.getName(), pk);
+        toDeleted.forEach(deleteCreator::whereEquals);
 
         log(deleteCreator.createSqlParameterSource(), deleteCreator.getSQL());
 
-        int result = this.namedParameterJdbcTemplate.update(deleteCreator.getSQL(), deleteCreator.createSqlParameterSource());
-        if (result !=1) {
-            throw new MetaException("can't update value");
-        }
-        return result;
+        return this.namedParameterJdbcTemplate.update(deleteCreator.getSQL(), deleteCreator.createSqlParameterSource());
     }
     @Transactional
     public int deleteAll(String entityId) {

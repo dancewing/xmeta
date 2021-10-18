@@ -1,6 +1,6 @@
 package io.xmeta.core.utils;
 
-import io.xmeta.core.sqlbuilder.Dialect;
+import io.xmeta.core.sqlbuilder.dialect.Dialect;
 import io.xmeta.core.sqlbuilder.dialect.MySQLDialect;
 import io.xmeta.core.sqlbuilder.dialect.PostgreSQLDialect;
 import io.xmeta.core.sqlbuilder.dialect.SQLDialectCode;

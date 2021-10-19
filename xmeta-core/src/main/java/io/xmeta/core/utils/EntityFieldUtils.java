@@ -243,6 +243,11 @@ public final class EntityFieldUtils {
         return (DataType.CreatedAt == dataType || DataType.UpdatedAt == dataType);
     }
 
+    /**
+     * 判断字段是否可供查询
+     * @param field
+     * @return
+     */
     public static boolean isSelectable(EntityField field) {
         DataType dataType = field.getDataType();
         return (DataType.Lookup != dataType);

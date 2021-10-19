@@ -5,17 +5,21 @@ public enum DataType {
     Id("Id"),
     SingleLineText("SingleLineText"),
     MultiLineText("MultiLineText"),
-    Email("Email"),
     WholeNumber("WholeNumber"),
-    DateTime("DateTime"),
     DecimalNumber("DecimalNumber"),
+    Date("Date"),
+    Time("Time"),
+    DateTime("DateTime"),
+    Boolean("Boolean"),
     Lookup("Lookup"),
+    Email("Email"),
     MultiSelectOptionSet("MultiSelectOptionSet"),
     OptionSet("OptionSet"),
-    Boolean("Boolean"),
     GeographicLocation("GeographicLocation"),
     CreatedAt("CreatedAt"),
     UpdatedAt("UpdatedAt"),
+    CreatedBy("CreatedBy"),
+    UpdatedBy("UpdatedBy"),
     Roles("Roles"),
     Username("Username"),
     Password("Password"),
@@ -23,7 +27,7 @@ public enum DataType {
 
     private final String graphqlName;
 
-    private DataType(String graphqlName) {
+    DataType(String graphqlName) {
         this.graphqlName = graphqlName;
     }
 

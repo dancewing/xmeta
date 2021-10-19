@@ -92,8 +92,8 @@ public interface EntityJdbcTemplate {
     <T> boolean existsById(Object id, Class<T> domainType);
 
 
-    Iterable<Map<String, Object>> findAll(Entity entity, Sort sort);
+    List<Map<String, Object>> findAll(Entity entity, Sort sort);
 
 
-    Iterable<Map<String, Object>> findAll(Entity entity, Pageable pageable);
+    List<Map<String, Object>> findAll(Entity entity, Pageable pageable);
 }

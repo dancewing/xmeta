@@ -114,27 +114,31 @@ public final class EntityConverter {
                         throw new RuntimeException("");
                     }
                     boolean dominant = MapUtils.getBooleanValue(entityField.getProperties(), RelationTypeConstants.RELATION_DOMINANT, false);
-                    EntityField targetEntityField = entityFieldList.get(0);
 
-                    JaxbHbmSetType setType = new JaxbHbmSetType();
-                    setType.setInverse(!dominant);
-                    setType.setName(entityField.getName());
-                    setType.setTable(getJoinTable(rootEntityType.getTable(), relationEntities.get(0).getTable(), setType.isInverse()));
-                    setType.setLazy(JaxbHbmLazyWithExtraEnum.TRUE);
-                    setType.setFetch(JaxbHbmFetchStyleWithSubselectEnum.SELECT);
+                    //主导方负责创建表
+                    if (dominant) {
+                        EntityField targetEntityField = entityFieldList.get(0);
 
-                    JaxbHbmKeyType keyType = new JaxbHbmKeyType();
-                    keyType.setNotNull(Boolean.TRUE);
-                    keyType.setColumnAttribute(entityField.getColumn());
-                    setType.setKey(keyType);
+                        JaxbHbmSetType setType = new JaxbHbmSetType();
+                        setType.setInverse(!dominant);
+                        setType.setName(entityField.getName());
+                        setType.setTable(getJoinTable(rootEntityType.getTable(), relationEntities.get(0).getTable(), setType.isInverse()));
+                        setType.setLazy(JaxbHbmLazyWithExtraEnum.TRUE);
+                        setType.setFetch(JaxbHbmFetchStyleWithSubselectEnum.SELECT);
 
-                    JaxbHbmManyToManyCollectionElementType manyToManyCollectionElementType = new JaxbHbmManyToManyCollectionElementType();
-                    manyToManyCollectionElementType.setEntityName(relatedEntityName);
-                    manyToManyCollectionElementType.setColumnAttribute(targetEntityField.getColumn());
+                        JaxbHbmKeyType keyType = new JaxbHbmKeyType();
+                        keyType.setNotNull(Boolean.TRUE);
+                        keyType.setColumnAttribute(entityField.getColumn());
+                        setType.setKey(keyType);
 
-                    setType.setManyToMany(manyToManyCollectionElementType);
+                        JaxbHbmManyToManyCollectionElementType manyToManyCollectionElementType = new JaxbHbmManyToManyCollectionElementType();
+                        manyToManyCollectionElementType.setEntityName(relatedEntityName);
+                        manyToManyCollectionElementType.setColumnAttribute(targetEntityField.getColumn());
 
-                    rootEntityType.getAttributes().add(setType);
+                        setType.setManyToMany(manyToManyCollectionElementType);
+
+                        rootEntityType.getAttributes().add(setType);
+                    }
                 }
 
             } else {

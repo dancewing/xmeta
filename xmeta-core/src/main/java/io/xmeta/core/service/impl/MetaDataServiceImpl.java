@@ -11,6 +11,8 @@ import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.EntityUtils;
 import io.xmeta.core.utils.IDGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.core.convert.Identifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +40,21 @@ public class MetaDataServiceImpl implements MetaDataService {
         Entity entity = this.metaEntityService.getEntity(entityId);
         Assert.notNull(entity, "未知的entityId");
 
-        return this.entityJdbcTemplate.findAll(entity);
+        List<Map<String, Object>> result;
+        if (page == null || size == null) {
+            result = this.entityJdbcTemplate.findAll(entity);
+        } else {
+            if (page == null) {
+                page = 1;
+            }
+            if (size == null) {
+                size = 20;
+            }
+            Pageable pageable = PageRequest.of(page-1, size);
+            result = this.entityJdbcTemplate.findAll(entity, pageable);
+        }
+
+        return result;
     }
 
     @Override

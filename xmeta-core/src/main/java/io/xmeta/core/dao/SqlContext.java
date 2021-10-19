@@ -51,7 +51,6 @@ class SqlContext {
 
 	Column getVersionColumn() {
 		return null;
-//		return table.column(entity.getRequiredVersionProperty().getColumnName());
 	}
 
 	Table getTable() {

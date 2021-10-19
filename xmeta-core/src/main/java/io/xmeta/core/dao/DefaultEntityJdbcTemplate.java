@@ -63,7 +63,6 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
         }
 
         String insertSql = sqlGenerator.getInsert(new HashSet<>(parameterSource.getIdentifiers()));
-        log.info(insertSql);
 
         operations.update(insertSql, parameterSource);
         return data;
@@ -77,7 +76,6 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
         SqlIdentifierParameterSource whereParameterSource = getParameterSource(where, entity, getIdentifierProcessing());
 
         String updateSql = sqlGenerator.getUpdate(new HashSet<>(updateParameterSource.getIdentifiers()), new HashSet<>(whereParameterSource.getIdentifiers()));
-        log.info(updateSql);
 
         updateParameterSource.addAll(whereParameterSource);
         return operations.update(updateSql, updateParameterSource);
@@ -94,8 +92,6 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
                 pkValue, //
                 getClass(pk.getJavaType())//
         );
-        log.info(deleteByIdSql);
-
         return operations.update(deleteByIdSql, parameterSource);
     }
 
@@ -162,13 +158,15 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
     }
 
     @Override
-    public Iterable<Map<String, Object>> findAll(Entity entity, Sort sort) {
+    public List<Map<String, Object>> findAll(Entity entity, Sort sort) {
         return operations.query(sql(entity).getFindAll(sort), getEntityRowMapper(entity));
     }
 
     @Override
-    public Iterable<Map<String, Object>> findAll(Entity entity, Pageable pageable) {
-        return operations.query(sql(entity).getFindAll(pageable), getEntityRowMapper(entity));
+    public List<Map<String, Object>> findAll(Entity entity, Pageable pageable) {
+        String findAllSQL = sql(entity).getFindAll(pageable);
+
+        return operations.query(findAllSQL, getEntityRowMapper(entity));
     }
 
     private SqlIdentifierParameterSource getParameterSource(@NonNull Map<String, Object> instance, Entity entity, IdentifierProcessing identifierProcessing) {

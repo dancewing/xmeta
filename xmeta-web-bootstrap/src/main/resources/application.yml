@@ -4,6 +4,7 @@ server:
 logging:
   level:
     org.springframework.transaction: TRACE
+    org.springframework.jdbc.core: DEBUG
 
 
 spring:

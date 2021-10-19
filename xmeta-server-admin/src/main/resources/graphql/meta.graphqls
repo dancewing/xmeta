@@ -952,17 +952,21 @@ enum EnumDataType {
   Id
   SingleLineText
   MultiLineText
-  Email
   WholeNumber
-  DateTime
   DecimalNumber
+  Date
+  Time
+  DateTime
+  Boolean
   Lookup
+  Email
   MultiSelectOptionSet
   OptionSet
-  Boolean
   GeographicLocation
   CreatedAt
   UpdatedAt
+  CreatedBy
+  UpdatedBy
   Roles
   Username
   Password

@@ -17,9 +17,11 @@ public interface EntityJdbcTemplate {
     @Nullable
     Object insert(Entity entity,  Map<String, Object> data,  Identifier identifier);
 
-    int update(Entity entity,  Map<String, Object> data);
+    int update(Entity entity,  Map<String, Object> data, Map<String, Object> where);
 
-    int delete(Entity entity,  Map<String, Object> data);
+    int deleteById(Entity entity,  Object id);
+
+    int delete(Entity entity,  Map<String, Object> where);
 
     int deleteAll(Entity entity);
 

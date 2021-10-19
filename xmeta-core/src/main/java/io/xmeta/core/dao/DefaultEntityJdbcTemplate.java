@@ -19,7 +19,6 @@ import org.springframework.data.relational.core.mapping.RelationalPersistentProp
 import org.springframework.data.relational.core.sql.IdentifierProcessing;
 import org.springframework.data.relational.core.sql.LockMode;
 import org.springframework.data.relational.core.sql.SqlIdentifier;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -28,9 +27,12 @@ import org.springframework.util.Assert;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
+
+    private static final Map<String, Class> CLASS_CACHE = new ConcurrentHashMap<>();
 
     private final JdbcConverter converter;
     private final NamedParameterJdbcOperations operations;
@@ -51,20 +53,16 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
     public Object insert(Entity entity, Map<String, Object> data, Identifier identifier) {
 
         SqlGenerator sqlGenerator = sql(entity);
-
         SqlIdentifierParameterSource parameterSource = getParameterSource(data, entity, getIdentifierProcessing());
-
         identifier.forEach((name, value, type) -> addConvertedPropertyValue(parameterSource, name, value, type));
 
         EntityField pk = EntityFieldUtils.findPK(entity).orElseThrow(MetaException::new);
-
         Object idValue = data.get(pk.getName());
         if (idValue != null) {
             addConvertedPropertyValue(parameterSource, SqlIdentifier.unquoted(pk.getColumn()), idValue, String.class);
         }
 
         String insertSql = sqlGenerator.getInsert(new HashSet<>(parameterSource.getIdentifiers()));
-
         log.info(insertSql);
 
         operations.update(insertSql, parameterSource);
@@ -72,12 +70,47 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
     }
 
     @Override
-    public int update(Entity entity, Map<String, Object> data) {
-        return 0;
+    public int update(Entity entity, Map<String, Object> data, Map<String, Object> where) {
+        SqlGenerator sqlGenerator = sql(entity);
+
+        SqlIdentifierParameterSource updateParameterSource = getParameterSource(data, entity, getIdentifierProcessing());
+        SqlIdentifierParameterSource whereParameterSource = getParameterSource(where, entity, getIdentifierProcessing());
+
+        String updateSql = sqlGenerator.getUpdate(new HashSet<>(updateParameterSource.getIdentifiers()), new HashSet<>(whereParameterSource.getIdentifiers()));
+        log.info(updateSql);
+
+        updateParameterSource.addAll(whereParameterSource);
+        return operations.update(updateSql, updateParameterSource);
+    }
+
+    public int deleteById(Entity entity,  Object pkValue){
+        String deleteByIdSql = sql(entity).getDeleteById();
+        EntityField pk = EntityFieldUtils.findPK(entity).orElseThrow(MetaException::new);
+        SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource(getIdentifierProcessing());
+
+        addConvertedPropertyValue( //
+                parameterSource, //
+                SqlIdentifier.unquoted(pk.getColumn()),
+                pkValue, //
+                getClass(pk.getJavaType())//
+        );
+        log.info(deleteByIdSql);
+
+        return operations.update(deleteByIdSql, parameterSource);
     }
 
     @Override
     public int delete(Entity entity, Map<String, Object> data) {
+/*        SqlGenerator sqlGenerator = sql(entity);
+
+        SqlIdentifierParameterSource updateParameterSource = getParameterSource(data, entity, getIdentifierProcessing());
+        SqlIdentifierParameterSource whereParameterSource = getParameterSource(where, entity, getIdentifierProcessing());
+
+        String updateSql = sqlGenerator.getDeleteById(new HashSet<>(updateParameterSource.getIdentifiers()), new HashSet<>(whereParameterSource.getIdentifiers()));
+        log.info(updateSql);
+
+        updateParameterSource.addAll(whereParameterSource);
+        return operations.update(updateSql, updateParameterSource);*/
         return 0;
     }
 
@@ -199,5 +232,20 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
 
     private EntityRowMapper getEntityRowMapper(Entity entity) {
         return new EntityRowMapper(entity, converter);
+    }
+
+    @NonNull
+    private Class<?> getClass(String className) {
+        if (CLASS_CACHE.containsKey(className)) {
+            return  CLASS_CACHE.get(className);
+        }
+        Class<?> cls = null;
+        try {
+            cls = ClassUtils.getClass(className, true);
+            CLASS_CACHE.put(className, cls);
+        } catch (ClassNotFoundException e) {
+            throw new MetaException("不能初始化："+ className);
+        }
+        return cls;
     }
 }

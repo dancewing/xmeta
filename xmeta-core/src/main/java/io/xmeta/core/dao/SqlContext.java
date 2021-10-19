@@ -15,8 +15,10 @@
  */
 package io.xmeta.core.dao;
 
+import io.xmeta.core.MetaException;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.utils.EntityFieldUtils;
 import org.springframework.data.relational.core.mapping.PersistentPropertyPathExtension;
 import org.springframework.data.relational.core.mapping.RelationalPersistentEntity;
 import org.springframework.data.relational.core.sql.Column;
@@ -43,8 +45,8 @@ class SqlContext {
 	}
 
 	Column getIdColumn() {
-//		return table.column(entity.getIdColumn());
-		return null;
+		EntityField field = EntityFieldUtils.findPK(entity).orElseThrow(MetaException::new);
+		return table.column(field.getColumn());
 	}
 
 	Column getVersionColumn() {

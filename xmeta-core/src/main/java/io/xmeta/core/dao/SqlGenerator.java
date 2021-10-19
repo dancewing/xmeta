@@ -260,8 +260,8 @@ public class SqlGenerator {
      *
      * @return the statement as a {@link String}. Guaranteed to be not {@literal null}.
      */
-    String getUpdate() {
-        return updateSql.get();
+    String getUpdate(Set<SqlIdentifier> toUpdateColumns, Set<SqlIdentifier> whereColumns) {
+        return createUpdateSql(toUpdateColumns, whereColumns);
     }
 
     /**
@@ -551,6 +551,33 @@ public class SqlGenerator {
         }
 
         return render(insertWithValues == null ? insert.build() : insertWithValues.build());
+    }
+
+    private String createUpdateSql(Set<SqlIdentifier> toUpdateColumns, Set<SqlIdentifier> whereColumns) {
+
+        Table table = getTable();
+
+        List<AssignValue> assignments = toUpdateColumns
+                .stream() //
+                .map(columnName -> Assignments.value( //
+                        table.column(columnName), //
+                        getBindMarker(columnName))) //
+                .collect(Collectors.toList());
+
+        UpdateBuilder.UpdateAssign updateAssign = Update.builder().table(table);
+        UpdateBuilder.UpdateWhere updateWhere = updateAssign.set(assignments);
+
+        int count = 0;
+        UpdateBuilder.UpdateWhereAndOr updateWhereAndOr = null;
+        for (SqlIdentifier identifier: whereColumns) {
+            if (count ==  0) {
+                updateWhereAndOr = updateWhere.where(table.column(identifier).isEqualTo(getBindMarker(identifier)));
+            } else {
+                updateWhereAndOr.and(table.column(identifier).isEqualTo(getBindMarker(identifier)));
+            }
+            count++;
+        }
+        return render(updateWhereAndOr.build());
     }
 
     private String createUpdateSql() {

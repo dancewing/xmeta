@@ -23,7 +23,7 @@ public class DeleteHandler implements EntityHandler {
     @Override
     public void process(Context context) {
         Map<String, Object> requestBody = context.getRequest().requestBody();
-        int result = metadataService.delete(context.getEntityId(), requestBody);
+        int result = metadataService.deleteById(context.getEntityId(), requestBody);
         context.setData(R.data(result));
     }
 }

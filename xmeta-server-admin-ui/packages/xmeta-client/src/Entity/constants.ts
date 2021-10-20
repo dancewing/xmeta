@@ -65,6 +65,14 @@ export const DATA_TYPE_TO_LABEL_AND_ICON: {
     label: "Decimal Number",
     icon: "decimal_number",
   },
+  [models.EnumDataType.Date]: {
+    label: "Date",
+    icon: "calendar",
+  },
+  [models.EnumDataType.Time]: {
+    label: "Time",
+    icon: "calendar",
+  },
   [models.EnumDataType.DateTime]: {
     label: "Date Time",
     icon: "calendar",
@@ -97,14 +105,21 @@ export const DATA_TYPE_TO_LABEL_AND_ICON: {
     label: "Created At",
     icon: "created_at",
   },
+  [models.EnumDataType.CreatedBy]: {
+    label: "Created By",
+    icon: "id",
+  },
   [models.EnumDataType.UpdatedAt]: {
     label: "Updated At",
     icon: "updated_at",
   },
-
+  [models.EnumDataType.UpdatedBy]: {
+    label: "Updated By",
+    icon: "id",
+  },
   [models.EnumDataType.Id]: {
     label: "Id",
-    icon: "id",
+    icon: "key",
   },
   [models.EnumDataType.Username]: {
     label: "Username",

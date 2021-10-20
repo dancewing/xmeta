@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "Entity_Field",
+@Table(name = "entity_field",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"entity_version_id", "display_name"}),
                 @UniqueConstraint(columnNames = {"entity_version_id", "name"}),
@@ -33,7 +33,14 @@ public class EntityFieldEntity extends BaseEntity {
     private ZonedDateTime updatedAt;
 
     @ManyToOne
+    @JoinColumn(name = "entity_version_id")
     private EntityVersionEntity entityVersion;
+
+    /**
+     * 这个字段必须要要加，负责会报找不到 'entity_version_id' 的错误信息
+     */
+    @Column(name = "entity_version_id", insertable = false, updatable = false)
+    private String entityVersionId;
 
     @Column(name = "permanent_Id")
     private String permanentId;

@@ -19,6 +19,7 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { getToken, setToken } from "./authentication/authentication";
 import { setContext } from "@apollo/client/link/context";
+import basename from './basename';
 
 import { translationMessages } from './i18n';
 
@@ -76,7 +77,7 @@ ReactDOM.render(
       <ApolloProvider client={apolloClient}>
         <LanguageProvider messages={translationMessages}>
           <amplicationDesignSystem.Provider>
-            <Router>
+            <Router basename={basename}>
               <App />
               <SnackbarQueue messages={queue.messages} />
             </Router>

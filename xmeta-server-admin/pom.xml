@@ -103,7 +103,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.22</version>
         </dependency>
 
 		<dependency>
@@ -181,6 +180,19 @@
         </dependency>
 
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>withUI</id>
+            <dependencies>
+                <dependency>
+                    <groupId>io.xmeta</groupId>
+                    <artifactId>xmeta-server-admin-ui</artifactId>
+                    <version>0.3.1-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 	<build>
 		<plugins>

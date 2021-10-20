@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @Description
@@ -29,4 +30,7 @@ public interface EntityFieldRepository extends JpaRepository<EntityFieldEntity, 
 
     @Query("from EntityFieldEntity ef where ef.entityVersion.id = :entityVersionId order by ef.createdAt asc ")
     List<EntityFieldEntity> getFields(@Param("entityVersionId") String entityVersionId);
+
+    @Query("from EntityFieldEntity ef where ef.entityVersion.id  = :entityVersionId and ef.permanentId = :permanentId")
+    Optional<EntityFieldEntity> findByVersionAndPermanentId(@Param("entityVersionId") String entityVersionId, @Param("permanentId") String permanentId);
 }

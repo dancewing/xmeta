@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.xmeta.admin.config.MetaAdminConfiguration,\
+io.xmeta.admin.config.SecurityConfiguration,\
+io.xmeta.admin.config.XMetaGraphQLConfiguration

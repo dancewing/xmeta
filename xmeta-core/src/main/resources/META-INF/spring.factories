@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.xmeta.core.config.MetaConfiguration,\
+io.xmeta.core.config.RedisTemplateConfiguration

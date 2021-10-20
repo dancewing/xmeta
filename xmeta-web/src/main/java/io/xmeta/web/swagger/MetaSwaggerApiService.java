@@ -52,7 +52,7 @@ public class MetaSwaggerApiService {
 
         Components components = new Components();
 
-        for (Entity entity: entities) {
+        for (Entity entity : entities) {
             paths.addPathItem(this.apiDocPath + "/" + entity.getId(), createRestPathItem(entity));
             paths.addPathItem(this.apiDocPath + "/" + entity.getId() + "/{id}", createRestParamPathItem(entity));
             openApi.addTagsItem(new Tag().name(entity.getName()).description(StringUtils.defaultString(entity.getDescription(), "")));
@@ -139,7 +139,7 @@ public class MetaSwaggerApiService {
     private Operation createGetOneOperation(Entity entity) {
         Operation operation = new Operation();
         operation.setDescription(entity.getDescription());
-        operation.setSummary(" get one record of " +entity.getName() + " by ID" );
+        operation.setSummary(" get one record of " + entity.getName() + " by ID");
         operation.setOperationId("getOne" + entity.getName());
         operation.addTagsItem(entity.getName());
 
@@ -147,7 +147,7 @@ public class MetaSwaggerApiService {
         Parameter idParam = new Parameter();
         idParam.setName("id");
         idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() +" that needs to be loaded");
+        idParam.setDescription("ID of " + entity.getName() + " that needs to be loaded");
         parameters.add(idParam);
 
         operation.setResponses(createEntityResponse(entity));
@@ -162,7 +162,7 @@ public class MetaSwaggerApiService {
     private Operation createUpdateOperation(Entity entity) {
         Operation operation = new Operation();
         operation.setDescription(entity.getDescription());
-        operation.setSummary("update one record of " + entity.getName() + " by ID" );
+        operation.setSummary("update one record of " + entity.getName() + " by ID");
         operation.setOperationId("update" + entity.getName());
         operation.addTagsItem(entity.getName());
 
@@ -174,7 +174,7 @@ public class MetaSwaggerApiService {
         Parameter idParam = new Parameter();
         idParam.setName("id");
         idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() +" that needs to be updated");
+        idParam.setDescription("ID of " + entity.getName() + " that needs to be updated");
         parameters.add(idParam);
 
         operation.setParameters(parameters);
@@ -184,7 +184,7 @@ public class MetaSwaggerApiService {
     private Operation createDeleteOperation(Entity entity) {
         Operation operation = new Operation();
         operation.setDescription(entity.getDescription());
-        operation.setSummary("delete one record of " + entity.getName() + " by ID" );
+        operation.setSummary("delete one record of " + entity.getName() + " by ID");
         operation.setOperationId("update" + entity.getName());
         operation.addTagsItem(entity.getName());
 
@@ -195,7 +195,7 @@ public class MetaSwaggerApiService {
         Parameter idParam = new Parameter();
         idParam.setName("id");
         idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() +" that needs to be delete");
+        idParam.setDescription("ID of " + entity.getName() + " that needs to be delete");
         parameters.add(idParam);
 
         operation.setParameters(parameters);
@@ -218,7 +218,7 @@ public class MetaSwaggerApiService {
                 try {
                     Class<?> cls = Class.forName(javaType);
                     Schema<?> fieldSchema = getFieldSchema(cls.getName());
-                    if (fieldSchema!=null) {
+                    if (fieldSchema != null) {
                         if (entityField.getRequired()) {
                             //fieldSchema.required(true);
                             objectSchema.addRequiredItem(entityField.getName());
@@ -236,9 +236,9 @@ public class MetaSwaggerApiService {
         components.addSchemas(entity.getName(), objectSchema);
     }
 
-    private void addClassSchema(Components components , Class<?> cls, String name) {
+    private void addClassSchema(Components components, Class<?> cls, String name) {
         if (StringUtils.isEmpty(name)) {
-            name =  cls.getSimpleName();
+            name = cls.getSimpleName();
         }
         components.addSchemas(name, generateClassSchema(cls));
     }
@@ -246,7 +246,7 @@ public class MetaSwaggerApiService {
     private Schema<?> generateClassSchema(Class<?> cls) {
         ObjectSchema objectSchema = new ObjectSchema();
         PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(cls);
-        for (PropertyDescriptor pd: descriptors) {
+        for (PropertyDescriptor pd : descriptors) {
 
             if (pd.getWriteMethod() == null) {
                 continue;

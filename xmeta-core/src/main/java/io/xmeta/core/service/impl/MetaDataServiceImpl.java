@@ -1,10 +1,11 @@
 package io.xmeta.core.service.impl;
 
-import io.xmeta.core.MetaException;
 import io.xmeta.core.dao.EntityJdbcTemplate;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.exception.MetaException;
+import io.xmeta.core.service.FieldConversionService;
 import io.xmeta.core.service.MetaDataService;
 import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.core.utils.EntityFieldUtils;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.core.convert.Identifier;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -23,17 +23,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
 @Slf4j
 @Transactional(readOnly = true)
 public class MetaDataServiceImpl implements MetaDataService {
 
     private final MetaEntityService metaEntityService;
     private final EntityJdbcTemplate entityJdbcTemplate;
+    private final FieldConversionService fieldConversionService;
 
-    public MetaDataServiceImpl(MetaEntityService metaEntityService, EntityJdbcTemplate entityDataAccessStrategy) {
+    public MetaDataServiceImpl(MetaEntityService metaEntityService, EntityJdbcTemplate entityDataAccessStrategy, FieldConversionService fieldConversionService) {
         this.metaEntityService = metaEntityService;
         this.entityJdbcTemplate = entityDataAccessStrategy;
+        this.fieldConversionService = fieldConversionService;
     }
 
     public List<Map<String, Object>> query(String entityId, Integer page, Integer size) {
@@ -50,7 +51,7 @@ public class MetaDataServiceImpl implements MetaDataService {
             if (size == null) {
                 size = 20;
             }
-            Pageable pageable = PageRequest.of(page-1, size);
+            Pageable pageable = PageRequest.of(page - 1, size);
             result = this.entityJdbcTemplate.findAll(entity, pageable);
         }
 
@@ -104,27 +105,23 @@ public class MetaDataServiceImpl implements MetaDataService {
 
             if (DataType.CreatedAt == dataType && create) {
                 toSaved.put(field.getName(), LocalDateTime.now());
-            } else if (DataType.UpdatedAt == dataType) {
+                return;
+            }
+            if (DataType.UpdatedAt == dataType) {
                 toSaved.put(field.getName(), LocalDateTime.now());
+                return;
             }
 
             if (data.containsKey(field.getName())) {
-                if (DataType.CreatedAt == dataType && create) {
-                    toSaved.put(field.getName(), LocalDateTime.now());
-                } else if (DataType.UpdatedAt == dataType) {
-                    toSaved.put(field.getName(), LocalDateTime.now());
-                } else if (DataType.Lookup == dataType) {
+                // 特殊字段处理
+                if (DataType.Lookup == dataType) {
 
                 } else {
-                    Object value = EntityFieldUtils.convertParamValue(dataType, data.get(field.getName()));
+                    Object value = fieldConversionService.convert(DataType.valueOf(dataType.name()), data.get(field.getName()));
                     toSaved.put(field.getName(), value);
                 }
             } else {
-//                if (entityField.getRequired() && !EntityFieldUtils.isSystemControl(entityField.getDataType())) {
-//                    if (!create && entityField.getDataType() != DataType.Id) {
-//                        throw new MetaException("必填字段" + entityField.getName() + "缺失");
-//                    }
-//                }
+
             }
 
         });

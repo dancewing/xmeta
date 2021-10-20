@@ -4,7 +4,6 @@ import io.xmeta.core.domain.Entity;
 import io.xmeta.core.service.MetaCacheLoaderService;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
@@ -16,7 +15,6 @@ import java.util.Map;
 /**
  *
  */
-@Service
 public class RedisMetaEntityCacheService implements MetaCacheLoaderService {
 
     static String ENTITY_REDIS_CACHE_KEY = "ENTITY_REDIS_CACHE_KEY";

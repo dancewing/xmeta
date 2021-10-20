@@ -23,7 +23,7 @@ public class TestRestController {
 
     @PostMapping("/search")
     public ResponseEntity<Page<User>> search(@RequestParam(required = false) Integer page,
-                                             @RequestParam(required = false)  Integer size,
+                                             @RequestParam(required = false) Integer size,
                                              @RequestBody SearchUser searchUser) {
         return ResponseEntity.ok(Page.empty());
     }

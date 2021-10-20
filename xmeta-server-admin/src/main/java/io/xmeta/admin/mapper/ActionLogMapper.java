@@ -1,8 +1,8 @@
 package io.xmeta.admin.mapper;
 
-import io.xmeta.core.utils.ObjectMapperUtils;
 import io.xmeta.admin.domain.ActionLogEntity;
 import io.xmeta.admin.model.ActionLog;
+import io.xmeta.core.utils.ObjectMapperUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

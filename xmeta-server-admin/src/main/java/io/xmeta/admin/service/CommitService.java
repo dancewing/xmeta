@@ -1,12 +1,9 @@
 package io.xmeta.admin.service;
 
-import io.xmeta.admin.domain.AppEntity;
-import io.xmeta.admin.domain.CommitEntity;
-import io.xmeta.admin.domain.UserEntity;
-import io.xmeta.admin.repository.CommitRepository;
 import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.CommitMapper;
 import io.xmeta.admin.model.*;
+import io.xmeta.admin.repository.CommitRepository;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import org.apache.commons.lang.StringUtils;

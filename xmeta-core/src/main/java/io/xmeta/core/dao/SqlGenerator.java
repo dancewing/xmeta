@@ -1,9 +1,9 @@
 package io.xmeta.core.dao;
 
-import io.xmeta.core.MetaException;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.EntityUtils;
 import org.springframework.data.domain.Pageable;
@@ -61,10 +61,10 @@ public class SqlGenerator {
      * Create a new {@link SqlGenerator} given {@link RelationalMappingContext} and {@link RelationalPersistentEntity}.
      *
      * @param converter must not be {@literal null}.
-     * @param entity must not be {@literal null}.
-     * @param dialect must not be {@literal null}.
+     * @param entity    must not be {@literal null}.
+     * @param dialect   must not be {@literal null}.
      */
-    SqlGenerator(JdbcConverter converter, Entity entity,  Dialect dialect) {
+    SqlGenerator(JdbcConverter converter, Entity entity, Dialect dialect) {
         this.sqlContext = new SqlContext(entity);
         this.sqlRenderer = SqlRenderer.create(new RenderContextFactory(dialect).createRenderContext());
         this.columns = new SqlGenerator.Columns(entity, converter);
@@ -75,9 +75,9 @@ public class SqlGenerator {
      * Construct a IN-condition based on a {@link Select Sub-Select} which selects the ids (or stand ins for ids) of the
      * given {@literal path} to those that reference the root entities specified by the {@literal rootCondition}.
      *
-     * @param path specifies the table and id to select
+     * @param path          specifies the table and id to select
      * @param rootCondition the condition on the root of the path determining what to select
-     * @param filterColumn the column to apply the IN-condition to.
+     * @param filterColumn  the column to apply the IN-condition to.
      * @return the IN condition
      */
     private Condition getSubselectCondition(PersistentPropertyPathExtension path,
@@ -166,9 +166,9 @@ public class SqlGenerator {
      * a referencing entity.
      *
      * @param parentIdentifier name of the column of the FK back to the referencing entity.
-     * @param keyColumn if the property is of type {@link Map} this column contains the map key.
-     * @param ordered whether the SQL statement should include an ORDER BY for the keyColumn. If this is {@code true}, the
-     *          keyColumn must not be {@code null}.
+     * @param keyColumn        if the property is of type {@link Map} this column contains the map key.
+     * @param ordered          whether the SQL statement should include an ORDER BY for the keyColumn. If this is {@code true}, the
+     *                         keyColumn must not be {@code null}.
      * @return a SQL String.
      */
     String getFindAllByProperty(Identifier parentIdentifier, @Nullable SqlIdentifier keyColumn, boolean ordered) {
@@ -325,7 +325,7 @@ public class SqlGenerator {
             return render(deleteAll.build());
         }
 
-       // return createDeleteByPathAndCriteria(new PersistentPropertyPathExtension(mappingContext, path), Column::isNotNull);
+        // return createDeleteByPathAndCriteria(new PersistentPropertyPathExtension(mappingContext, path), Column::isNotNull);
         return null;
     }
 
@@ -339,7 +339,6 @@ public class SqlGenerator {
         return createDeleteByPathAndCriteria(new PersistentPropertyPathExtension(mappingContext, path),
                 filterColumn -> filterColumn.isEqualTo(getBindMarker(ROOT_ID_PARAMETER)));
     }*/
-
     private String createFindOneSql() {
 
         Select select = selectBuilder().where(getIdColumn().isEqualTo(getBindMarker(ID_SQL_PARAMETER))) //
@@ -536,7 +535,7 @@ public class SqlGenerator {
         Table table = getTable();
 
         Set<SqlIdentifier> columnNamesForInsert = new TreeSet<>(Comparator.comparing(SqlIdentifier::getReference));
-       // columnNamesForInsert.addAll(columns.getInsertableColumns());
+        // columnNamesForInsert.addAll(columns.getInsertableColumns());
         columnNamesForInsert.addAll(additionalColumns);
 
         InsertBuilder.InsertIntoColumnsAndValuesWithBuild insert = Insert.builder().into(table);
@@ -569,8 +568,8 @@ public class SqlGenerator {
 
         int count = 0;
         UpdateBuilder.UpdateWhereAndOr updateWhereAndOr = null;
-        for (SqlIdentifier identifier: whereColumns) {
-            if (count ==  0) {
+        for (SqlIdentifier identifier : whereColumns) {
+            if (count == 0) {
                 updateWhereAndOr = updateWhere.where(table.column(identifier).isEqualTo(getBindMarker(identifier)));
             } else {
                 updateWhereAndOr.and(table.column(identifier).isEqualTo(getBindMarker(identifier)));
@@ -731,9 +730,9 @@ public class SqlGenerator {
 
         Join(Table joinTable, Column joinColumn, Column parentId) {
 
-            Assert.notNull( joinTable,"JoinTable must not be null.");
-            Assert.notNull( joinColumn,"JoinColumn must not be null.");
-            Assert.notNull( parentId,"ParentId must not be null.");
+            Assert.notNull(joinTable, "JoinTable must not be null.");
+            Assert.notNull(joinColumn, "JoinColumn must not be null.");
+            Assert.notNull(parentId, "ParentId must not be null.");
 
             this.joinTable = joinTable;
             this.joinColumn = joinColumn;

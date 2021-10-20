@@ -1,16 +1,14 @@
 package io.xmeta.core.service.impl;
 
-import io.xmeta.core.MetaException;
 import io.xmeta.core.domain.Entity;
+import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.service.MetaCacheLoaderService;
-import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.core.service.MetaDatabaseLoaderService;
+import io.xmeta.core.service.MetaEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public class MetaEntityServiceImpl implements MetaEntityService {
 
     private MetaCacheLoaderService metaCacheLoaderService;

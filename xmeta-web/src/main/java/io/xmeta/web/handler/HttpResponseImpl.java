@@ -1,6 +1,5 @@
 package io.xmeta.web.handler;
 
-import io.xmeta.web.handler.Response;
 import org.springframework.http.HttpHeaders;
 
 public class HttpResponseImpl implements Response {

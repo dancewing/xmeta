@@ -129,6 +129,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
     /**
      * 创建数据模型，并创建默认字段(ID, createAt, createBy)
+     *
      * @param data
      * @return
      */
@@ -379,7 +380,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
     public List<io.xmeta.core.domain.Entity> loadEntities(String appId) {
         List<EntityEntity> entityEntities = this.entityRepository.findEntitiesByApp(appId);
         List<io.xmeta.core.domain.Entity> entityDomains = new ArrayList<>();
-        for (EntityEntity entity: entityEntities) {
+        for (EntityEntity entity : entityEntities) {
             io.xmeta.core.domain.Entity entityDomain = new io.xmeta.core.domain.Entity();
             entityDomain.setId(entity.getId());
             entityDomain.setTable(entity.getTable());

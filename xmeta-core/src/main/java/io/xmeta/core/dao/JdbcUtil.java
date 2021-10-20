@@ -33,91 +33,91 @@ import java.util.Map;
  */
 public final class JdbcUtil {
 
-	private static final Map<Class<?>, Integer> sqlTypeMappings = new HashMap<>();
+    private static final Map<Class<?>, Integer> sqlTypeMappings = new HashMap<>();
 
-	static {
+    static {
 
-		sqlTypeMappings.put(String.class, Types.VARCHAR);
-		sqlTypeMappings.put(BigInteger.class, Types.BIGINT);
-		sqlTypeMappings.put(BigDecimal.class, Types.DECIMAL);
-		sqlTypeMappings.put(Byte.class, Types.TINYINT);
-		sqlTypeMappings.put(byte.class, Types.TINYINT);
-		sqlTypeMappings.put(Short.class, Types.SMALLINT);
-		sqlTypeMappings.put(short.class, Types.SMALLINT);
-		sqlTypeMappings.put(Integer.class, Types.INTEGER);
-		sqlTypeMappings.put(int.class, Types.INTEGER);
-		sqlTypeMappings.put(Long.class, Types.BIGINT);
-		sqlTypeMappings.put(long.class, Types.BIGINT);
-		sqlTypeMappings.put(Double.class, Types.DOUBLE);
-		sqlTypeMappings.put(double.class, Types.DOUBLE);
-		sqlTypeMappings.put(Float.class, Types.REAL);
-		sqlTypeMappings.put(float.class, Types.REAL);
-		sqlTypeMappings.put(Boolean.class, Types.BIT);
-		sqlTypeMappings.put(boolean.class, Types.BIT);
-		sqlTypeMappings.put(byte[].class, Types.VARBINARY);
-		sqlTypeMappings.put(Date.class, Types.DATE);
-		sqlTypeMappings.put(Time.class, Types.TIME);
-		sqlTypeMappings.put(Timestamp.class, Types.TIMESTAMP);
-	}
+        sqlTypeMappings.put(String.class, Types.VARCHAR);
+        sqlTypeMappings.put(BigInteger.class, Types.BIGINT);
+        sqlTypeMappings.put(BigDecimal.class, Types.DECIMAL);
+        sqlTypeMappings.put(Byte.class, Types.TINYINT);
+        sqlTypeMappings.put(byte.class, Types.TINYINT);
+        sqlTypeMappings.put(Short.class, Types.SMALLINT);
+        sqlTypeMappings.put(short.class, Types.SMALLINT);
+        sqlTypeMappings.put(Integer.class, Types.INTEGER);
+        sqlTypeMappings.put(int.class, Types.INTEGER);
+        sqlTypeMappings.put(Long.class, Types.BIGINT);
+        sqlTypeMappings.put(long.class, Types.BIGINT);
+        sqlTypeMappings.put(Double.class, Types.DOUBLE);
+        sqlTypeMappings.put(double.class, Types.DOUBLE);
+        sqlTypeMappings.put(Float.class, Types.REAL);
+        sqlTypeMappings.put(float.class, Types.REAL);
+        sqlTypeMappings.put(Boolean.class, Types.BIT);
+        sqlTypeMappings.put(boolean.class, Types.BIT);
+        sqlTypeMappings.put(byte[].class, Types.VARBINARY);
+        sqlTypeMappings.put(Date.class, Types.DATE);
+        sqlTypeMappings.put(Time.class, Types.TIME);
+        sqlTypeMappings.put(Timestamp.class, Types.TIMESTAMP);
+    }
 
-	private JdbcUtil() {
-		throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-	}
+    private JdbcUtil() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
 
-	/**
-	 * Returns the {@link Types} value suitable for passing a value of the provided type to a
-	 * {@link java.sql.PreparedStatement}.
-	 *
-	 * @param type The type of value to be bound to a {@link java.sql.PreparedStatement}.
-	 * @return One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
-	 */
-	public static int sqlTypeFor(Class<?> type) {
+    /**
+     * Returns the {@link Types} value suitable for passing a value of the provided type to a
+     * {@link java.sql.PreparedStatement}.
+     *
+     * @param type The type of value to be bound to a {@link java.sql.PreparedStatement}.
+     * @return One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
+     */
+    public static int sqlTypeFor(Class<?> type) {
 
-		Assert.notNull(type, "Type must not be null.");
+        Assert.notNull(type, "Type must not be null.");
 
-		return sqlTypeMappings.keySet().stream() //
-				.filter(k -> k.isAssignableFrom(type)) //
-				.findFirst() //
-				.map(sqlTypeMappings::get) //
-				.orElse(JdbcUtils.TYPE_UNKNOWN);
-	}
+        return sqlTypeMappings.keySet().stream() //
+                .filter(k -> k.isAssignableFrom(type)) //
+                .findFirst() //
+                .map(sqlTypeMappings::get) //
+                .orElse(JdbcUtils.TYPE_UNKNOWN);
+    }
 
-	/**
-	 * Converts a {@link JDBCType} to an {@code int} value as defined in {@link Types}.
-	 *
-	 * @param jdbcType value to be converted. May be {@literal null}.
-	 * @return One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
-	 */
-	public static int sqlTypeFor(@Nullable JDBCType jdbcType) {
-		return jdbcType == null ? JdbcUtils.TYPE_UNKNOWN : jdbcType.getVendorTypeNumber();
-	}
+    /**
+     * Converts a {@link JDBCType} to an {@code int} value as defined in {@link Types}.
+     *
+     * @param jdbcType value to be converted. May be {@literal null}.
+     * @return One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
+     */
+    public static int sqlTypeFor(@Nullable JDBCType jdbcType) {
+        return jdbcType == null ? JdbcUtils.TYPE_UNKNOWN : jdbcType.getVendorTypeNumber();
+    }
 
-	/**
-	 * Converts a value defined in {@link Types} into a {@link JDBCType} instance or {@literal null} if the value is
-	 * {@link JdbcUtils#TYPE_UNKNOWN}
-	 *
-	 * @param sqlType One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
-	 * @return a matching {@link JDBCType} instance or {@literal null}.
-	 */
-	@Nullable
-	public static JDBCType jdbcTypeFor(int sqlType) {
+    /**
+     * Converts a value defined in {@link Types} into a {@link JDBCType} instance or {@literal null} if the value is
+     * {@link JdbcUtils#TYPE_UNKNOWN}
+     *
+     * @param sqlType One of the values defined in {@link Types} or {@link JdbcUtils#TYPE_UNKNOWN}.
+     * @return a matching {@link JDBCType} instance or {@literal null}.
+     */
+    @Nullable
+    public static JDBCType jdbcTypeFor(int sqlType) {
 
-		if (sqlType == JdbcUtils.TYPE_UNKNOWN) {
-			return null;
-		}
+        if (sqlType == JdbcUtils.TYPE_UNKNOWN) {
+            return null;
+        }
 
-		return JDBCType.valueOf(sqlType);
-	}
+        return JDBCType.valueOf(sqlType);
+    }
 
-	/**
-	 * Returns the {@link JDBCType} suitable for passing a value of the provided type to a
-	 * {@link java.sql.PreparedStatement}.
-	 *
-	 * @param type The type of value to be bound to a {@link java.sql.PreparedStatement}.
-	 * @return a matching {@link JDBCType} instance or {@literal null}.
-	 */
-	@Nullable
-	public static JDBCType jdbcTypeFor(Class<?> type) {
-		return jdbcTypeFor(sqlTypeFor(type));
-	}
+    /**
+     * Returns the {@link JDBCType} suitable for passing a value of the provided type to a
+     * {@link java.sql.PreparedStatement}.
+     *
+     * @param type The type of value to be bound to a {@link java.sql.PreparedStatement}.
+     * @return a matching {@link JDBCType} instance or {@literal null}.
+     */
+    @Nullable
+    public static JDBCType jdbcTypeFor(Class<?> type) {
+        return jdbcTypeFor(sqlTypeFor(type));
+    }
 }

@@ -125,7 +125,7 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
      * @return
      */
     public List<WorkspaceDomain> metadata() {
-        List<Workspace>  workspaces = this.getCurrentAccountWorkspaces();
+        List<Workspace> workspaces = this.getCurrentAccountWorkspaces();
         List<WorkspaceDomain> workspaceDomains = new ArrayList<>();
         for (Workspace workspace : workspaces) {
             WorkspaceDomain workspaceDomain = new WorkspaceDomain();

@@ -1,8 +1,8 @@
 package io.xmeta.admin.mapper;
 
 import io.xmeta.admin.domain.BlockVersionEntity;
-import io.xmeta.core.utils.ObjectMapperUtils;
 import io.xmeta.admin.model.BlockVersion;
+import io.xmeta.core.utils.ObjectMapperUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

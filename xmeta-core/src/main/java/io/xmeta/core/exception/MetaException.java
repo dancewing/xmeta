@@ -1,4 +1,4 @@
-package io.xmeta.core;
+package io.xmeta.core.exception;
 
 public class MetaException extends RuntimeException {
     public MetaException() {

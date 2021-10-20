@@ -1,16 +1,13 @@
 package io.xmeta.admin.service;
 
-import io.xmeta.admin.domain.AppEntity;
-import io.xmeta.admin.domain.AppRoleEntity;
-import io.xmeta.admin.domain.WorkspaceEntity;
-import io.xmeta.admin.mix.AppDomain;
-import io.xmeta.admin.util.Inflector;
-import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.AppMapper;
+import io.xmeta.admin.mix.AppDomain;
 import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.AppRepository;
 import io.xmeta.admin.repository.AppRoleRepository;
+import io.xmeta.admin.util.Inflector;
+import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -409,9 +406,9 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         };
         specification = specification.and(condition);
         Sort sort = Sort.by(Sort.Order.desc("createdAt"));
-        List<AppEntity>  result = this.appRepository.findAll(specification, sort);
+        List<AppEntity> result = this.appRepository.findAll(specification, sort);
         List<AppDomain> appDomains = new ArrayList<>();
-        for (AppEntity app: result) {
+        for (AppEntity app : result) {
             AppDomain appDomain = new AppDomain();
             appDomain.setId(app.getId());
             appDomain.setName(app.getName());

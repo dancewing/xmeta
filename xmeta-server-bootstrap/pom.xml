@@ -45,7 +45,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>io.xmeta.server.XMetaServerApp</mainClass>
+                    <mainClass>io.xmeta.server.boot.XMetaServerApp</mainClass>
                     <executable>true</executable>
                 </configuration>
             </plugin>

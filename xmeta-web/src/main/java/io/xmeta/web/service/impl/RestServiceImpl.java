@@ -6,8 +6,8 @@ import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.web.ApiException;
 import io.xmeta.web.handler.ActionInterceptor;
 import io.xmeta.web.handler.Context;
-import io.xmeta.web.handler.Response;
 import io.xmeta.web.handler.HttpResponseImpl;
+import io.xmeta.web.handler.Response;
 import io.xmeta.web.registrar.EntityHandler;
 import io.xmeta.web.registrar.PluginActionManager;
 import io.xmeta.web.registrar.PostActionHandler;
@@ -32,7 +32,6 @@ public class RestServiceImpl implements RestService {
     }
 
     /**
-     *
      * @param context 需要处理的上下文数据
      */
     @Override

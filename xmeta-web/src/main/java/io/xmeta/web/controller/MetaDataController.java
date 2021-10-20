@@ -1,9 +1,9 @@
 package io.xmeta.web.controller;
 
 import io.xmeta.core.ActionType;
-import io.xmeta.core.MetaException;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.web.handler.Context;
@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static io.xmeta.web.Constants.META_API_URL;
@@ -36,9 +34,9 @@ public class MetaDataController {
 
     @GetMapping("/{entityId}")
     public ResponseEntity<Object> getAll(@PathVariable String entityId,
-                                                                @RequestHeader(required = false) HttpHeaders headers,
-                                                                @RequestParam(required = false) Map<String, Object> params,
-                                                                HttpServletRequest servletRequest) {
+                                         @RequestHeader(required = false) HttpHeaders headers,
+                                         @RequestParam(required = false) Map<String, Object> params,
+                                         HttpServletRequest servletRequest) {
 
         Request request = Request.of(headers, HttpMethod.resolve(servletRequest.getMethod()), params, null);
         Context context = new Context(request, entityId, ActionType.Query);

@@ -1,9 +1,9 @@
 package io.xmeta.core.dao;
 
-import io.xmeta.core.MetaException;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.domain.EntityField;
+import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +81,7 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
         return operations.update(updateSql, updateParameterSource);
     }
 
-    public int deleteById(Entity entity,  Object pkValue){
+    public int deleteById(Entity entity, Object pkValue) {
         String deleteByIdSql = sql(entity).getDeleteById();
         EntityField pk = EntityFieldUtils.findPK(entity).orElseThrow(MetaException::new);
         SqlIdentifierParameterSource parameterSource = new SqlIdentifierParameterSource(getIdentifierProcessing());
@@ -235,14 +235,14 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
     @NonNull
     private Class<?> getClass(String className) {
         if (CLASS_CACHE.containsKey(className)) {
-            return  CLASS_CACHE.get(className);
+            return CLASS_CACHE.get(className);
         }
         Class<?> cls = null;
         try {
             cls = ClassUtils.getClass(className, true);
             CLASS_CACHE.put(className, cls);
         } catch (ClassNotFoundException e) {
-            throw new MetaException("不能初始化："+ className);
+            throw new MetaException("不能初始化：" + className);
         }
         return cls;
     }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,7 +74,7 @@ public class PluginActionManager {
         postActionHandlers = new ConcurrentHashMap<>();
         Map<String, PostActionHandler> actionHandlerBeans = applicationContext.getBeansOfType(PostActionHandler.class);
 
-        actionHandlerBeans.values().forEach( postActionHandler -> {
+        actionHandlerBeans.values().forEach(postActionHandler -> {
             MetaHandler metaHandler = postActionHandler.getClass().getDeclaredAnnotation(MetaHandler.class);
             if (ObjectUtils.isNotEmpty(metaHandler)) {
                 if (ArrayUtils.isNotEmpty(metaHandler.supports())) {
@@ -94,7 +93,7 @@ public class PluginActionManager {
 
         Map<String, PreActionHandler> actionHandlerBeans = applicationContext.getBeansOfType(PreActionHandler.class);
 
-        actionHandlerBeans.values().forEach( postActionHandler -> {
+        actionHandlerBeans.values().forEach(postActionHandler -> {
             MetaHandler metaHandler = postActionHandler.getClass().getDeclaredAnnotation(MetaHandler.class);
             if (ObjectUtils.isNotEmpty(metaHandler)) {
                 if (ArrayUtils.isNotEmpty(metaHandler.supports())) {

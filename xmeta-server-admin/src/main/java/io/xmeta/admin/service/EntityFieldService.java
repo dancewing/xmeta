@@ -7,10 +7,13 @@ import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.EntityFieldRepository;
 import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.admin.repository.EntityVersionRepository;
-import io.xmeta.admin.util.*;
+import io.xmeta.admin.util.Inflector;
+import io.xmeta.admin.util.Maps;
+import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.domain.RelationTypeConstants;
+import io.xmeta.core.service.DataTypeMapping;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.IDGenerator;
 import io.xmeta.core.utils.ObjectMapperUtils;
@@ -49,14 +52,16 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
     private final EntityFieldMapper entityFieldMapper;
     private final EntityRepository entityRepository;
     private final LockService lockService;
+    private final DataTypeMapping dataTypeMapping;
 
-    public EntityFieldService(EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityFieldMapper entityFieldMapper, EntityRepository entityRepository, LockService lockService) {
+    public EntityFieldService(EntityFieldRepository entityFieldRepository, EntityVersionRepository entityVersionRepository, EntityFieldMapper entityFieldMapper, EntityRepository entityRepository, LockService lockService, DataTypeMapping dataTypeMapping) {
         super(entityFieldRepository);
         this.entityFieldRepository = entityFieldRepository;
         this.entityVersionRepository = entityVersionRepository;
         this.entityFieldMapper = entityFieldMapper;
         this.entityRepository = entityRepository;
         this.lockService = lockService;
+        this.dataTypeMapping = dataTypeMapping;
     }
 
     public List<EntityField> fields(Entity entity, EntityFieldWhereInput where, EntityFieldOrderByInput orderBy, Integer skip, Integer take) {
@@ -69,7 +74,8 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
     }
 
     /**
-     *  创建字段信息
+     * 创建字段信息
+     *
      * @param entityField
      * @param entityVersion
      * @return
@@ -91,8 +97,8 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setPosition(entityField.getPosition());
         fieldEntity.setUnique(entityField.getUnique());
         fieldEntity.setColumn(entityField.getColumn());
-        if (entityField.getDataType()!= null) {
-            fieldEntity.setJavaType(EntityFieldUtils.determineJavaType(entityField.getDataType().name(), entityField.getProperties()));
+        if (entityField.getDataType() != null) {
+            fieldEntity.setJavaType(dataTypeMapping.javaTypeFor(entityField.getDataType().name()).getName());
         }
         if (entityField.getInputType() != null) {
             fieldEntity.setInputType(entityField.getInputType().name());
@@ -105,6 +111,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
     /**
      * 创建字段
+     *
      * @param data
      * @param relatedFieldName
      * @param relatedFieldDisplayName
@@ -129,7 +136,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             if (relationType == null) {
                 throw new RuntimeException("relation type is null");
             }
-            boolean needCreateRelation =  relationType != RelationType.oneWay;
+            boolean needCreateRelation = relationType != RelationType.oneWay;
             if (needCreateRelation) {
                 RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
                 this.createRelatedField(
@@ -155,7 +162,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         if (data.getInputType() != null) {
             entityFieldEntity.setInputType(data.getInputType().name());
         }
-        entityFieldEntity.setJavaType(EntityFieldUtils.determineJavaType(data.getDataType().name(), data.getProperties()));
+        entityFieldEntity.setJavaType(dataTypeMapping.javaTypeFor(data.getDataType().name()).getName());
         entityFieldEntity.setDisplayName(data.getDisplayName());
         entityFieldEntity.setDataType(data.getDataType().name());
         entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
@@ -208,6 +215,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
     /**
      * 创建一个供存储用的EntityField 设置 name， dataType, properties
+     *
      * @param data
      * @return
      */
@@ -281,7 +289,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             }
         }
 
-        if (dataType == null)  {
+        if (dataType == null) {
             dataType = EnumDataType.SingleLineText; // 保存dataType 不为空
         }
 
@@ -442,9 +450,9 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         boolean shouldUpdateRelated = !shouldCreateRelated &&
                 !shouldDeleteRelated && StringUtils.equals(MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID),
                 MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_ENTITY_ID)) && !StringUtils.equals(
-                        MapUtils.getString(properties, RelationTypeConstants.RELATION_TYPE),
-                        MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATION_TYPE)
-                );
+                MapUtils.getString(properties, RelationTypeConstants.RELATION_TYPE),
+                MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATION_TYPE)
+        );
 
         log.info("shouldDeleteRelated: {}, shouldCreateRelated: {}, shouldChangeRelated: {}, shouldUpdateRelated: {}",
                 shouldDeleteRelated, shouldCreateRelated, shouldChangeRelated, shouldUpdateRelated);
@@ -468,7 +476,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             if (relationType == null) {
                 throw new RuntimeException("relation type is null");
             }
-            boolean needCreateRelation =  relationType != RelationType.oneWay;
+            boolean needCreateRelation = relationType != RelationType.oneWay;
             if (needCreateRelation) {
                 RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
                 this.createRelatedField(
@@ -487,7 +495,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             if (relationType == null) {
                 throw new RuntimeException("relation type is null");
             }
-            boolean needUpdateRelation =  relationType != RelationType.oneWay;
+            boolean needUpdateRelation = relationType != RelationType.oneWay;
             if (needUpdateRelation) {
                 RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
                 this.updateRelatedField(MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY_ID),
@@ -506,7 +514,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         field.setName(data.getName());
         field.setDisplayName(data.getDisplayName());
         field.setDataType(data.getDataType().name());
-        field.setJavaType(EntityFieldUtils.determineJavaType(data.getDataType().name(), data.getProperties()));
+        field.setJavaType(dataTypeMapping.javaTypeFor(data.getDataType().name()).getName());
         field.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
         field.setRequired(data.getRequired());
         field.setSearchable(data.getSearchable());
@@ -521,6 +529,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
     /**
      * 创建关联字段
+     *
      * @param permanentId
      * @param name
      * @param displayName

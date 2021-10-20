@@ -1,10 +1,10 @@
 package io.xmeta.admin.resolver.impl;
 
+import io.xmeta.admin.model.*;
+import io.xmeta.admin.resolver.EntityResolver;
 import io.xmeta.admin.service.EntityFieldService;
 import io.xmeta.admin.service.EntityPermissionService;
 import io.xmeta.admin.service.EntityVersionService;
-import io.xmeta.admin.model.*;
-import io.xmeta.admin.resolver.EntityResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

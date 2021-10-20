@@ -1,8 +1,6 @@
 package io.xmeta.admin.service;
 
 import io.xmeta.admin.domain.*;
-import io.xmeta.admin.repository.*;
-import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.EntityVersionMapper;
 import io.xmeta.admin.model.Entity;
 import io.xmeta.admin.model.EntityVersion;
@@ -10,7 +8,7 @@ import io.xmeta.admin.model.EntityVersionOrderByInput;
 import io.xmeta.admin.model.EntityVersionWhereInput;
 import io.xmeta.admin.repository.*;
 import io.xmeta.admin.util.PredicateBuilder;
-import io.xmeta.core.MetaException;
+import io.xmeta.core.exception.MetaException;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +24,6 @@ import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -245,8 +242,8 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
                             .orElseThrow(MetaException::new);
 
                     newPermissionFieldEntity.setField(entityFieldEntity);
-                   // newPermissionFieldEntity.setEntityVersionId(targetVersionId);
-                   // newPermissionFieldEntity.setFieldPermanentId(permissionField.getFieldPermanentId());
+                    // newPermissionFieldEntity.setEntityVersionId(targetVersionId);
+                    // newPermissionFieldEntity.setFieldPermanentId(permissionField.getFieldPermanentId());
                     newPermissionFieldEntity.setPermission(updEntityPermission);
                     //TODO bug here.
                     this.entityPermissionFieldRepository.save(newPermissionFieldEntity);

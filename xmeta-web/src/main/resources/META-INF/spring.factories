@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.xmeta.web.config.DatabaseConfiguration,\
+io.xmeta.web.config.JacksonConfiguration,\
+io.xmeta.web.config.MetaWebConfiguration,\
+io.xmeta.web.config.SwaggerConfig

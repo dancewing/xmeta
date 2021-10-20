@@ -1,14 +1,11 @@
 package io.xmeta.admin.service;
 
-import io.xmeta.admin.domain.EntityEntity;
-import io.xmeta.admin.domain.EntityPermissionEntity;
-import io.xmeta.admin.domain.EntityVersionEntity;
-import io.xmeta.admin.repository.EntityPermissionRepository;
-import io.xmeta.admin.repository.EntityVersionRepository;
-import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.EntityPermissionMapper;
 import io.xmeta.admin.model.*;
+import io.xmeta.admin.repository.EntityPermissionRepository;
+import io.xmeta.admin.repository.EntityVersionRepository;
+import io.xmeta.admin.util.PredicateBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;

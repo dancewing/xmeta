@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.xmeta.security.config.SecureConfiguration,\
+io.xmeta.security.config.WebConfigurer

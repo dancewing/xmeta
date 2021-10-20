@@ -23,36 +23,6 @@ import java.util.Optional;
  */
 public final class EntityFieldUtils {
 
-    /***
-     * 将数据类型转成java类型
-     * @param dataType
-     * @param properties
-     * @return
-     */
-    public static String determineJavaType(String dataType, Map<String, Object> properties) {
-        Assert.hasText(dataType, "data must not be empty");
-        DataType type = DataType.valueOf(dataType);
-
-        switch (type) {
-            case Id:
-            case SingleLineText:
-            case MultiLineText:
-                return "java.lang.String";
-            case WholeNumber:
-                return "java.lang.Integer";
-            case DecimalNumber:
-                return "java.math.BigDecimal";
-            case Boolean:
-                return "java.lang.Boolean";
-            case CreatedAt:
-            case UpdatedAt:
-            case DateTime:
-                return "java.time.LocalDateTime";
-            default:
-                return null;
-        }
-    }
-
     public static Object convertParamValue(DataType dataType, Object value) {
         switch (dataType) {
             case Id:
@@ -100,7 +70,7 @@ public final class EntityFieldUtils {
         return (relationType == RelationType.manyToOne || relationType == RelationType.manyToMany);
     }
 
-    public static Optional<EntityField> findPK(Entity entity){
+    public static Optional<EntityField> findPK(Entity entity) {
         return entity.getFields().stream().filter(entityField -> DataType.Id == entityField.getDataType()).findFirst();
     }
 
@@ -245,6 +215,7 @@ public final class EntityFieldUtils {
 
     /**
      * 判断字段是否可供查询
+     *
      * @param field
      * @return
      */

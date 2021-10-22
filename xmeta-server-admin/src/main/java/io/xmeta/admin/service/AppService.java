@@ -8,9 +8,12 @@ import io.xmeta.admin.repository.AppRepository;
 import io.xmeta.admin.repository.AppRoleRepository;
 import io.xmeta.admin.util.Inflector;
 import io.xmeta.admin.util.PredicateBuilder;
+import io.xmeta.core.domain.RelationTypeConstants;
+import io.xmeta.core.exception.MetaException;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +27,7 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -169,54 +170,65 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         App app = this.createApp(new AppCreateInput(data.getApp().getName(), data.getApp().getDescription(), data.getApp().getColor()));
         List<AppCreateWithEntitiesEntityInput> entities = data.getEntities();
 
-        List<Entity> newEntities = new ArrayList<>();
         if (entities != null && entities.size() > 0) {
+            Map<String, Entity> newEntities = new HashMap<>();
+
+            //第一步创建数据模型，添加普通字段
             entities.forEach(appEntityInput -> {
                 String displayName = StringUtils.trim(appEntityInput.getName());
                 String pluralDisplayName = Inflector.getInstance().pluralize(displayName);
                 String singularDisplayName = Inflector.getInstance().singularize(displayName);
                 String name = Inflector.getInstance().upperCamelCase(singularDisplayName, ' ');
 
+                String table = appEntityInput.getTable();
+                if (StringUtils.isEmpty(table)) {
+                    table = name;
+                }
                 EntityCreateInput.Builder builder = EntityCreateInput.builder();
                 builder.setApp(WhereParentIdInput.builder().setConnect(WhereUniqueInput.builder().setId(app.getId()).build()).build());
                 builder.setName(name);
                 builder.setDisplayName(displayName);
-                builder.setTable(name);
+                builder.setTable(table);
                 builder.setPluralDisplayName(pluralDisplayName);
                 Entity newEntity = this.entityService.createOneEntity(builder.build());
-                newEntities.add(newEntity);
+                newEntities.put(appEntityInput.getName(), newEntity);
 
                 List<AppCreateWithEntitiesFieldInput> fields = appEntityInput.getFields();
 
                 if (fields != null && fields.size() > 0) {
                     fields.forEach(appCreateWithEntitiesFieldInput -> {
-                        this.entityFieldService.createEntityFieldByDisplayName(createFieldByDisplayName(newEntity,
-                                appCreateWithEntitiesFieldInput.getName(),
-                                appCreateWithEntitiesFieldInput.getDataType(),
-                                authUserDetail.getUserId()));
+                        EnumDataType dataType = appCreateWithEntitiesFieldInput.getDataType();
+                        if (dataType != EnumDataType.Lookup) {
+                            this.entityFieldService.importEntityFieldByDisplayName(createFieldByDisplayName(newEntity,
+                                    appCreateWithEntitiesFieldInput.getName(),
+                                    dataType,
+                                    authUserDetail.getUserId()));
+                        }
                     });
                 }
             });
 
-            int entityIndex = 0;
-            for (AppCreateWithEntitiesEntityInput appEntityInput : entities) {
-                if (appEntityInput.getRelationsToEntityIndex() != null && appEntityInput.getRelationsToEntityIndex().size() > 0) {
-                    for (Integer relationToIndex : appEntityInput.getRelationsToEntityIndex()) {
-                        if (relationToIndex < 0 || relationToIndex >= newEntities.size()) {
-                            throw new RuntimeException("wrong RelationsToEntityIndex");
+            //添加关联字段
+            entities.forEach(appEntityInput -> {
+                appEntityInput.getFields().forEach(appCreateWithEntitiesFieldInput -> {
+                    if (EnumDataType.Lookup == appCreateWithEntitiesFieldInput.getDataType()) {
+                        String name = appCreateWithEntitiesFieldInput.getName();
+                        Map<String, Object> properties = appCreateWithEntitiesFieldInput.getProperties();
+                        String relationEntityName = MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY);
+                        Entity relationEntity = newEntities.get(relationEntityName);
+                        Entity entity = newEntities.get(appEntityInput.getName());
+                        if (relationEntity == null) {
+                            log.error("{} 中 {} 字段找不到关联的模型{}", appEntityInput.getName(), appCreateWithEntitiesFieldInput.getName(), relationEntityName);
+                            throw new MetaException("");
                         }
-                        Entity relationEntity = newEntities.get(relationToIndex);
-                        this.entityFieldService.createEntityFieldByDisplayName(createFieldByDisplayName(newEntities.get(entityIndex),
+                        this.entityFieldService.importEntityFieldByDisplayName(createFieldByDisplayName(entity,
                                 relationEntity.getDisplayName(),
                                 EnumDataType.Lookup,
                                 authUserDetail.getUserId()));
                     }
-                } else {
-                    log.info("no relation field");
-                }
-                entityIndex++;
-            }
-            //flush all changes
+                });
+            });
+
             this.appRepository.flush();
             this.commit(new CommitCreateInput(data.getCommitMessage(),
                     new WhereParentIdInput(new WhereUniqueInput(app.getId()))), false);

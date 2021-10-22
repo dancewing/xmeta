@@ -4,6 +4,7 @@ server:
 logging:
   level:
     org.hibernate.internal: DEBUG
+    io.xmeta: DEBUG
 
 
 spring:

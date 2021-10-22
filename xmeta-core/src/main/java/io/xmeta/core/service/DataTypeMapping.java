@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class DataTypeMapping {
@@ -33,11 +34,12 @@ public class DataTypeMapping {
         dataTypeMappings.put(DataType.OptionSet, String.class);
         dataTypeMappings.put(DataType.GeographicLocation, String.class);
 
-        dataTypeMappings.put(DataType.CreatedAt, String.class);
-        dataTypeMappings.put(DataType.UpdatedAt, String.class);
+        dataTypeMappings.put(DataType.CreatedAt, LocalDateTime.class);
+        dataTypeMappings.put(DataType.UpdatedAt, LocalDateTime.class);
         dataTypeMappings.put(DataType.CreatedBy, String.class);
         dataTypeMappings.put(DataType.UpdatedBy, String.class);
 
+        dataTypeMappings.put(DataType.Email, String.class);
         dataTypeMappings.put(DataType.Roles, String.class);
         dataTypeMappings.put(DataType.Username, String.class);
         dataTypeMappings.put(DataType.Password, String.class);
@@ -47,11 +49,15 @@ public class DataTypeMapping {
     public Class<?> javaTypeFor(DataType type) {
         Assert.notNull(type, "Type must not be null.");
 
-        return dataTypeMappings.keySet().stream() //
+        Optional<Class<?>> optionalClass = dataTypeMappings.keySet().stream() //
                 .filter(dataType -> dataType == type) //
                 .findFirst() //
-                .map(dataTypeMappings::get) //
-                .orElseThrow(UnknownDataTypeMappingException::new);
+                .map(dataTypeMappings::get);
+        if (optionalClass.isPresent()) {
+            return optionalClass.get();
+        } else {
+            throw new UnknownDataTypeMappingException("DataType: " + type + " can't find mapping java type");
+        }
     }
 
     public Class<?> javaTypeFor(String typeName) {

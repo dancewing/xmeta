@@ -26,6 +26,7 @@
     <modules>
         <module>xmeta-core</module>
         <module>xmeta-deploy</module>
+        <module>xmeta-screw</module>
         <module>xmeta-server-admin</module>
         <module>xmeta-server-admin-ui</module>
         <module>xmeta-server-security</module>

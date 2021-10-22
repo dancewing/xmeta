@@ -21,4 +21,9 @@ public interface RelationTypeConstants {
      * many-to-many 谁做主导
      */
     String RELATION_DOMINANT = "dominant";
+
+    /**
+     * 关联数据模型的名称
+     */
+    String RELATED_ENTITY = "relatedEntity";
 }

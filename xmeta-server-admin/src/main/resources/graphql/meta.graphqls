@@ -79,12 +79,14 @@ input AppCreateInput {
 input AppCreateWithEntitiesEntityInput {
   name: String!
   fields: [AppCreateWithEntitiesFieldInput!]!
-  relationsToEntityIndex: [Int!]
+  table: String
+#  relationsToEntityIndex: [Int!]
 }
 
 input AppCreateWithEntitiesFieldInput {
   name: String!
   dataType: EnumDataType
+  properties: JSONObject
 }
 
 input AppCreateWithEntitiesInput {
@@ -607,6 +609,7 @@ input EntityFieldCreateByDisplayNameInput {
   displayName: String!
   dataType: EnumDataType
   entity: WhereParentIdInput!
+  properties: JSONObject
 }
 
 input EntityFieldCreateInput {
@@ -971,6 +974,13 @@ enum EnumDataType {
   Username
   Password
   Json
+}
+
+enum EnumRelationType {
+  manyToOne
+  oneWay
+  oneToMany
+  manyToMany
 }
 
 enum EnumInputType {

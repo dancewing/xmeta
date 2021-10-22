@@ -86,7 +86,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                     if (StringUtils.isEmpty(field.getColumn())) {
                         field.setColumn(field.getName());
                     }
-                    this.entityFieldService.createEntityField(field, null, null);
+                    this.entityFieldService.createEntityField(field, null, null, false);
                 }
             }
         }
@@ -156,6 +156,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
         AppEntity appEntity = new AppEntity();
         appEntity.setId(data.getApp().getConnect().getId());
+
         entityEntity.setApp(appEntity);
         entityEntity.setName(data.getName());
         entityEntity.setTable(table);
@@ -164,8 +165,11 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setDescription("");
         entityEntity.setLockedByUser(user);
         entityEntity.setLockedAt(ZonedDateTime.now());
-        //   entityEntity.setDeletedAt(ZonedDateTime.now());
         this.entityRepository.saveAndFlush(entityEntity);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Create entity with displayName: {}, name: {}", entityEntity.getDisplayName(), entityEntity.getName());
+        }
 
         //create Version
         EntityVersionEntity entityVersionEntity = new EntityVersionEntity();

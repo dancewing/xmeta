@@ -116,12 +116,13 @@ export type AppCreateInput = {
 export type AppCreateWithEntitiesEntityInput = {
   name: Scalars["String"];
   fields: Array<AppCreateWithEntitiesFieldInput>;
-  relationsToEntityIndex?: Maybe<Array<Scalars["Int"]>>;
+  table?: Scalars["String"];
 };
 
 export type AppCreateWithEntitiesFieldInput = {
   name: Scalars["String"];
   dataType?: Maybe<EnumDataType>;
+  properties?: Scalars["JSONObject"];
 };
 
 export type AppCreateWithEntitiesInput = {
@@ -1058,6 +1059,13 @@ export enum EnumDataType {
   Username = "Username",
   Password = "Password",
   Json = "Json",
+}
+
+export enum EnumRelationType {
+  manyToOne = "manyToOne",
+  oneWay = "oneWay",
+  oneToMany = "oneToMany",
+  manyToMany = "manyToMany",
 }
 
 export type EnumDataTypeFilter = {

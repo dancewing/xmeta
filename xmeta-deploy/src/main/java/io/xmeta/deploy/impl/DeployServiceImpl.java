@@ -44,7 +44,8 @@ public class DeployServiceImpl implements DeployService {
         MetadataImplementor metadata = (MetadataImplementor) metadataSources.buildMetadata();
         SchemaExport schemaExport = new SchemaExport();
         // schemaExport.setOutputFile("hbm2schema.sql");
-        schemaExport.create(EnumSet.of(TargetType.DATABASE), metadata);
+        schemaExport.createOnly(EnumSet.of(TargetType.DATABASE), metadata);
+
         serviceRegistry.close();
 
         if (saveMeta) {

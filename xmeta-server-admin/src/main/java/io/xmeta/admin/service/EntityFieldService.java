@@ -98,10 +98,18 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setUnique(entityField.getUnique());
         fieldEntity.setColumn(entityField.getColumn());
         if (entityField.getDataType() != null) {
-            fieldEntity.setJavaType(dataTypeMapping.javaTypeFor(entityField.getDataType().name()).getName());
+            EnumDataType enumDataType = entityField.getDataType();
+            DataType dataType = DataType.valueOf(enumDataType.name());
+            if (EntityFieldUtils.isControlledJavaType(dataType)) {
+                fieldEntity.setJavaType(dataTypeMapping.javaTypeFor(dataType).getName());
+            }
         }
         if (entityField.getInputType() != null) {
             fieldEntity.setInputType(entityField.getInputType().name());
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Create default field with entity: {}, version: {}, displayName: {}, name: {}", entityVersion.getName(), entityVersion.getId(), entityField.getDisplayName(), entityField.getName());
         }
 
         this.entityFieldRepository.save(fieldEntity);
@@ -115,10 +123,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
      * @param data
      * @param relatedFieldName
      * @param relatedFieldDisplayName
+     * @param forceCreateRelation
      * @return
      */
     @Transactional
-    public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
+    public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName, boolean forceCreateRelation) {
 
         EntityEntity entityEntity = this.lockService.acquireEntityLock(data.getEntity().getConnect().getId());
 
@@ -137,7 +146,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                 throw new RuntimeException("relation type is null");
             }
             boolean needCreateRelation = relationType != RelationType.oneWay;
-            if (needCreateRelation) {
+            if (needCreateRelation && forceCreateRelation) {
                 RelationType targetRelationType = EntityFieldUtils.getTargetRelationType(relationType);
                 this.createRelatedField(
                         MapUtils.getString(data.getProperties(), RelationTypeConstants.RELATED_FIELD_ID),
@@ -162,7 +171,13 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         if (data.getInputType() != null) {
             entityFieldEntity.setInputType(data.getInputType().name());
         }
-        entityFieldEntity.setJavaType(dataTypeMapping.javaTypeFor(data.getDataType().name()).getName());
+
+        EnumDataType enumDataType = data.getDataType();
+        DataType dataType = DataType.valueOf(enumDataType.name());
+        if (EntityFieldUtils.isControlledJavaType(dataType)) {
+            entityFieldEntity.setJavaType(dataTypeMapping.javaTypeFor(dataType).getName());
+        }
+
         entityFieldEntity.setDisplayName(data.getDisplayName());
         entityFieldEntity.setDataType(data.getDataType().name());
         entityFieldEntity.setProperties(ObjectMapperUtils.toBytes(data.getProperties()));
@@ -171,6 +186,10 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         entityFieldEntity.setDescription(data.getDescription());
         entityFieldEntity.setPosition(0);
         entityFieldEntity.setUnique(data.getUnique());
+
+        if (log.isDebugEnabled()) {
+            log.debug("Create field with entity: {},version: {}, displayName: {}, name: {}", entityVersion.getName(),entityVersion.getId(), entityFieldEntity.getDisplayName(), entityFieldEntity.getName());
+        }
 
         this.entityFieldRepository.saveAndFlush(entityFieldEntity);
 
@@ -184,6 +203,15 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
      */
     @Transactional
     public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
+        return this.createEntityFieldByDisplayName(data, true);
+    }
+
+    @Transactional
+    public EntityField importEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data) {
+        return this.createEntityFieldByDisplayName(data, false);
+    }
+
+    public EntityField createEntityFieldByDisplayName(EntityFieldCreateByDisplayNameInput data, boolean forceCreateRelation) {
         // validate the entity
 
         EntityEntity entityEntity = this.entityRepository.getById(data.getEntity().getConnect().getId());
@@ -210,7 +238,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                     ? entityEntity.getPluralDisplayName()
                     : entityEntity.getDisplayName();
         }
-        return this.createEntityField(createInput, relatedFieldName, relatedFieldDisplayName);
+        return this.createEntityField(createInput, relatedFieldName, relatedFieldDisplayName, forceCreateRelation);
     }
 
     /**
@@ -276,10 +304,13 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                                 : entity.getPluralDisplayName(), ' ');
                 if (isFieldNameAvailable(relatedFieldName, relatedEntity.getId())) {
                     //TODO relation 类型需要重新处理
+                    Map<String, Object> properties = data.getProperties();
+                    RelationType relationType = (RelationType) MapUtils.getObject(properties, RelationTypeConstants.RELATION_TYPE, RelationType.manyToOne);
+
                     builder.setDataType(EnumDataType.Lookup)
                             .setProperties(
                                     Maps.of(RelationTypeConstants.RELATED_ENTITY_ID, relatedEntity.getId())
-                                            .and(RelationTypeConstants.RELATION_TYPE, RelationType.manyToOne.name())
+                                            .and(RelationTypeConstants.RELATION_TYPE, relationType.name())
                                             .build()
                             )
                             .setColumn(name);
@@ -293,8 +324,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             dataType = EnumDataType.SingleLineText; // 保存dataType 不为空
         }
 
-        builder.setDataType(dataType)
-                .setProperties(getDefaultFieldProperties(dataType));
+        builder.setDataType(dataType).setProperties(getDefaultFieldProperties(dataType));
 
         return builder.build();
     }
@@ -547,6 +577,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         if (!entityVersionEntity.isPresent()) {
             throw new RuntimeException("can't find entity version");
         }
+        EntityVersionEntity versionEntity = entityVersionEntity.get();
         Maps.MapBuilder<String, Object> propertyBuilder = Maps.of(RelationTypeConstants.RELATION_TYPE, relationType.name())
                 .and(RelationTypeConstants.RELATED_ENTITY_ID, relatedEntityId)
                 .and(RelationTypeConstants.RELATED_FIELD_ID, relatedFieldId);
@@ -556,7 +587,7 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         EntityFieldEntity entityFieldEntity = new EntityFieldEntity();
         entityFieldEntity.setCreatedAt(ZonedDateTime.now());
         entityFieldEntity.setUpdatedAt(ZonedDateTime.now());
-        entityFieldEntity.setEntityVersion(entityVersionEntity.get());
+        entityFieldEntity.setEntityVersion(versionEntity);
         entityFieldEntity.setPermanentId(permanentId);
         entityFieldEntity.setName(name);
         entityFieldEntity.setDisplayName(displayName);
@@ -568,6 +599,11 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         entityFieldEntity.setDescription("");
         entityFieldEntity.setPosition(0);
         entityFieldEntity.setUnique(false);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Create related field with entity: {}, version: {}, displayName: {}, name: {}", versionEntity.getName(), versionEntity.getId(), entityFieldEntity.getDisplayName(), entityFieldEntity.getName());
+        }
+
         this.entityFieldRepository.save(entityFieldEntity);
     }
 

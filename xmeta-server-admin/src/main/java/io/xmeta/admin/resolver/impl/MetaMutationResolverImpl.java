@@ -96,7 +96,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public EntityField createEntityField(EntityFieldCreateInput data, String relatedFieldName, String relatedFieldDisplayName) {
-        return this.entityFieldService.createEntityField(data, relatedFieldDisplayName, relatedFieldDisplayName);
+        return this.entityFieldService.createEntityField(data, relatedFieldDisplayName, relatedFieldDisplayName, true);
     }
 
     @Override

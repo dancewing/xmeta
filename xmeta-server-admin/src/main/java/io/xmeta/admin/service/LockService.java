@@ -8,6 +8,7 @@ import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.security.AuthUserDetail;
 import io.xmeta.security.SecurityUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.time.ZonedDateTime;
 @Transactional
 @AllArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Slf4j
 public class LockService {
 
     private final EntityRepository entityRepository;
@@ -28,6 +30,9 @@ public class LockService {
     public EntityEntity acquireEntityLock(String entityId) {
         AuthUserDetail authUser = SecurityUtils.getAuthUser();
         EntityEntity entity = this.entityRepository.getById(entityId);
+        if (log.isDebugEnabled()) {
+            log.debug("Get entity by id: {}", entityId);
+        }
         if (entity.getLockedByUser() != null && StringUtils.equals(entity.getLockedByUser().getId(),
                 authUser.getUserId())) {
             return entity;

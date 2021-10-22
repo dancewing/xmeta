@@ -65,6 +65,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
   entities: [
     {
       name: "Orders",
+      table: "t_order",
       fields: [
         {
           name: "Quantity",
@@ -78,11 +79,27 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Total Price",
           dataType: models.EnumDataType.WholeNumber,
         },
+        {
+          name: "Customer",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.manyToOne,
+            relatedEntity: "Customer",
+          }
+        },
+        {
+          name: "Product",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.oneWay,
+            relatedEntity: "Product",
+          }
+        }
       ],
-      relationsToEntityIndex: [1, 3],
     },
     {
       name: "Customer",
+      table: "t_customer",
       fields: [
         {
           name: "First Name",
@@ -100,11 +117,27 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Phone",
           dataType: models.EnumDataType.SingleLineText,
         },
+        {
+          name: "Orders",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.oneToMany,
+            relatedEntity: "Orders",
+          }
+        },
+        {
+          name: "Addresses",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.oneToMany,
+            relatedEntity: "Address",
+          }
+        }
       ],
-      relationsToEntityIndex: [2],
     },
     {
       name: "Address",
+      table: "t_address",
       fields: [
         {
           name: "Address 1",
@@ -126,10 +159,19 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Zip",
           dataType: models.EnumDataType.WholeNumber,
         },
+        {
+          name: "Customer",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.manyToOne,
+            relatedEntity: "Customer",
+          }
+        }
       ],
     },
     {
       name: "Product",
+      table: "t_product",
       fields: [
         {
           name: "Name",

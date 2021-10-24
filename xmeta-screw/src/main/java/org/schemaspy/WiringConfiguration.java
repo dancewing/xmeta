@@ -81,4 +81,9 @@ public class WiringConfiguration {
         return new SchemaAnalyzer(sqlService, databaseService, commandLineArguments);
     }
 
+    @Bean
+    public SchemaLoader schemaLoader(SqlService sqlService, DatabaseService databaseService) {
+        return new SchemaLoader(sqlService, databaseService);
+    }
+
 }

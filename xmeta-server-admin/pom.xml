@@ -35,6 +35,12 @@
             <version>0.3.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.xmeta</groupId>
+            <artifactId>xmeta-screw</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+        </dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -220,50 +226,6 @@
                             <sources>
                                 <source>${project.build.directory}/generated-sources/graphql</source>
                             </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>io.github.kobylynskyi</groupId>
-                <artifactId>graphql-codegen-maven-plugin</artifactId>
-                <version>5.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <graphqlSchemaPaths>
-                                <graphqlSchemaPath>${project.basedir}/src/main/resources/graphql/meta.graphqls</graphqlSchemaPath>
-                            </graphqlSchemaPaths>
-                            <outputDir>${project.build.directory}/generated-sources/graphql</outputDir>
-                            <modelPackageName>io.xmeta.admin.model</modelPackageName>
-                            <modelNameSuffix></modelNameSuffix>
-                            <apiPackageName>io.xmeta.admin.resolver</apiPackageName>
-                            <addGeneratedAnnotation>false</addGeneratedAnnotation>
-                            <apiInterfaceStrategy>DO_NOT_GENERATE</apiInterfaceStrategy>
-                            <apiRootInterfaceStrategy>INTERFACE_PER_SCHEMA</apiRootInterfaceStrategy>
-                            <apiNamePrefixStrategy>FILE_NAME_AS_PREFIX</apiNamePrefixStrategy>
-                            <generateApisWithThrowsException>false</generateApisWithThrowsException>
-                            <customTypesMapping>
-                                <DateTime>java.time.ZonedDateTime</DateTime>
-                                <JSONObject>java.util.Map&lt;String, Object&gt;</JSONObject>
-                                <Price.amount>java.math.BigDecimal</Price.amount>
-                            </customTypesMapping>
-                            <responseProjectionMaxDepth>10</responseProjectionMaxDepth>
-                            <parentInterfaces>
-                                <queryResolver>graphql.kickstart.tools.GraphQLQueryResolver</queryResolver>
-                                <mutationResolver>graphql.kickstart.tools.GraphQLMutationResolver</mutationResolver>
-                                <subscriptionResolver>graphql.kickstart.tools.GraphQLSubscriptionResolver
-                                </subscriptionResolver>
-                                <resolver><![CDATA[graphql.kickstart.tools.GraphQLResolver<{{TYPE}}>]]></resolver>
-                            </parentInterfaces>
-                            <customAnnotationsMapping>
-                                <EpochMillis>
-                                    <annotation>com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.example.json.EpochMillisScalarDeserializer.class)</annotation>
-                                </EpochMillis>
-                            </customAnnotationsMapping>
                         </configuration>
                     </execution>
                 </executions>

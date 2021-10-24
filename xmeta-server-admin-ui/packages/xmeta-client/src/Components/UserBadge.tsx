@@ -1,33 +1,24 @@
-import React, { useEffect } from "react";
-import { gql, useQuery } from "@apollo/client";
-import { Tooltip } from "@primer/components";
+import React, {useEffect} from "react";
+import {Tooltip} from "@primer/components";
 
 import * as models from "../models";
-
-import useAuthenticated from "../authentication/use-authenticated";
-import { UserAvatar } from "@xmeta/design-system";
+import useApi from '../api';
+import {UserAvatar} from "@xmeta/design-system";
 
 import "./UserBadge.scss";
-import { identity } from "../util/analytics";
+import {identity} from "../util/analytics";
 
-type TData = {
-  me: {
-    account: models.Account;
-  };
-};
 const TOOLTIP_DIRECTION = "e";
 
 function UserBadge() {
-  const authenticated = useAuthenticated();
-  const { data } = useQuery<TData>(GET_USER, {
-    skip: !authenticated,
-  });
+  //const authenticated = useAuthenticated();
+  const [ data ] = useApi<null, models.User>('/me', 'GET', {shouldRequest: ()=>true});
 
   useEffect(() => {
     if (data) {
-      identity(data.me.account.id, {
-        createdAt: data.me.account.createdAt,
-        email: data.me.account.email,
+      identity(data.id, {
+        createdAt: data.createdAt,
+        email: data.account?.email,
       });
     }
   }, [data]);
@@ -37,28 +28,14 @@ function UserBadge() {
       direction={TOOLTIP_DIRECTION}
       noDelay
       wrap
-      aria-label={`${data.me.account.firstName} ${data.me.account.lastName}`}
+      aria-label={`${data.account?.firstName} ${data.account?.lastName}`}
     >
       <UserAvatar
-        firstName={data.me.account.firstName}
-        lastName={data.me.account.lastName}
+        firstName={data.account?.firstName}
+        lastName={data.account?.lastName}
       />
     </Tooltip>
   ) : null;
 }
 
 export default UserBadge;
-
-const GET_USER = gql`
-  query getUser {
-    me {
-      account {
-        id
-        email
-        firstName
-        lastName
-        createdAt
-      }
-    }
-  }
-`;

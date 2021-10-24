@@ -2,12 +2,10 @@ package io.xmeta.admin.controller;
 
 import io.xmeta.admin.model.Auth;
 import io.xmeta.admin.model.LoginInput;
+import io.xmeta.admin.model.User;
 import io.xmeta.admin.service.AuthService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.xmeta.core.api.R;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -20,11 +18,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginInput data) {
+    public R<String> login(@RequestBody LoginInput data) {
         Auth auth = authService.login(data);
         if (auth != null) {
-            return ResponseEntity.ok(auth.getToken());
+            return R.data(auth.getToken());
         }
-        return ResponseEntity.internalServerError().body("error");
+        return R.fail("登录失败");
+    }
+
+    @GetMapping("/me")
+    public R<User> me() {
+        return R.data(this.authService.currentUser());
     }
 }

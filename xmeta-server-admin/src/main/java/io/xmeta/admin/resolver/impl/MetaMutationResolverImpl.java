@@ -6,9 +6,11 @@ import io.xmeta.admin.service.*;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 
 @Component
 @AllArgsConstructor
+@RestController
 public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     private final AccountService accountService;
@@ -36,7 +38,7 @@ public class MetaMutationResolverImpl implements MetaMutationResolver {
 
     @Override
     public Workspace updateWorkspace(WorkspaceUpdateInput data, WhereUniqueInput where) {
-        return this.workspaceService.updateWorkspace(data, where);
+        return this.workspaceService.updateWorkspace(data, where.getId());
     }
 
     @Override

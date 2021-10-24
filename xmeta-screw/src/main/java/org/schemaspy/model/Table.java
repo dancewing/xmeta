@@ -23,6 +23,7 @@
  */
 package org.schemaspy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.schemaspy.input.dbms.xml.TableColumnMeta;
 import org.schemaspy.input.dbms.xml.TableMeta;
 import org.schemaspy.util.CaseInsensitiveMap;
@@ -97,6 +98,7 @@ public class Table implements Comparable<Table> {
      *
      * @return
      */
+    @JsonIgnore
     public CaseInsensitiveMap<ForeignKeyConstraint> getForeignKeysMap() {
         return foreignKeys;
     }
@@ -142,6 +144,7 @@ public class Table implements Comparable<Table> {
         return indexes.get(indexName);
     }
 
+    @JsonIgnore
     public CaseInsensitiveMap<TableIndex> getIndexesMap() {
         return indexes;
     }
@@ -313,6 +316,7 @@ public class Table implements Comparable<Table> {
      *
      * @return
      */
+    @JsonIgnore
     public CaseInsensitiveMap<TableColumn> getColumnsMap() {
         return columns;
     }

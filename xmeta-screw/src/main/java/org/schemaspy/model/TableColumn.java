@@ -22,6 +22,7 @@
  */
 package org.schemaspy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.schemaspy.input.dbms.xml.TableColumnMeta;
 
 import java.sql.DatabaseMetaData;
@@ -99,6 +100,7 @@ public class TableColumn {
      *
      * @return
      */
+    @JsonIgnore
     public Table getTable() {
         return table;
     }
@@ -141,7 +143,7 @@ public class TableColumn {
     public void setType(Integer type) {
     	this.type = type;
     }
-    
+
     /**
      * Type of the column.
      * See {@link DatabaseMetaData#getColumns(String, String, String, String)}'s <code>TYPE_NAME</code>.
@@ -396,6 +398,7 @@ public class TableColumn {
      *
      * @return
      */
+    @JsonIgnore
     public Set<TableColumn> getParents() {
         return parents.keySet();
     }
@@ -467,6 +470,7 @@ public class TableColumn {
      * references this <code>TableColumn</code>.
      * @return Set
      */
+    @JsonIgnore
     public Set<TableColumn> getChildren() {
         return children.keySet();
     }

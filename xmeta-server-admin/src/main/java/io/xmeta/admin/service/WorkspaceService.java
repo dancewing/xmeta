@@ -113,8 +113,8 @@ public class WorkspaceService extends BaseService<WorkspaceRepository, Workspace
     }
 
     @Transactional
-    public Workspace updateWorkspace(WorkspaceUpdateInput data, WhereUniqueInput where) {
-        WorkspaceEntity workspaceEntity = this.workspaceRepository.getById(where.getId());
+    public Workspace updateWorkspace(WorkspaceUpdateInput data, String id) {
+        WorkspaceEntity workspaceEntity = this.workspaceRepository.getById(id);
         workspaceEntity.setUpdatedAt(ZonedDateTime.now());
         workspaceEntity.setName(data.getName());
         return this.workspaceMapper.toDto(this.workspaceRepository.save(workspaceEntity));

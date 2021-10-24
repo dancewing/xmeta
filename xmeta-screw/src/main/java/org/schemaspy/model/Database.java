@@ -23,6 +23,7 @@
  */
 package org.schemaspy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.schemaspy.util.CaseInsensitiveMap;
 
 import java.time.ZonedDateTime;
@@ -64,6 +65,7 @@ public class Database {
         this.schema = new Schema(schema);
     }
 
+    @JsonIgnore
     public DbmsMeta getDbmsMeta() {
         return dbmsMeta;
     }

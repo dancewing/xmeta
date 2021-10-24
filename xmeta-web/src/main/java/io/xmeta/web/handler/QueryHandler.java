@@ -2,7 +2,7 @@ package io.xmeta.web.handler;
 
 import io.xmeta.core.ActionType;
 import io.xmeta.core.MetaHandler;
-import io.xmeta.core.R;
+import io.xmeta.core.api.R;
 import io.xmeta.core.service.MetaDataService;
 import io.xmeta.web.registrar.EntityHandler;
 import org.apache.commons.collections.MapUtils;

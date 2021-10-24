@@ -1,4 +1,4 @@
-package io.xmeta.core;
+package io.xmeta.core.api;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +38,22 @@ public class R<T> implements Serializable {
     private boolean success;
     private T data;
     private String msg;
+
+    private R(IResultCode resultCode) {
+        this(resultCode, null, resultCode.getMessage());
+    }
+
+    private R(IResultCode resultCode, String msg) {
+        this(resultCode, null, msg);
+    }
+
+    private R(IResultCode resultCode, T data) {
+        this(resultCode, data, resultCode.getMessage());
+    }
+
+    private R(IResultCode resultCode, T data, String msg) {
+        this(resultCode.getCode(), data, msg);
+    }
 
     private R(int resultCode) {
         this(resultCode, null, null);
@@ -103,6 +119,10 @@ public class R<T> implements Serializable {
         return data(200, data, msg);
     }
 
+    public static <T> R<T> data(int code, T data) {
+        return new R<>(code, data,  DEFAULT_NULL_MESSAGE);
+    }
+
     /**
      * 返回R
      *
@@ -149,6 +169,21 @@ public class R<T> implements Serializable {
      */
     public static <T> R<T> fail(int code, String msg) {
         return new R<>(code, null, msg);
+    }
+
+    /**
+     * 返回R
+     *
+     * @param resultCode 业务代码
+     * @param <T>        T 泛型标记
+     * @return R
+     */
+    public static <T> R<T> fail(IResultCode resultCode) {
+        return new R<>(resultCode);
+    }
+
+    public static <T> R<T> fail(IResultCode resultCode, String msg) {
+        return new R<>(resultCode, msg);
     }
 
     /**

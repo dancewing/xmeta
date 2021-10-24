@@ -9,6 +9,7 @@ import {
   ApolloProvider,
   from,
 } from "@apollo/client";
+import { ApiProvider } from './api';
 import { onError } from "@apollo/client/link/error";
 import * as amplicationDesignSystem from "@xmeta/design-system";
 import { SnackbarQueue, createSnackbarQueue } from '@rmwc/snackbar';
@@ -72,18 +73,24 @@ const apolloClient = new ApolloClient({
   link: from([errorLink, authLink.concat(httpLink)]),
 });
 
+const apiContext = {
+  baseUrl: process.env.API_BASE_URL || '/api',
+}
+
 ReactDOM.render(
     <React.StrictMode>
-      <ApolloProvider client={apolloClient}>
-        <LanguageProvider messages={translationMessages}>
-          <amplicationDesignSystem.Provider>
-            <Router basename={basename}>
-              <App />
-              <SnackbarQueue messages={queue.messages} />
-            </Router>
-          </amplicationDesignSystem.Provider>
-        </LanguageProvider>
-      </ApolloProvider>
+      <ApiProvider context={apiContext}>
+        <ApolloProvider client={apolloClient}>
+          <LanguageProvider messages={translationMessages}>
+            <amplicationDesignSystem.Provider>
+              <Router basename={basename}>
+                <App />
+                <SnackbarQueue messages={queue.messages} />
+              </Router>
+            </amplicationDesignSystem.Provider>
+          </LanguageProvider>
+        </ApolloProvider>
+      </ApiProvider>
     </React.StrictMode>,
   document.getElementById("root")
 );

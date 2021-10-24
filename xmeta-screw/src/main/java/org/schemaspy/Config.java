@@ -35,6 +35,7 @@ import org.schemaspy.view.HtmlConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -122,9 +123,8 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private String imageFormat;
     private String renderer;
     private Boolean paginationEnabled;
-    /**      
-     * @deprecated replaced by -dp expanding folders
-     */
+    private DataSource dataSource;
+
     @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
     private String schemaSpec;  // used in conjunction with evaluateAll
@@ -137,6 +137,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private static final String DEFAULT_TABLE_EXCLUSION = ".*\\$.*";
     private static final String DEFAULT_COLUMN_EXCLUSION = "[^.]";  // match nothing
     private static final String DEFAULT_PROPERTIES_FILE = "schemaspy.properties";
+
     private Properties schemaspyProperties = new Properties();
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -1604,5 +1605,19 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         params.add(String.valueOf(getMaxDetailedTables()));
 
         return params;
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public Config setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+        return this;
+    }
+
+    public Config setDbType(String dbType) {
+        this.dbType = dbType;
+        return this;
     }
 }

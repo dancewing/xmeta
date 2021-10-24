@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from "react";
 import { Location } from "history";
 import { useHistory, useLocation, Link } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
+import useApi from '../api';
 import {useIntl} from 'react-intl';
 import { Formik } from "formik";
 import { CircularProgress } from "@rmwc/circular-progress";
@@ -40,7 +40,7 @@ const INITIAL_VALUES: Values = {
 const Login = () => {
   const history = useHistory();
   const location = useLocation();
-  const [login, { loading, data, error }] = useMutation(DO_LOGIN);
+  const [data, { loading, error }, request] = useApi( '/login', 'POST');
   const intl = useIntl();
   const content = useMemo(() => {
     const s: LocationStateInterface | undefined | null = location.state;
@@ -53,13 +53,9 @@ const Login = () => {
 
   const handleSubmit = useCallback(
     (data) => {
-      login({
-        variables: {
-          data,
-        },
-      }).catch(console.error);
+      request(data).catch(console.error);
     },
-    [login]
+    [request]
   );
 
   const urlError = useMemo(() => {
@@ -71,7 +67,7 @@ const Login = () => {
 
   useEffect(() => {
     if (data) {
-      setToken(data.login.token);
+      setToken(data);
       // @ts-ignore
       let { from } = location.state || { from: { pathname: "/" } };
       if (from === "login") {
@@ -147,11 +143,3 @@ const Login = () => {
 };
 
 export default Login;
-
-const DO_LOGIN = gql`
-  mutation login($data: LoginInput!) {
-    login(data: $data) {
-      token
-    }
-  }
-`;

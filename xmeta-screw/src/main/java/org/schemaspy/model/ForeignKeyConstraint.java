@@ -22,6 +22,7 @@
  */
 package org.schemaspy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,6 +138,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @return
      */
+    @JsonIgnore
     public Table getParentTable() {
         return parentTable;
     }
@@ -146,6 +148,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @return
      */
+    @JsonIgnore
     public List<TableColumn> getParentColumns() {
         return Collections.unmodifiableList(parentColumns);
     }
@@ -156,6 +159,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @return
      */
+    @JsonIgnore
     public Table getChildTable() {
         return childTable;
     }
@@ -165,6 +169,7 @@ public class ForeignKeyConstraint implements Comparable<ForeignKeyConstraint> {
      *
      * @return
      */
+    @JsonIgnore
     public List<TableColumn> getChildColumns() {
         return Collections.unmodifiableList(childColumns);
     }

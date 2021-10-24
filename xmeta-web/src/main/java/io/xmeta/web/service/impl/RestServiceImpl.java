@@ -1,6 +1,6 @@
 package io.xmeta.web.service.impl;
 
-import io.xmeta.core.R;
+import io.xmeta.core.api.R;
 import io.xmeta.core.domain.Entity;
 import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.web.ApiException;

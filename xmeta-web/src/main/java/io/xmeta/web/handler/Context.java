@@ -1,7 +1,7 @@
 package io.xmeta.web.handler;
 
 import io.xmeta.core.ActionType;
-import io.xmeta.core.R;
+import io.xmeta.core.api.R;
 
 public class Context {
 

@@ -77,6 +77,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/site/**").permitAll() // 前台api在前面前端检查是否能访问
                 .antMatchers("/api/data-helper/**").permitAll() // 页面渲染辅助api，未登录也应该可以访问
                 .antMatchers("/api/data/**").permitAll() // 数据接口应该在ActionHandler 里去检查是否有权限
+                .antMatchers("/api/database/**").permitAll() // 数据接口应该在ActionHandler 里去检查是否有权限
                 .antMatchers("/api/upload/files/view/**").permitAll() // 图片读取
                 .antMatchers("/api/**").authenticated()
                 .antMatchers("/management/health").permitAll()

@@ -8,6 +8,7 @@ import io.xmeta.admin.repository.AppRepository;
 import io.xmeta.admin.repository.AppRoleRepository;
 import io.xmeta.admin.util.Inflector;
 import io.xmeta.admin.util.PredicateBuilder;
+import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.domain.RelationTypeConstants;
 import io.xmeta.core.exception.MetaException;
 import io.xmeta.security.AuthUserDetail;
@@ -199,7 +200,7 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                     fields.forEach(appCreateWithEntitiesFieldInput -> {
                         EnumDataType dataType = appCreateWithEntitiesFieldInput.getDataType();
                         if (dataType != EnumDataType.Lookup) {
-                            this.entityFieldService.importEntityFieldByDisplayName(createFieldByDisplayName(newEntity,
+                            this.entityFieldService.createEntityFieldByDisplayName(createFieldByDisplayName(newEntity,
                                     appCreateWithEntitiesFieldInput.getName(),
                                     dataType,
                                     authUserDetail.getUserId()));
@@ -209,22 +210,49 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
             });
 
             //添加关联字段
+            List<String> processedQueue = new ArrayList<>();
             entities.forEach(appEntityInput -> {
                 appEntityInput.getFields().forEach(appCreateWithEntitiesFieldInput -> {
                     if (EnumDataType.Lookup == appCreateWithEntitiesFieldInput.getDataType()) {
                         String name = appCreateWithEntitiesFieldInput.getName();
                         Map<String, Object> properties = appCreateWithEntitiesFieldInput.getProperties();
                         String relationEntityName = MapUtils.getString(properties, RelationTypeConstants.RELATED_ENTITY);
+                        String relationFieldName = MapUtils.getString(properties, RelationTypeConstants.RELATED_FIELD);
+                        String relationType = MapUtils.getString(properties, RelationTypeConstants.RELATION_TYPE);
+                        if (StringUtils.isEmpty(relationType)) {
+                            log.error("Missing relation type");
+                            throw new MetaException("Missing relation type");
+                        }
+
                         Entity relationEntity = newEntities.get(relationEntityName);
                         Entity entity = newEntities.get(appEntityInput.getName());
                         if (relationEntity == null) {
-                            log.error("{} 中 {} 字段找不到关联的模型{}", appEntityInput.getName(), appCreateWithEntitiesFieldInput.getName(), relationEntityName);
+                            log.error("{} 中 {} 字段找不到关联的模型{}", appEntityInput.getName(), name, relationEntityName);
                             throw new MetaException("");
                         }
-                        this.entityFieldService.importEntityFieldByDisplayName(createFieldByDisplayName(entity,
-                                relationEntity.getDisplayName(),
-                                EnumDataType.Lookup,
-                                authUserDetail.getUserId()));
+
+                        String processedKey = entity.getName() + "_" + name;
+
+
+                        if (!processedQueue.contains(processedKey) &&
+                                (!StringUtils.equals(RelationType.ManyToMany.name(), relationType) || MapUtils.getBooleanValue(properties, RelationTypeConstants.RELATION_DOMINANT, false))) {
+
+                            if (!StringUtils.equals(RelationType.OneWay.name(), relationType)) {
+                                AppCreateWithEntitiesFieldInput targetField = findFieldInput(entities, relationEntityName, relationFieldName);
+                                processedQueue.add(relationEntity.getName()+ "_"+ targetField.getName());
+                            }
+
+                            EntityFieldCreateByDisplayNameInput fieldByDisplayName = createFieldByDisplayName(entity,
+                                    relationEntity.getDisplayName(),
+                                    EnumDataType.Lookup,
+                                    authUserDetail.getUserId());
+                            properties.remove(RelationTypeConstants.RELATED_ENTITY);
+                            properties.put(RelationTypeConstants.RELATED_ENTITY_ID, relationEntity.getId());
+                            fieldByDisplayName.setProperties(properties);
+                            this.entityFieldService.createEntityFieldByDisplayName(fieldByDisplayName);
+                            processedQueue.add(processedKey);
+                        }
+
                     }
                 });
             });
@@ -235,6 +263,26 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
         }
 
         return app;
+    }
+
+    private AppCreateWithEntitiesFieldInput findFieldInput(List<AppCreateWithEntitiesEntityInput> entities, String relationEntityName, String relationFieldName) {
+        List<AppCreateWithEntitiesFieldInput> result = new ArrayList<>();
+        entities.forEach(appEntityInput -> {
+            appEntityInput.getFields().forEach(appCreateWithEntitiesFieldInput -> {
+                if (StringUtils.equals(relationEntityName, appEntityInput.getName()) && StringUtils.equals(relationFieldName, appCreateWithEntitiesFieldInput.getName())) {
+                    result.add(appCreateWithEntitiesFieldInput);
+                }
+            });
+        });
+        if (result.size() == 0) {
+            log.error("Can't find {} in {}", relationFieldName, relationEntityName);
+            throw new MetaException("Can't find relationFieldName in entity");
+        }
+        if (result.size() > 1) {
+            log.error("Find more than one field ({}) in {}", relationFieldName, relationEntityName);
+            throw new MetaException("Can't find relationFieldName in entity");
+        }
+        return result.get(0);
     }
 
     private List<AppEntity> findExistingApps(String name) {

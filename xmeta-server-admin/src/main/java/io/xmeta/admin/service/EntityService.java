@@ -86,7 +86,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                     if (StringUtils.isEmpty(field.getColumn())) {
                         field.setColumn(field.getName());
                     }
-                    this.entityFieldService.createEntityField(field, null, null, false);
+                    this.entityFieldService.createEntityField(field, null, null);
                 }
             }
         }

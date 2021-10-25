@@ -14,7 +14,7 @@
     "relationType": {
       "title": "Relation Type",
       "type": "string",
-      "enum": ["manyToOne", "oneWay", "oneToMany", "manyToMany"],
+      "enum": ["ManyToOne", "OneWay", "OneToMany", "ManyToMany"],
       "default": "manyToOne"
     },
     "dominant": {

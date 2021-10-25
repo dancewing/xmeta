@@ -26,12 +26,12 @@ public final class EntityFieldUtils {
 
     public static RelationType getTargetRelationType(RelationType relationType) {
         switch (relationType) {
-            case manyToOne:
-                return RelationType.oneToMany;
-            case oneToMany:
-                return RelationType.manyToOne;
-            case manyToMany:
-                return RelationType.manyToMany;
+            case ManyToOne:
+                return RelationType.OneToMany;
+            case OneToMany:
+                return RelationType.ManyToOne;
+            case ManyToMany:
+                return RelationType.ManyToMany;
             default:
                 throw new RuntimeException("un-support relation type convert");
         }
@@ -39,7 +39,7 @@ public final class EntityFieldUtils {
 
     public static boolean allowMultipleSelection(RelationType relationType) {
         Assert.notNull(relationType, "relationType can not be null");
-        return (relationType == RelationType.manyToOne || relationType == RelationType.manyToMany);
+        return (relationType == RelationType.OneToMany || relationType == RelationType.ManyToMany);
     }
 
     public static Optional<EntityField> findPK(Entity entity) {

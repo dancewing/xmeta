@@ -15,7 +15,7 @@ public abstract class FieldConstProperties {
             999999999).and("precision", 2).build();
     public static Map<String, Object> DateTime = Maps.of("timeZone", "localTime").and("dateOnly", false).build();
     public static Map<String, Object> Lookup =
-            Maps.of(RelationTypeConstants.RELATED_ENTITY_ID, "").and(RelationTypeConstants.RELATION_TYPE, RelationType.manyToOne.name()).and(RelationTypeConstants.RELATED_FIELD_ID, "").build();
+            Maps.of(RelationTypeConstants.RELATED_ENTITY_ID, "").and(RelationTypeConstants.RELATION_TYPE, RelationType.ManyToOne.name()).and(RelationTypeConstants.RELATED_FIELD_ID, "").build();
     public static Map<String, Object> OptionSet =
             Maps.of("options", Arrays.asList(Maps.of("label", "Option 1").and("value", "Option1").build())).build();
 

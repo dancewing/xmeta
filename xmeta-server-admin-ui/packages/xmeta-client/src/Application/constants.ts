@@ -83,16 +83,36 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Customer",
           dataType: models.EnumDataType.Lookup,
           properties: {
-            relationType: models.EnumRelationType.manyToOne,
+            relationType: models.EnumRelationType.ManyToOne,
             relatedEntity: "Customer",
+            relatedField: "Orders"
           }
         },
         {
           name: "Product",
           dataType: models.EnumDataType.Lookup,
           properties: {
-            relationType: models.EnumRelationType.oneWay,
+            relationType: models.EnumRelationType.OneWay,
             relatedEntity: "Product",
+          }
+        }
+      ],
+    },
+    {
+      name: "Shop",
+      table: "t_shop",
+      fields: [
+        {
+          name: "Name",
+          dataType: models.EnumDataType.SingleLineText,
+        },
+        {
+          name: "Customers",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.ManyToMany,
+            relatedEntity: "Customer",
+            relatedField: "Shops"
           }
         }
       ],
@@ -121,16 +141,28 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Orders",
           dataType: models.EnumDataType.Lookup,
           properties: {
-            relationType: models.EnumRelationType.oneToMany,
+            relationType: models.EnumRelationType.OneToMany,
             relatedEntity: "Orders",
+            relatedField: "Customer"
           }
         },
         {
           name: "Addresses",
           dataType: models.EnumDataType.Lookup,
           properties: {
-            relationType: models.EnumRelationType.oneToMany,
+            relationType: models.EnumRelationType.OneToMany,
             relatedEntity: "Address",
+            relatedField: "Customer"
+          }
+        },
+        {
+          name: "Shops",
+          dataType: models.EnumDataType.Lookup,
+          properties: {
+            relationType: models.EnumRelationType.ManyToMany,
+            relatedEntity: "Shop",
+            dominant: true,
+            relatedField: "Customers"
           }
         }
       ],
@@ -163,8 +195,9 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
           name: "Customer",
           dataType: models.EnumDataType.Lookup,
           properties: {
-            relationType: models.EnumRelationType.manyToOne,
+            relationType: models.EnumRelationType.ManyToOne,
             relatedEntity: "Customer",
+            relatedField: "Addresses"
           }
         }
       ],

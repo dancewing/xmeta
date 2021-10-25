@@ -74,7 +74,7 @@ export const EntityRelationFieldsChart = ({
           <div className={`${CLASS_NAME}__status`}>
             <span
               className={`${CLASS_NAME}__status__cardinality--source ${CLASS_NAME}__status__cardinality--${
-                ['oneWay', 'manyToOne', 'manyToMany'].includes(field?.properties?.relationType)
+                ['OneWay', 'ManyToOne', 'ManyToMany'].includes(field?.properties?.relationType)
                   ? "many"
                   : "one"
               }`}
@@ -86,7 +86,7 @@ export const EntityRelationFieldsChart = ({
             )}
             <span
               className={`${CLASS_NAME}__status__cardinality--target ${CLASS_NAME}__status__cardinality--${
-                ['oneToMany', 'manyToMany'].includes(field?.properties?.relationType) ? "many" : "one"
+                ['OneToMany', 'ManyToMany'].includes(field?.properties?.relationType) ? "many" : "one"
               }`}
             />
           </div>

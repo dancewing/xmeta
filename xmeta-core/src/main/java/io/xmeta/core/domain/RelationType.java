@@ -1,9 +1,9 @@
 package io.xmeta.core.domain;
 
 public enum RelationType {
-    manyToOne,
+    ManyToOne,
     //manyWay,
-    oneWay,
-    oneToMany,
-    manyToMany;
+    OneWay,
+    OneToMany,
+    ManyToMany;
 }

@@ -48,7 +48,7 @@ export function useApi<Request = ReactUseApi.Data, Response = ReactUseApi.Data>(
             refData.isRequesting = true
             return fetchApi(url, method, context, dispatch, data, headers);
         },
-        [context, dispatch, state]
+        [context, dispatch, refData, headers, method, url]
     )
 
     const shouldFetchApi = useCallback(

@@ -977,10 +977,10 @@ enum EnumDataType {
 }
 
 enum EnumRelationType {
-  manyToOne
-  oneWay
-  oneToMany
-  manyToMany
+  ManyToOne
+  OneWay
+  OneToMany
+  ManyToMany
 }
 
 enum EnumInputType {

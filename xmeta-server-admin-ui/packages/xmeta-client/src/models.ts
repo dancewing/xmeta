@@ -1062,10 +1062,10 @@ export enum EnumDataType {
 }
 
 export enum EnumRelationType {
-  manyToOne = "manyToOne",
-  oneWay = "oneWay",
-  oneToMany = "oneToMany",
-  manyToMany = "manyToMany",
+  ManyToOne = "ManyToOne",
+  OneWay = "OneWay",
+  OneToMany = "OneToMany",
+  ManyToMany = "ManyToMany",
 }
 
 export type EnumDataTypeFilter = {

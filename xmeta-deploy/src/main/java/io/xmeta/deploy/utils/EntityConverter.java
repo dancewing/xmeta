@@ -96,14 +96,14 @@ public final class EntityConverter {
                     throw new RuntimeException("");
                 }
                 String relatedEntityName = relationEntities.get(0).getName();
-                if (relationType.equals(RelationType.manyToOne)) {
+                if (relationType.equals(RelationType.ManyToOne) || relationType.equals(RelationType.OneWay) ) {
                     JaxbHbmManyToOneType manyToOneType = new JaxbHbmManyToOneType();
                     manyToOneType.setName(entityField.getName());
                     manyToOneType.setColumnAttribute(entityField.getColumn());
                     manyToOneType.setFetch(JaxbHbmFetchStyleEnum.JOIN);
                     manyToOneType.setEntityName(relatedEntityName);
                     rootEntityType.getAttributes().add(manyToOneType);
-                } else if (relationType.equals(RelationType.manyToMany)) {
+                } else if (relationType.equals(RelationType.ManyToMany)) {
 
                     String relatedFieldId = MapUtils.getString(entityField.getProperties(), RelationTypeConstants.RELATED_FIELD_ID);
                     if (StringUtils.isEmpty(relatedFieldId)) {

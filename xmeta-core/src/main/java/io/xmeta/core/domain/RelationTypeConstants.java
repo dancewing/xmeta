@@ -18,6 +18,11 @@ public interface RelationTypeConstants {
     String RELATED_FIELD_ID = "relatedFieldId";
 
     /**
+     * 关联字段的id
+     */
+    String RELATED_FIELD = "relatedField";
+
+    /**
      * many-to-many 谁做主导
      */
     String RELATION_DOMINANT = "dominant";

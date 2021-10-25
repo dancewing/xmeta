@@ -28,7 +28,7 @@ public class JdbcMetaLoaderService implements MetaDatabaseLoaderService {
             + " FROM " + ENTITY_TABLE_NAME;
 
     private static final String UPDATE_ENTITY_SQL = "UPDATE " + ENTITY_TABLE_NAME +
-            " SET lastSyncTime=?, name=?, displayName=?, pluralDisplayName=?, table_= ?, description= ?" +
+            " SET lastSyncTime=?, name=?, displayName=?, pluralDisplayName=?, table_= ?, description= ? " +
             "WHERE id= ?";
     private static final String INSERT_ENTITY_SQL = "INSERT INTO " + ENTITY_TABLE_NAME +
             " (lastSyncTime, name, displayName, pluralDisplayName, table_, description, id) " +

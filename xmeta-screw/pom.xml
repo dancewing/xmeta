@@ -22,6 +22,12 @@
 
 	<dependencies>
 
+        <dependency>
+            <groupId>io.xmeta</groupId>
+            <artifactId>xmeta-core</artifactId>
+            <version>0.3.1-SNAPSHOT</version>
+        </dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>

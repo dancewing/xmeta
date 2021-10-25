@@ -24,7 +24,7 @@
 
         <dependency>
             <groupId>io.xmeta</groupId>
-            <artifactId>xmeta-core</artifactId>
+            <artifactId>xmeta-screw</artifactId>
             <version>0.3.1-SNAPSHOT</version>
         </dependency>
 
@@ -41,11 +41,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
         </dependency>
 
         <dependency>

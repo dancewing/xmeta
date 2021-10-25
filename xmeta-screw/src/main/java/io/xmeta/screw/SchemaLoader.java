@@ -114,11 +114,11 @@ public class SchemaLoader {
             Collection<Table> tables = new ArrayList<>(db.getTables());
             tables.addAll(db.getViews());
 
-            if (tables.isEmpty()) {
-                dumpNoTablesMessage(schema, config.getUser(), databaseMetaData, config.getTableInclusions() != null);
-                if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
-                    throw new EmptySchemaException();
-            }
+//            if (tables.isEmpty()) {
+//                dumpNoTablesMessage(schema, config.getUser(), databaseMetaData, config.getTableInclusions() != null);
+//                if (!config.isOneOfMultipleSchemas()) // don't bail if we're doing the whole enchilada
+//                    throw new EmptySchemaException();
+//            }
 
             List<ForeignKeyConstraint> recursiveConstraints = new ArrayList<>();
 

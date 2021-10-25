@@ -48,6 +48,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.jar.JarEntry;
@@ -123,7 +124,7 @@ public final class Config implements HtmlConfig, GraphvizConfig {
     private String imageFormat;
     private String renderer;
     private Boolean paginationEnabled;
-    private DataSource dataSource;
+    private Connection connection;
 
     @Deprecated
     private Boolean loadJDBCJarsEnabled = false;
@@ -1607,13 +1608,12 @@ public final class Config implements HtmlConfig, GraphvizConfig {
         return params;
     }
 
-    public DataSource getDataSource() {
-        return dataSource;
+    public Connection getConnection() {
+        return connection;
     }
 
-    public Config setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-        return this;
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 
     public Config setDbType(String dbType) {

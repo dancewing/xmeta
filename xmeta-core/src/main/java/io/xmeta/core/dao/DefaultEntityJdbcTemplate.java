@@ -7,7 +7,6 @@ import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ClassUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jdbc.core.convert.Identifier;
@@ -27,12 +26,9 @@ import org.springframework.util.Assert;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
-
-    private static final Map<String, Class> CLASS_CACHE = new ConcurrentHashMap<>();
 
     private final JdbcConverter converter;
     private final NamedParameterJdbcOperations operations;
@@ -90,7 +86,7 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
                 parameterSource, //
                 SqlIdentifier.unquoted(pk.getColumn()),
                 pkValue, //
-                getClass(pk.getJavaType())//
+                EntityFieldUtils.getClass(pk.getJavaType())//
         );
         return operations.update(deleteByIdSql, parameterSource);
     }
@@ -182,13 +178,8 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
             }
             Object value = instance.get(field.getName());
             SqlIdentifier paramName = transform(field.getColumn());
-            try {
-                Class cls = ClassUtils.getClass(field.getJavaType(), false);
-                addConvertedPropertyValue(parameters, paramName, value, cls);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return;
-            }
+            Class cls = EntityFieldUtils.getClass(field.getJavaType());
+            addConvertedPropertyValue(parameters, paramName, value, cls);
 
         });
 
@@ -232,18 +223,4 @@ public class DefaultEntityJdbcTemplate implements EntityJdbcTemplate {
         return new EntityRowMapper(entity, converter);
     }
 
-    @NonNull
-    private Class<?> getClass(String className) {
-        if (CLASS_CACHE.containsKey(className)) {
-            return CLASS_CACHE.get(className);
-        }
-        Class<?> cls = null;
-        try {
-            cls = ClassUtils.getClass(className, true);
-            CLASS_CACHE.put(className, cls);
-        } catch (ClassNotFoundException e) {
-            throw new MetaException("不能初始化：" + className);
-        }
-        return cls;
-    }
 }

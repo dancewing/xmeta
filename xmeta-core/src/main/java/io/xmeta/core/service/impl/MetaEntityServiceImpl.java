@@ -7,7 +7,9 @@ import io.xmeta.core.service.MetaDatabaseLoaderService;
 import io.xmeta.core.service.MetaEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MetaEntityServiceImpl implements MetaEntityService {
 
@@ -36,6 +38,16 @@ public class MetaEntityServiceImpl implements MetaEntityService {
         }
         entities = this.metaDatabaseLoaderService.load();
         return entities;
+    }
+
+    @Override
+    public Map<String, Entity> loadAsMap() {
+        List<Entity> entities = load();
+        Map<String, Entity> entityMap = new HashMap<>();
+        for (Entity entity: entities) {
+            entityMap.put(entity.getTable(), entity);
+        }
+        return entityMap;
     }
 
     @Override

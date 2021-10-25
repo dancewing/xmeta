@@ -22,6 +22,9 @@ import org.springframework.util.Assert;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +42,7 @@ public final class JdbcUtil {
 
         sqlTypeMappings.put(String.class, Types.VARCHAR);
         sqlTypeMappings.put(BigInteger.class, Types.BIGINT);
-        sqlTypeMappings.put(BigDecimal.class, Types.DECIMAL);
+        sqlTypeMappings.put(BigDecimal.class, Types.NUMERIC);
         sqlTypeMappings.put(Byte.class, Types.TINYINT);
         sqlTypeMappings.put(byte.class, Types.TINYINT);
         sqlTypeMappings.put(Short.class, Types.SMALLINT);
@@ -58,6 +61,9 @@ public final class JdbcUtil {
         sqlTypeMappings.put(Date.class, Types.DATE);
         sqlTypeMappings.put(Time.class, Types.TIME);
         sqlTypeMappings.put(Timestamp.class, Types.TIMESTAMP);
+        sqlTypeMappings.put(LocalDate.class, Types.DATE);
+        sqlTypeMappings.put(LocalTime.class, Types.TIME);
+        sqlTypeMappings.put(LocalDateTime.class, Types.TIMESTAMP);
     }
 
     private JdbcUtil() {

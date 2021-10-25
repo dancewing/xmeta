@@ -18,6 +18,7 @@ public class EntityField implements java.io.Serializable {
     private boolean searchable;
     private String description;
     private String entityId;
+    private boolean deleted = false;
 
     public EntityField() {
     }
@@ -133,6 +134,15 @@ public class EntityField implements java.io.Serializable {
 
     public EntityField setEntityId(String entityId) {
         this.entityId = entityId;
+        return this;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public EntityField setDeleted(boolean deleted) {
+        this.deleted = deleted;
         return this;
     }
 

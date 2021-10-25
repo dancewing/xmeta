@@ -13,10 +13,7 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.*;
 import java.util.function.Function;
 

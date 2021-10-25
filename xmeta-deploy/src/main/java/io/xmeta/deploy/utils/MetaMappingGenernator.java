@@ -1,11 +1,7 @@
 package io.xmeta.deploy.utils;
 
-import org.hibernate.boot.jaxb.hbm.spi.*;
-
-import static io.xmeta.deploy.utils.EntityConverter.createTypeSpecificationType;
-
 public final class MetaMappingGenernator {
-    public static void createMetaMapping(JaxbHbmHibernateMapping hibernateMapping) {
+ /*   public static void createMetaMapping(JaxbHbmHibernateMapping hibernateMapping) {
 
         JaxbHbmRootEntityType entityType = new JaxbHbmRootEntityType();
         entityType.setTable("xmeta_entity");
@@ -142,5 +138,5 @@ public final class MetaMappingGenernator {
         hibernateMapping.getClazz().add(entityType);
 
 
-    }
+    }*/
 }

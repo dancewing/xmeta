@@ -207,7 +207,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setRequired(true)
                         .setSearchable(true)
                         .setColumn("id")
-                        .setProperties(Maps.empty())
                         .build(),
                 entityVersionEntity);
 
@@ -220,7 +219,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setRequired(true)
                         .setSearchable(false)
                         .setColumn("created_at")
-                        .setProperties(Maps.empty())
                         .build(),
                 entityVersionEntity);
 
@@ -233,7 +231,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
                         .setRequired(true)
                         .setSearchable(false)
                         .setColumn("updated_at")
-                        .setProperties(Maps.empty())
                         .build(),
                 entityVersionEntity);
 

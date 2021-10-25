@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 public abstract class FieldConstProperties {
+    public static Map<String, Object> Id = Maps.of("maxLength", 64).build();
     public static Map<String, Object> SingleLineText = Maps.of("maxLength", 1000).build();
     public static Map<String, Object> MultiLineText = Maps.of("maxLength", 1000).build();
     public static Map<String, Object> WholeNumber = Maps.of("minimumValue", -999999999).and("maximumValue", 999999999).build();

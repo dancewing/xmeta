@@ -62,7 +62,7 @@ public class Database {
         this.dbmsMeta = dbmsMeta;
         this.databaseName = name;
         this.catalog = new Catalog(catalog);
-        this.schema = new Schema(schema);
+        this.schema = new Schema(schema == null ? catalog : schema);
     }
 
     @JsonIgnore

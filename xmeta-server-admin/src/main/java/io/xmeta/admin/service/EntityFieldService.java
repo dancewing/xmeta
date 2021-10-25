@@ -90,7 +90,12 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         fieldEntity.setName(entityField.getName());
         fieldEntity.setDisplayName(entityField.getDisplayName());
         fieldEntity.setDataType(entityField.getDataType().name());
-        fieldEntity.setProperties(ObjectMapperUtils.toBytes(entityField.getProperties()));
+        if (entityField.getProperties() != null && entityField.getProperties().size() > 0) {
+            fieldEntity.setProperties(ObjectMapperUtils.toBytes(entityField.getProperties()));
+        } else {
+            fieldEntity.setProperties(ObjectMapperUtils.toBytes(getDefaultFieldProperties(entityField.getDataType())));
+        }
+
         fieldEntity.setRequired(entityField.getRequired());
         fieldEntity.setSearchable(entityField.getSearchable());
         fieldEntity.setDescription(entityField.getDescription());
@@ -333,6 +338,8 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
             return FieldConstProperties.SingleLineText;
         }
         switch (dataType) {
+            case Id:
+                return FieldConstProperties.Id;
             case SingleLineText:
                 return FieldConstProperties.SingleLineText;
             case MultiLineText:

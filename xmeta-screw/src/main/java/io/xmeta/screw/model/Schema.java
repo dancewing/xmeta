@@ -38,7 +38,7 @@ public final class Schema implements Comparable<Schema>{
 	}
 
 	public Schema(String name, String comment) {
-		this.name = Objects.requireNonNull(name);
+		this.name = name;
 		this.comment = comment;
 	}
 

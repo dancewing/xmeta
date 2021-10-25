@@ -23,6 +23,7 @@
 package io.xmeta.screw.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.xmeta.core.dialect.MetaDialect;
 import io.xmeta.screw.dbms.xml.TableColumnMeta;
 
 import java.sql.DatabaseMetaData;
@@ -553,5 +554,16 @@ public class TableColumn {
      */
     public boolean allowsImpliedChildren() {
         return allowImpliedChildren;
+    }
+
+    public String getQuotedName(MetaDialect dialect) {
+        return name == null ? null : dialect.getIdentifierProcessing().quote(name);
+    }
+
+    public String getSqlType(MetaDialect dialect) {
+        if (typeName == null && getType() != null) {
+            typeName = dialect.getTypeName(getType(), getLength(), getDecimalDigits(), 0);
+        }
+        return typeName;
     }
 }

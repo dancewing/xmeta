@@ -7,15 +7,14 @@ import io.xmeta.core.exception.MetaException;
 import io.xmeta.core.utils.jdbc.DatabaseInfo;
 import io.xmeta.core.utils.jdbc.JdbcUrlParserFactory;
 import io.xmeta.core.utils.jdbc.UnKnownDatabaseInfo;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import io.xmeta.screw.Config;
 import io.xmeta.screw.SchemaLoader;
 import io.xmeta.screw.model.Database;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.sql.Connection;
 
 @Service
 @Slf4j
@@ -32,49 +31,35 @@ public class DatabaseMetaService {
         Environment environment = this.environmentService.environment(WhereUniqueInput.builder().setId(environmentId).build());
 
         try (HikariDataSource dataSource = createDataSource(environment)) {
-
-            String schema = dataSource.getSchema();
-            Config config = new Config();
-            String databaseType = JdbcUrlParserFactory.getDatabaseType(environment.getAddress());
-            DatabaseInfo databaseInfo = JdbcUrlParserFactory.getDatabaseInfo(environment.getAddress());
-            if (databaseInfo.equals(UnKnownDatabaseInfo.INSTANCE)) {
-                throw new MetaException("Unknown database");
-            }
-            if ("mysql".equals(databaseType)) {
-                if (StringUtils.isEmpty(schema)) {
-                    schema = databaseInfo.getDatabaseId();
+            try (Connection connection = dataSource.getConnection()) {
+                String schema = dataSource.getSchema();
+                Config config = new Config();
+                String databaseType = JdbcUrlParserFactory.getDatabaseType(environment.getAddress());
+                DatabaseInfo databaseInfo = JdbcUrlParserFactory.getDatabaseInfo(environment.getAddress());
+                if (databaseInfo.equals(UnKnownDatabaseInfo.INSTANCE)) {
+                    throw new MetaException("Unknown database");
                 }
-            }
-            config.setDb(databaseInfo.getDatabaseId());
-            config.setSchema(schema);
-            config.setDataSource(dataSource);
-            config.setDbType(databaseType);
+                if ("mysql".equals(databaseType)) {
+                    if (StringUtils.isEmpty(schema)) {
+                        schema = databaseInfo.getDatabaseId();
+                    }
+                }
+                config.setDb(databaseInfo.getDatabaseId());
+                config.setSchema(schema);
+                config.setConnection(connection);
+                config.setDbType(databaseType);
 
-            return this.schemaLoader.analyze(config, schema);
+                return this.schemaLoader.analyze(config, schema);
+            } catch (Exception e) {
+                throw new MetaException(e.getMessage());
+            }
+
+
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
 
         return null;
-    }
-
-    private static String getDatabase(String jdbcUrl) {
-        Pattern pattern = Pattern.compile("(?<=databaseName=)\\w+(?=;|$)", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(jdbcUrl);
-        if (matcher.find()) {
-            return matcher.group();
-        }
-        return null;
-    }
-
-    public static String getDataSourceType(String jdbcUrl) {
-        String dataSourceType = null;
-        jdbcUrl = jdbcUrl.replaceAll("\n", "").replaceAll(" ", "").trim();
-        Matcher matcher = Pattern.compile("jdbc:\\w+").matcher(jdbcUrl);
-        if (matcher.find()) {
-            dataSourceType = matcher.group().split(":")[1];
-        }
-        return dataSourceType;
     }
 
     private HikariDataSource createDataSource(Environment environment) {

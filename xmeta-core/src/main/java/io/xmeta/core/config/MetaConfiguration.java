@@ -3,6 +3,8 @@ package io.xmeta.core.config;
 import io.xmeta.core.dao.DefaultEntityJdbcTemplate;
 import io.xmeta.core.dao.EntityJdbcTemplate;
 import io.xmeta.core.dao.MetaJdbcProperties;
+import io.xmeta.core.dialect.MetaDialect;
+import io.xmeta.core.dialect.MetaDialectResolver;
 import io.xmeta.core.service.*;
 import io.xmeta.core.service.impl.JdbcMetaLoaderService;
 import io.xmeta.core.service.impl.MetaDataServiceImpl;
@@ -25,6 +27,12 @@ import javax.sql.DataSource;
 @EnableConfigurationProperties(MetaJdbcProperties.class)
 @Slf4j
 public class MetaConfiguration {
+
+    @Primary
+    @Bean
+    public MetaDialect metaDialect(Dialect dialect) {
+        return MetaDialectResolver.getDialect(dialect);
+    }
 
     @Primary
     @Bean

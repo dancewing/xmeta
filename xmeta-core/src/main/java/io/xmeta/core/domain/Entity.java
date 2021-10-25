@@ -20,6 +20,7 @@ public class Entity implements java.io.Serializable {
     private String table;
     private String description;
     private List<EntityField> fields = new ArrayList<>();
+    private boolean deleted = false;
 
     public Entity() {
     }
@@ -90,6 +91,14 @@ public class Entity implements java.io.Serializable {
         this.fields = fields;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -145,6 +154,6 @@ public class Entity implements java.io.Serializable {
         public Entity build() {
             return new Entity(id, name, displayName, pluralDisplayName, table, description, fields);
         }
-
     }
+
 }

@@ -38,7 +38,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.Driver;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,12 +59,8 @@ public class DbDriverLoader {
 
     public Connection getConnection(Config config) throws IOException {
 
-        if (config.getDataSource()!=null) {
-            try {
-                return config.getDataSource().getConnection();
-            } catch (SQLException e) {
-                LOGGER.error("Can't get connection from datasource");
-            }
+        if (config.getConnection() != null) {
+            return config.getConnection();
         }
         Properties properties = config.getDbProperties();
 

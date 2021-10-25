@@ -47,9 +47,9 @@ public class SchemaResolver {
                 LOGGER.error("Schema (-s/-schemas) not provided, queried jdbc driver for schema and failed", sqle);
             }
 
-            if (Objects.isNull(schema)) {
-                throw new InvalidConfigurationException("Schema (-s/-schemas) was not provided and unable to deduce schema, schema is sometimes referred to as user/owner/database");
-            }
+//            if (Objects.isNull(schema)) {
+//                throw new InvalidConfigurationException("Schema (-s/-schemas) was not provided and unable to deduce schema, schema is sometimes referred to as user/owner/database");
+//            }
             return schema;
         } else {
             return currentSchema;

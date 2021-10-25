@@ -24,9 +24,13 @@
 package io.xmeta.screw.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.xmeta.core.dialect.MetaDialect;
 import io.xmeta.screw.dbms.xml.TableColumnMeta;
 import io.xmeta.screw.dbms.xml.TableMeta;
 import io.xmeta.screw.util.CaseInsensitiveMap;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +47,8 @@ import java.util.*;
  * @author Daniel Watt
  * @author Nils Petzaell
  */
-public class Table implements Comparable<Table> {
+@Slf4j
+public class Table implements Comparable<Table>, ScriptModel {
     private final String catalog;
     private final String schema;
     private final String name;
@@ -724,5 +729,210 @@ public class Table implements Comparable<Table> {
                 return ((Number) id1).intValue() - ((Number) id2).intValue();
             return id1.toString().compareToIgnoreCase(id2.toString());
         }
+    }
+
+    @Override
+    public String sqlDrop(MetaDialect dialect, String defaultCatalog, String defaultSchema) {
+        return dialect.getDropTableString(getQualifiedName(dialect, defaultCatalog, defaultSchema));
+    }
+
+    @Override
+    public String sqlCreate(MetaDialect dialect, String defaultCatalog, String defaultSchema) {
+        StringBuilder buf = new StringBuilder(hasPrimaryKey() ? dialect.getCreateTableString() : dialect.getCreateMultisetTableString())
+                .append(' ')
+                .append(getQualifiedName(dialect, defaultCatalog, defaultSchema))
+                .append(" (");
+
+        // Try to find out the name of the primary key to create it as identity if the IdentityGenerator is used
+//        String pkname = null;
+//        if (hasPrimaryKey()) {
+//            pkname = (getPrimaryColumns().listIterator().next()).getQuotedName(dialect);
+//        }
+//
+
+        Iterator<TableColumn> iter = this.getColumns().listIterator();
+        while (iter.hasNext()) {
+            TableColumn col = iter.next();
+
+            buf.append(col.getQuotedName(dialect))
+                    .append(' ');
+
+            buf.append(col.getSqlType(dialect));
+
+            if (ObjectUtils.isNotEmpty(col.getDefaultValue())) {
+                buf.append(" default ").append(col.getDefaultValue());
+            }
+
+            if (col.isNullable()) {
+                buf.append(dialect.getNullColumnString());
+            } else {
+                buf.append(" not null");
+            }
+
+
+//            if ( col.isUnique() ) {
+//                String keyName = Constraint.generateName( "UK_", this, col );
+//                UniqueKey uk = getOrCreateUniqueKey( keyName );
+//                uk.addColumn( col );
+//                buf.append( dialect.getUniqueDelegate()
+//                        .getColumnDefinitionUniquenessFragment( col ) );
+//            }
+
+//            if ( col.hasCheckConstraint() && dialect.supportsColumnCheck() ) {
+//                buf.append( " check (" )
+//                        .append( col.getCheckConstraint() )
+//                        .append( ")" );
+//            }
+
+            String columnComment = col.getComments();
+            if (columnComment != null) {
+                buf.append(dialect.getColumnComment(columnComment));
+            }
+
+            if (iter.hasNext()) {
+                buf.append(",");
+            }
+
+        }
+        if (hasPrimaryKey()) {
+            buf.append(", ")
+                    .append(sqlConstraintString(dialect));
+        }
+
+        // buf.append( dialect.getUniqueDelegate().getTableCreationUniqueConstraintsFragment( this ) );
+
+//        if ( dialect.supportsTableCheck() ) {
+//            for ( String checkConstraint : checkConstraints ) {
+//                buf.append( ", check (" )
+//                        .append( checkConstraint )
+//                        .append( ')' );
+//            }
+//        }
+
+        buf.append(')');
+
+        if (comments != null) {
+            buf.append(dialect.getTableComment(comments));
+        }
+
+        return buf.append(dialect.getTableTypeString()).toString();
+    }
+
+    private boolean hasPrimaryKey() {
+        return primaryKeys.size() > 0;
+    }
+
+    @Override
+    public List<String> sqlAlters(MetaDialect dialect, CaseInsensitiveMap<TableColumn> columnMap, String defaultCatalog, String defaultSchema) {
+
+        final String tableName = getQualifiedName(dialect, defaultCatalog, defaultSchema);
+
+        StringBuilder root = new StringBuilder(dialect.getAlterTableString(tableName))
+                .append(' ')
+                .append(dialect.getAddColumnString());
+
+        Iterator<TableColumn> iter = getColumns().listIterator();
+        List<String> results = new ArrayList<>();
+
+        while (iter.hasNext()) {
+            final TableColumn column = (TableColumn) iter.next();
+
+            //don't have column
+            if (!columnMap.containsKey(column.getName())) {
+                // the column doesnt exist at all.
+                StringBuilder alter = new StringBuilder(root.toString())
+                        .append(' ')
+                        .append(column.getQuotedName(dialect))
+                        .append(' ')
+                        .append(column.getSqlType(dialect));
+
+                if (ObjectUtils.isNotEmpty(column.getDefaultValue())) {
+                    alter.append(" default ").append(column.getDefaultValue());
+                }
+
+                if (column.isNullable()) {
+                    alter.append(dialect.getNullColumnString());
+                } else {
+                    alter.append(" not null");
+                }
+
+//                if ( column.isUnique() ) {
+//                    String keyName = Constraint.generateName( "UK_", this, column );
+//                    UniqueKey uk = getOrCreateUniqueKey( keyName );
+//                    uk.addColumn( column );
+//                    alter.append( dialect.getUniqueDelegate()
+//                            .getColumnDefinitionUniquenessFragment( column ) );
+//                }
+
+//                if ( column.hasCheckConstraint() && dialect.supportsColumnCheck() ) {
+//                    alter.append( " check(" )
+//                            .append( column.getCheckConstraint() )
+//                            .append( ")" );
+//                }
+
+                String columnComment = column.getComments();
+                if (columnComment != null) {
+                    alter.append(dialect.getColumnComment(columnComment));
+                }
+
+                alter.append(dialect.getAddColumnSuffixString());
+
+                results.add(alter.toString());
+            }
+
+        }
+
+        if (results.isEmpty()) {
+            log.warn("No alter strings for table : {}", getName());
+        }
+
+        return results;
+    }
+
+    public String getQuotedName(MetaDialect dialect) {
+        return name == null ? null : dialect.getIdentifierProcessing().quote(name);
+    }
+
+    public String getQualifiedName(MetaDialect dialect, String defaultCatalog, String defaultSchema) {
+        String quotedName = getQuotedName(dialect);
+        String usedSchema = schema == null ?
+                defaultSchema :
+                getQuotedSchema(dialect);
+        String usedCatalog = catalog == null ?
+                defaultCatalog :
+                getQuotedCatalog(dialect);
+        return qualify(usedCatalog, usedSchema, quotedName);
+    }
+
+    public String getQuotedSchema(MetaDialect dialect) {
+        return schema == null ? null : dialect.getIdentifierProcessing().quote(schema);
+    }
+
+    public String getQuotedCatalog(MetaDialect dialect) {
+        return catalog == null ? null : dialect.getIdentifierProcessing().quote(catalog);
+    }
+
+    public static String qualify(String catalog, String schema, String table) {
+        StringBuilder qualifiedName = new StringBuilder();
+        if (catalog != null) {
+            qualifiedName.append(catalog).append('.');
+        }
+        if (schema != null) {
+            qualifiedName.append(schema).append('.');
+        }
+        return qualifiedName.append(table).toString();
+    }
+
+
+    public String sqlConstraintString(MetaDialect dialect) {
+        StringBuilder buf = new StringBuilder("primary key (");
+        Iterator iter = getPrimaryColumns().listIterator();
+        while (iter.hasNext()) {
+            buf.append(((TableColumn) iter.next()).getQuotedName(dialect));
+            if (iter.hasNext()) {
+                buf.append(", ");
+            }
+        }
+        return buf.append(')').toString();
     }
 }

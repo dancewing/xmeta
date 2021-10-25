@@ -9,14 +9,11 @@ import io.xmeta.core.utils.jdbc.JdbcUrlParserFactory;
 import io.xmeta.core.utils.jdbc.UnKnownDatabaseInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.schemaspy.Config;
-import org.schemaspy.SchemaLoader;
-import org.schemaspy.model.Database;
+import io.xmeta.screw.Config;
+import io.xmeta.screw.SchemaLoader;
+import io.xmeta.screw.model.Database;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

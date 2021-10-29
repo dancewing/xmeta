@@ -1,6 +1,7 @@
 package io.xmeta.core.service;
 
 import io.xmeta.core.domain.DataType;
+import io.xmeta.core.domain.EntityField;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.Nullable;
 
@@ -15,10 +16,11 @@ public class FieldConversionService {
     }
 
     @Nullable
-    public Object convert(DataType dataType, Object sourceValue) {
+    public Object convert(EntityField field, Object sourceValue) {
         if (sourceValue == null) {
             return null;
         }
+        DataType dataType = field.getDataType();
         Class<?> cls = dataTypeMapping.javaTypeFor(dataType);
         if (cls.isAssignableFrom(sourceValue.getClass())) {
             return sourceValue;

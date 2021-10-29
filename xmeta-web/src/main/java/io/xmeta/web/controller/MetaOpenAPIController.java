@@ -1,19 +1,19 @@
 package io.xmeta.web.controller;
 
-import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.xmeta.web.swagger.MetaSwaggerApiService;
+import io.xmeta.web.swagger.SwaggerProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@Hidden
-@RequestMapping("/meta-docs")
+@RequestMapping(value = SwaggerProvider.API_URI)
+@ApiIgnore
 public class MetaOpenAPIController {
 
     private final MetaSwaggerApiService metaSwaggerApiService;
@@ -23,15 +23,9 @@ public class MetaOpenAPIController {
     }
 
     @GetMapping
-    public ResponseEntity<OpenAPI> metaDocs() {
-        return ResponseEntity.ok(metaSwaggerApiService.load());
-    }
-
-    @GetMapping("/swagger-config")
-    public ResponseEntity<Map<String, String>> swaggerConfig() {
-        Map<String, String> config = new HashMap<>();
-        config.put("configUrl", "/meta-docs/swagger-config");
-        config.put("url", "/meta-docs");
-        return ResponseEntity.ok(config);
+    @ResponseBody
+    public ResponseEntity<String> metaDocs() {
+        OpenAPI openAPI = metaSwaggerApiService.load();
+        return ResponseEntity.ok(Json.pretty(openAPI));
     }
 }

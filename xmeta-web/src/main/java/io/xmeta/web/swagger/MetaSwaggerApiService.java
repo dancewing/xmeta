@@ -1,9 +1,14 @@
 package io.xmeta.web.swagger;
 
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.media.*;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.ObjectSchema;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
@@ -18,14 +23,14 @@ import io.xmeta.core.service.MetaEntityService;
 import io.xmeta.web.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -51,7 +56,7 @@ public class MetaSwaggerApiService {
         Paths paths = new Paths();
 
         Components components = new Components();
-
+        components.setSchemas(new HashMap<>());
         for (Entity entity : entities) {
             paths.addPathItem(this.apiDocPath + "/" + entity.getId(), createRestPathItem(entity));
             paths.addPathItem(this.apiDocPath + "/" + entity.getId() + "/{id}", createRestParamPathItem(entity));
@@ -207,7 +212,7 @@ public class MetaSwaggerApiService {
         addClassSchema(components, BooleanFilter.class, null);
         addClassSchema(components, IntFilter.class, null);
         addClassSchema(components, DateTimeFilter.class, null);
-        addClassSchema(components, PageImpl.class, "Page");
+        addClassSchema(components, Pageable.class, "Page");
     }
 
     private void addEntitySchema(Components components, Entity entity) {
@@ -217,13 +222,14 @@ public class MetaSwaggerApiService {
             if (StringUtils.isNotEmpty(javaType)) {
                 try {
                     Class<?> cls = Class.forName(javaType);
-                    Schema<?> fieldSchema = getFieldSchema(cls.getName());
-                    if (fieldSchema != null) {
+                    Schema property = PrimitiveType.createProperty(cls);
+                    if (property != null) {
                         if (entityField.getRequired()) {
                             //fieldSchema.required(true);
                             objectSchema.addRequiredItem(entityField.getName());
                         }
-                        objectSchema.addProperties(entityField.getName(), fieldSchema);
+                        objectSchema.addProperties(entityField.getName(), property);
+
                     } else {
                         log.error("can't get field schema for :{},{} ", entity.getName(), entityField.getName());
                     }
@@ -240,53 +246,7 @@ public class MetaSwaggerApiService {
         if (StringUtils.isEmpty(name)) {
             name = cls.getSimpleName();
         }
-        components.addSchemas(name, generateClassSchema(cls));
-    }
-
-    private Schema<?> generateClassSchema(Class<?> cls) {
-        ObjectSchema objectSchema = new ObjectSchema();
-        PropertyDescriptor[] descriptors = BeanUtils.getPropertyDescriptors(cls);
-        for (PropertyDescriptor pd : descriptors) {
-
-            if (pd.getWriteMethod() == null) {
-                continue;
-            }
-
-            log.info("name: {}, type: {}", pd.getName(), pd.getPropertyType().getSimpleName());
-
-            String name = pd.getName();
-            if (pd.getPropertyType().isArray()) {
-                objectSchema.addProperties(name, new ArraySchema());
-            } else {
-                String typeName = pd.getPropertyType().getName();
-                Schema<?> schema = getFieldSchema(typeName);
-                if (schema != null) {
-                    objectSchema.addProperties(name, schema);
-                }
-            }
-        }
-        return objectSchema;
-    }
-
-    private Schema<?> getFieldSchema(String typeName) {
-        switch (typeName) {
-            case "java.util.List":
-                return new ArraySchema();
-            case "java.lang.String":
-                return new StringSchema();
-            case "java.lang.Boolean":
-                return new BooleanSchema();
-            case "java.lang.Integer":
-            case "int":
-                return new IntegerSchema();
-            case "java.time.LocalDate":
-            case "java.util.Date":
-                return new DateSchema();
-            case "java.time.LocalDateTime":
-            case "java.time.ZonedDateTime":
-                return new DateTimeSchema();
-        }
-        return null;
+        components.getSchemas().putAll(ModelConverters.getInstance().readAll(cls));
     }
 
 }

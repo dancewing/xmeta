@@ -37,14 +37,20 @@ import java.util.regex.Pattern;
  * @author Daniel Watt
  */
 public class TableColumn {
+
+    public static final int DEFAULT_LENGTH = 255; //默认字段长度
+    public static final int DEFAULT_PRECISION = 19; //默认数字精度
+    public static final int DEFAULT_SCALE = 2; //小位数字
+
     private final Table table;
     private String name;
     private Object id;
     private String typeName;
     private String shortTypeName;
     private Integer type;
-    private int length;
-    private int decimalDigits;
+    private int length = DEFAULT_LENGTH;
+    private int precision = DEFAULT_PRECISION;
+    private int decimalDigits = DEFAULT_SCALE;
     private String detailedSize;
     private boolean isNullable;
     private boolean isAutoUpdated;
@@ -562,8 +568,12 @@ public class TableColumn {
 
     public String getSqlType(MetaDialect dialect) {
         if (typeName == null && getType() != null) {
-            typeName = dialect.getTypeName(getType(), getLength(), getDecimalDigits(), 0);
+            typeName = dialect.getTypeName(getType(), getLength(), getPrecision(), getDecimalDigits());
         }
         return typeName;
+    }
+
+    public int getPrecision() {
+        return precision;
     }
 }

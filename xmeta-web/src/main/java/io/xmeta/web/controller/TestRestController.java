@@ -60,6 +60,8 @@ public class TestRestController {
         private List<Role> roles;
     }
 
+
+
     @Data
     public static class SearchUser {
         private StringFilter id;
@@ -72,5 +74,6 @@ public class TestRestController {
     public static class Role {
         private String id;
         private String name;
+        private List<User> users;
     }
 }

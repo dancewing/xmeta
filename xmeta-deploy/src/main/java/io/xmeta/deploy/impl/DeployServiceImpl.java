@@ -4,12 +4,15 @@ import io.xmeta.core.dao.JdbcUtil;
 import io.xmeta.core.dialect.MetaDialect;
 import io.xmeta.core.domain.*;
 import io.xmeta.core.exception.MetaException;
+import io.xmeta.core.service.MetaDatabaseLoaderService;
 import io.xmeta.core.service.MetaEntityService;
+import io.xmeta.core.service.impl.JdbcMetaLoaderService;
 import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.core.utils.jdbc.DatabaseInfo;
 import io.xmeta.core.utils.jdbc.JdbcUrlParserFactory;
 import io.xmeta.core.utils.jdbc.UnKnownDatabaseInfo;
 import io.xmeta.deploy.DeployService;
+import io.xmeta.deploy.utils.MetaMappingGenernator;
 import io.xmeta.screw.Config;
 import io.xmeta.screw.SchemaLoader;
 import io.xmeta.screw.model.Database;
@@ -20,6 +23,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
@@ -62,10 +66,10 @@ public class DeployServiceImpl implements DeployService {
         String jdbcUrl = null;
         String catalog = null;
         try (Connection connection = dataSource.getConnection()) {
+
             jdbcUrl = connection.getMetaData().getURL();
             schema = connection.getSchema();
             catalog = connection.getCatalog();
-
 
             Config config = new Config();
             String databaseType = JdbcUrlParserFactory.getDatabaseType(jdbcUrl);
@@ -105,6 +109,12 @@ public class DeployServiceImpl implements DeployService {
 
                 }
 
+                //保存元数据，先要确保有对应的表结构
+                if (saveMeta) {
+                    additionalTables.add(MetaMappingGenernator.generateEntityTable(database));
+                    additionalTables.add(MetaMappingGenernator.generateEntityField(database));
+                }
+
                 for (Table table : additionalTables) {
 
                     if (!tablesMap.containsKey(table.getName())) {
@@ -123,12 +133,12 @@ public class DeployServiceImpl implements DeployService {
 
             log.info(StringUtils.join(scripts, "\n"));
 
+            //执行当前数据库脚本
             runScripts(scripts, connection);
-
-
+            //保存当前的元数据信息
             if (saveMeta) {
-//            MetaDatabaseLoaderService metaLoaderService = new JdbcMetaLoaderService(dataSource);
-//            metaLoaderService.save(entities);
+                MetaDatabaseLoaderService metaLoaderService = new JdbcMetaLoaderService(new SingleConnectionDataSource(connection, false));
+                metaLoaderService.save(entities);
             }
 
         } catch (Exception ex) {

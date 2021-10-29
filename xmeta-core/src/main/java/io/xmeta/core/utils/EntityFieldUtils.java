@@ -59,7 +59,7 @@ public final class EntityFieldUtils {
      * @return
      */
     public static boolean isSystemControl(DataType dataType) {
-        return (DataType.CreatedAt == dataType || DataType.UpdatedAt == dataType);
+        return (DataType.CreatedAt == dataType || DataType.UpdatedAt == dataType || DataType.Id == dataType);
     }
 
     public static boolean isControlledJavaType(DataType dataType) {

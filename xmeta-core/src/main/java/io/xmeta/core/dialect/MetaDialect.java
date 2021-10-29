@@ -2,6 +2,8 @@ package io.xmeta.core.dialect;
 
 import org.springframework.data.relational.core.dialect.Dialect;
 
+import java.sql.Types;
+
 /**
  * Represents a dialect that is implemented by a particular database. Please note that not all features are supported by
  * all vendors. Dialects typically express this with feature flags. Methods for unsupported functionality may throw
@@ -86,6 +88,17 @@ public interface MetaDialect extends Dialect {
 
     String getTypeName(int code);
 
+    /**
+     * Get the name of the database type associated with the given
+     * {@link Types} typecode with the given storage specification
+     * parameters.
+     *
+     * @param code The {@link Types} typecode
+     * @param length The datatype length
+     * @param precision The datatype precision
+     * @param scale The datatype scale
+     * @return the database type name
+     */
     String getTypeName(int code, long length, int precision, int scale);
 
 

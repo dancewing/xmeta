@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -22,6 +23,7 @@ import static io.xmeta.web.Constants.META_API_URL;
 
 @RestController
 @RequestMapping(value = META_API_URL)
+@ApiIgnore
 public class MetaDataController {
 
     private final RestService restService;

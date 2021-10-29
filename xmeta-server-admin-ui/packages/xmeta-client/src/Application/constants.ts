@@ -65,7 +65,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
   entities: [
     {
       name: "Orders",
-      table: "t_order",
+      table: "order",
       fields: [
         {
           name: "Quantity",
@@ -100,7 +100,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
     },
     {
       name: "Shop",
-      table: "t_shop",
+      table: "shop",
       fields: [
         {
           name: "Name",
@@ -119,7 +119,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
     },
     {
       name: "Customer",
-      table: "t_customer",
+      table: "customer",
       fields: [
         {
           name: "First Name",
@@ -169,7 +169,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
     },
     {
       name: "Address",
-      table: "t_address",
+      table: "address",
       fields: [
         {
           name: "Address 1",
@@ -204,7 +204,7 @@ export const sampleAppWithEntities: models.AppCreateWithEntitiesInput = {
     },
     {
       name: "Product",
-      table: "t_product",
+      table: "product",
       fields: [
         {
           name: "Name",

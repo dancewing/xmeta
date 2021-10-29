@@ -117,7 +117,7 @@ public class MetaDataServiceImpl implements MetaDataService {
                 if (DataType.Lookup == dataType) {
 
                 } else {
-                    Object value = fieldConversionService.convert(DataType.valueOf(dataType.name()), data.get(field.getName()));
+                    Object value = fieldConversionService.convert(field, data.get(field.getName()));
                     toSaved.put(field.getName(), value);
                 }
             } else {

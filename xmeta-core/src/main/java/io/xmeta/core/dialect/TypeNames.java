@@ -63,7 +63,7 @@ public final class TypeNames {
 	 *
 	 */
 	public String get(final int typeCode) throws MetaException {
-		final Integer integer = Integer.valueOf( typeCode );
+		final Integer integer = typeCode;
 		final String result = defaults.get( integer );
 		if ( result == null ) {
 			throw new MetaException( "No Dialect mapping for JDBC type: " + typeCode );
@@ -83,7 +83,7 @@ public final class TypeNames {
 	 *
 	 */
 	public String get(int typeCode, long size, int precision, int scale) throws MetaException {
-		final Integer integer = Integer.valueOf( typeCode );
+		final Integer integer = typeCode;
 		final Map<Long, String> map = weighted.get( integer );
 		if ( map != null && map.size() > 0 ) {
 			// iterate entries ordered by capacity to find first fit
@@ -114,13 +114,9 @@ public final class TypeNames {
 	 * @param value The mapping (type name)
 	 */
 	public void put(int typeCode, long capacity, String value) {
-		final Integer integer = Integer.valueOf( typeCode );
-		Map<Long, String> map = weighted.get( integer );
-		if ( map == null ) {
-			// add new ordered map
-			map = new TreeMap<Long, String>();
-			weighted.put( integer, map );
-		}
+		final Integer integer = typeCode;
+		Map<Long, String> map = weighted.computeIfAbsent(integer, k -> new TreeMap<>());
+		// add new ordered map
 		map.put( capacity, value );
 	}
 
@@ -131,7 +127,7 @@ public final class TypeNames {
 	 * @param value The mapping (type name)
 	 */
 	public void put(int typeCode, String value) {
-		final Integer integer = Integer.valueOf( typeCode );
+		final Integer integer = typeCode;
 		defaults.put( integer, value );
 	}
 

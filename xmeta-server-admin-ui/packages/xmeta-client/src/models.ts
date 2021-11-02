@@ -114,12 +114,14 @@ export type AppCreateInput = {
 };
 
 export type AppCreateWithEntitiesEntityInput = {
+  id?: Scalars["String"];
   name: Scalars["String"];
   fields: Array<AppCreateWithEntitiesFieldInput>;
   table?: Scalars["String"];
 };
 
 export type AppCreateWithEntitiesFieldInput = {
+  id?: Scalars["String"];
   name: Scalars["String"];
   dataType?: Maybe<EnumDataType>;
   properties?: Scalars["JSONObject"];

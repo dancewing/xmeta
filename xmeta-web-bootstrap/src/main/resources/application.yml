@@ -30,3 +30,4 @@ springdoc:
   packages-to-scan: io.xmeta.web.controller
   swagger-ui:
     disable-swagger-default-url: true
+    path: /meta-swagger-ui.html

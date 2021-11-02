@@ -1,19 +1,18 @@
 package io.xmeta.web.controller;
 
 import io.swagger.v3.core.util.Json;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.xmeta.web.swagger.MetaSwaggerApiService;
-import io.xmeta.web.swagger.SwaggerProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping(value = SwaggerProvider.API_URI)
-@ApiIgnore
+@Hidden
+@RequestMapping("/v3/api/meta-docs")
 public class MetaOpenAPIController {
 
     private final MetaSwaggerApiService metaSwaggerApiService;

@@ -31,6 +31,8 @@ import ScreenResolutionMessage from "../Layout/ScreenResolutionMessage";
 import PendingChangesMenuItem from "../VersionControl/PendingChangesMenuItem";
 import Commits from "../VersionControl/Commits";
 import Environments from "../Environment/Environments";
+import {EntityDiagram} from "../Entity/EntityDiagram";
+import Diagram  from "../Graph";
 import NavigationTabs from "../Layout/NavigationTabs";
 
 enum EnumFixedPanelKeys {
@@ -231,6 +233,11 @@ function ApplicationLayout({ match }: Props) {
               to={`/${application}/environments`}
               icon="server"
           />
+          <MenuItem
+              title="Diagram"
+              to={`/${application}/diagram`}
+              icon="server"
+          />
         </MainLayout.Menu>
         <MainLayout.Content>
           <div className={`${CLASS_NAME}__app-container`}>
@@ -268,6 +275,8 @@ function ApplicationLayout({ match }: Props) {
               />
               <Route path="/:application/commits" component={Commits} />
               <Route path="/:application/environments" component={Environments} />
+              <Route path="/:application/diagram" component={EntityDiagram} />
+              <Route path="/:application/diagram2" component={Diagram} />
               <RouteWithAnalytics
                 path="/:application/fix-related-entities"
                 component={RelatedFieldsMigrationFix}

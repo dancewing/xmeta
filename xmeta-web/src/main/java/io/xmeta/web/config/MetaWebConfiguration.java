@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = {"io.xmeta.web.controller", "io.xmeta.web.handler",
-        "io.xmeta.web.registrar", "io.xmeta.web.service", "io.xmeta.web.swagger"})
+        "io.xmeta.web.registrar", "io.xmeta.web.service"})
 public class MetaWebConfiguration {
     @Bean
     @ConditionalOnMissingBean(ActionInterceptor.class)

@@ -4,22 +4,22 @@ import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.oas.models.*;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.media.Content;
-import io.swagger.v3.oas.models.media.MediaType;
-import io.swagger.v3.oas.models.media.ObjectSchema;
-import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.*;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.tags.Tag;
+import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.Entity;
+import io.xmeta.core.domain.Relation;
+import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.filter.BooleanFilter;
 import io.xmeta.core.filter.DateTimeFilter;
 import io.xmeta.core.filter.IntFilter;
 import io.xmeta.core.filter.StringFilter;
 import io.xmeta.core.service.MetaEntityService;
+import io.xmeta.core.utils.EntityFieldUtils;
 import io.xmeta.web.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,13 +30,12 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-@Component
 @Slf4j
-public class MetaSwaggerApiService {
+@Component
+public class MetaSwaggerApiService{
 
-    private MetaEntityService metaEntityService;
+    private final MetaEntityService metaEntityService;
 
     @Value(Constants.META_API_URL)
     private String apiDocPath;
@@ -49,10 +48,7 @@ public class MetaSwaggerApiService {
         List<Entity> entities = this.metaEntityService.load();
 
         OpenAPI openApi = new OpenAPI()
-                .info(new Info().title("SpringShop API")
-                        .description("Spring shop sample application")
-                        .version("v0.0.1")
-                        .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+                .info(new Info().title("Meta Rest API Explore").version("1.0.0"));
         Paths paths = new Paths();
 
         Components components = new Components();
@@ -122,7 +118,7 @@ public class MetaSwaggerApiService {
                 new MediaType()
                         .schema(new ObjectSchema().$ref("#/components/schemas/" + entity.getName())));
 
-        apiResponses.addApiResponse("200", new ApiResponse().content(content));
+        apiResponses.addApiResponse("200", new ApiResponse().content(content).description("OK"));
 
         return apiResponses;
     }
@@ -149,19 +145,26 @@ public class MetaSwaggerApiService {
         operation.addTagsItem(entity.getName());
 
         List<Parameter> parameters = new ArrayList<>();
-        Parameter idParam = new Parameter();
-        idParam.setName("id");
-        idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() + " that needs to be loaded");
-        parameters.add(idParam);
+        parameters.add(createStringVariable("id", "ID of " + entity.getName() + " that needs to be loaded"));
+        operation.setParameters(parameters);
 
         operation.setResponses(createEntityResponse(entity));
 
-        RequestBody requestBody = new RequestBody();
-        operation.requestBody(requestBody);
+//        RequestBody requestBody = new RequestBody();
+//
+//        operation.requestBody(requestBody);
 
-        operation.setParameters(parameters);
+
         return operation;
+    }
+
+    private Parameter createStringVariable(String name, String description) {
+        Parameter idParam = new Parameter();
+        idParam.setName(name);
+        idParam.setIn("path");
+        idParam.schema(new StringSchema());
+        idParam.setDescription(description);
+        return idParam;
     }
 
     private Operation createUpdateOperation(Entity entity) {
@@ -175,12 +178,7 @@ public class MetaSwaggerApiService {
         operation.setResponses(createEntityResponse(entity));
 
         List<Parameter> parameters = new ArrayList<>();
-
-        Parameter idParam = new Parameter();
-        idParam.setName("id");
-        idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() + " that needs to be updated");
-        parameters.add(idParam);
+        parameters.add(createStringVariable("id", "ID of " + entity.getName() + " that needs to be updated"));
 
         operation.setParameters(parameters);
         return operation;
@@ -190,18 +188,13 @@ public class MetaSwaggerApiService {
         Operation operation = new Operation();
         operation.setDescription(entity.getDescription());
         operation.setSummary("delete one record of " + entity.getName() + " by ID");
-        operation.setOperationId("update" + entity.getName());
+        operation.setOperationId("delete" + entity.getName()+ "byID");
         operation.addTagsItem(entity.getName());
 
         operation.setResponses(createEntityResponse(entity));
 
         List<Parameter> parameters = new ArrayList<>();
-
-        Parameter idParam = new Parameter();
-        idParam.setName("id");
-        idParam.setIn("path");
-        idParam.setDescription("ID of " + entity.getName() + " that needs to be delete");
-        parameters.add(idParam);
+        parameters.add(createStringVariable("id", "ID of " + entity.getName() + " that needs to be delete"));
 
         operation.setParameters(parameters);
         return operation;
@@ -219,12 +212,25 @@ public class MetaSwaggerApiService {
         ObjectSchema objectSchema = new ObjectSchema();
         entity.getFields().forEach(entityField -> {
             String javaType = entityField.getJavaType();
-            if (StringUtils.isNotEmpty(javaType)) {
+            DataType dataType = entityField.getDataType();
+            if (DataType.Lookup == dataType) {
+                Relation relation = Relation.of(entityField.getProperties());
+                Entity targetEntity = this.metaEntityService.getEntity(relation.getRelatedEntityId());
+                if (RelationType.ManyToOne == relation.getRelationType() || RelationType.OneWay == relation.getRelationType()) {
+                    Schema manyToOne = new ObjectSchema().$ref("#/components/schemas/" + targetEntity.getName());
+                    objectSchema.addProperties(entityField.getName(), manyToOne);
+                }
+                if ((RelationType.ManyToMany == relation.getRelationType() && relation.isDominant()) || RelationType.OneToMany == relation.getRelationType()) {
+                    Schema arraySchema = new ArraySchema().items(new ObjectSchema().$ref("#/components/schemas/" + targetEntity.getName()));
+                    objectSchema.addProperties(entityField.getName(), arraySchema);
+                }
+
+            } else  if (StringUtils.isNotEmpty(javaType)) {
                 try {
                     Class<?> cls = Class.forName(javaType);
                     Schema property = PrimitiveType.createProperty(cls);
                     if (property != null) {
-                        if (entityField.getRequired()) {
+                        if (entityField.getRequired() && !EntityFieldUtils.isSystemControl(dataType)) {
                             //fieldSchema.required(true);
                             objectSchema.addRequiredItem(entityField.getName());
                         }

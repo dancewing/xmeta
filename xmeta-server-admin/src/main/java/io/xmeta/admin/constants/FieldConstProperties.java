@@ -1,6 +1,6 @@
 package io.xmeta.admin.constants;
 
-import io.xmeta.admin.util.Maps;
+import io.xmeta.core.utils.Maps;
 import io.xmeta.core.domain.RelationType;
 import io.xmeta.core.domain.RelationTypeConstants;
 

@@ -10,7 +10,8 @@
     "lint": "eslint --cache .",
     "build": "npx rollup -c",
     "watch": "npm run build -- --watch",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "clean": "rimraf \"dist\""
   },
   "dependencies": {
     "@primer/components": "^20.3.0",

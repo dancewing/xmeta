@@ -4,6 +4,13 @@
 @import "./style/css-variables.css";
 @import "./style/index.scss";
 
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(http://cdn.bootcss.com/material-design-icons/3.0.2/iconfont/MaterialIcons-Regular.woff2) format('woff2');
+}
+
 body {
   color: var(--black100);
 }

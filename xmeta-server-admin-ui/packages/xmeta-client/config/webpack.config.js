@@ -28,6 +28,7 @@ const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const WebpackBar = require('webpackbar');
 const postcssNormalize = require('postcss-normalize');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const appPackageJson = require(paths.appPackageJson);
 
@@ -76,6 +77,8 @@ const hasJsxRuntime = (() => {
     return false;
   }
 })();
+
+const report = `${process.env.REPORT || 'false'}` === 'true';
 
 // This is the production and development configuration.
 // It is focused on developer experience, fast rebuilds, and a minimal bundle.
@@ -683,6 +686,7 @@ module.exports = function (webpackEnv) {
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         }),
       new WebpackBar(),
+      report && new BundleAnalyzerPlugin(),
       // TypeScript type checking
       useTypeScript &&
         new ForkTsCheckerWebpackPlugin({

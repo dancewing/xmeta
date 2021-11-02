@@ -1,0 +1,27 @@
+@import "../../../style/index.scss";
+.handler {
+  position: absolute;
+  left: var(--double-spacing);
+  top: 40px;
+  z-index: 99;
+  width: 200px;
+  margin: 0;
+  padding: 8px 0;
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 16px;
+  list-style-type: none;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 3px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.01);
+
+  .item {
+    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      color: #000;
+      background-color: #e0e0e0;
+    }
+  }
+}

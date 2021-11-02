@@ -5,7 +5,7 @@ import io.xmeta.admin.mapper.BlockMapper;
 import io.xmeta.admin.model.*;
 import io.xmeta.admin.repository.BlockRepository;
 import io.xmeta.admin.repository.BlockVersionRepository;
-import io.xmeta.admin.util.Maps;
+import io.xmeta.core.utils.Maps;
 import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.core.utils.ObjectMapperUtils;
 import io.xmeta.security.AuthUserDetail;

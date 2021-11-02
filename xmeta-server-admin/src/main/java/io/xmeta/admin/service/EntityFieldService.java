@@ -1,5 +1,6 @@
 package io.xmeta.admin.service;
 
+import io.jsonwebtoken.lang.Assert;
 import io.xmeta.admin.constants.FieldConstProperties;
 import io.xmeta.admin.domain.*;
 import io.xmeta.admin.mapper.EntityFieldMapper;
@@ -8,7 +9,7 @@ import io.xmeta.admin.repository.EntityFieldRepository;
 import io.xmeta.admin.repository.EntityRepository;
 import io.xmeta.admin.repository.EntityVersionRepository;
 import io.xmeta.admin.util.Inflector;
-import io.xmeta.admin.util.Maps;
+import io.xmeta.core.utils.Maps;
 import io.xmeta.admin.util.PredicateBuilder;
 import io.xmeta.core.domain.DataType;
 import io.xmeta.core.domain.RelationType;
@@ -334,31 +335,10 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
     //获取
     private Map<String, Object> getDefaultFieldProperties(EnumDataType dataType) {
-        if (dataType == null) {
-            return FieldConstProperties.SingleLineText;
-        }
-        switch (dataType) {
-            case Id:
-                return FieldConstProperties.Id;
-            case SingleLineText:
-                return FieldConstProperties.SingleLineText;
-            case MultiLineText:
-                return FieldConstProperties.MultiLineText;
-            case WholeNumber:
-                return FieldConstProperties.WholeNumber;
-            case DecimalNumber:
-                return FieldConstProperties.DecimalNumber;
-            case DateTime:
-                return FieldConstProperties.DateTime;
-            case Lookup:
-                return FieldConstProperties.Lookup;
-            case OptionSet:
-                return FieldConstProperties.OptionSet;
-            case MultiSelectOptionSet:
-                return FieldConstProperties.MultiSelectOptionSet;
-            default:
-                return new HashMap<>();
-        }
+        Assert.notNull(dataType, "DataType can't be null");
+        DataType type = DataType.fromName(dataType.name());
+        Assert.notNull(type, dataType.name() + "未找到映射的系统类型");
+        return type.getProperties();
     }
 
     private boolean isFieldNameAvailable(String name, String entityId) {

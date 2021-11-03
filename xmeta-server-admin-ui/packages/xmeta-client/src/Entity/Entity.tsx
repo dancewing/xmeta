@@ -171,7 +171,6 @@ export const GET_ENTITY = gql`
       id
       name
       displayName
-      pluralDisplayName
       description
       lockedAt
       table
@@ -203,7 +202,6 @@ const UPDATE_ENTITY = gql`
       id
       name
       displayName
-      pluralDisplayName
       description
       lockedAt
       table

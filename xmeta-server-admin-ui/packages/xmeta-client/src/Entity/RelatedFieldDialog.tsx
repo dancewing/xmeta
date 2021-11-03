@@ -51,14 +51,7 @@ export const RelatedFieldDialog = ({
       skip: !relatedEntityId,
     }
   );
-  //TODO update here
-  const allowMultipleSelection = true;
-  const valuesSuggestion = allowMultipleSelection
-    ? {
-        relatedFieldName: camelCase(entity.pluralDisplayName),
-        relatedFieldDisplayName: entity.pluralDisplayName,
-      }
-    : {
+  const valuesSuggestion =  {
         relatedFieldName: camelCase(entity.name),
         relatedFieldDisplayName: entity.displayName,
       };

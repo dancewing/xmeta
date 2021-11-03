@@ -6,7 +6,6 @@ import { pascalCase } from "pascal-case";
 import { formatError } from "../util/error";
 import * as models from "../models";
 import {
-  generatePluralDisplayName,
   generateSingularDisplayName,
 } from "../Components/PluralDisplayNameField";
 import PendingChangesContext from "../VersionControl/PendingChangesContext";
@@ -74,7 +73,6 @@ const NewEntity = ({ applicationId }: Props) => {
   const handleSubmit = useCallback(
     (data: CreateEntityType) => {
       const displayName = data.displayName.trim();
-      const pluralDisplayName = generatePluralDisplayName(displayName);
       const singularDisplayName = generateSingularDisplayName(displayName);
       const name = pascalCase(singularDisplayName);
 
@@ -84,7 +82,6 @@ const NewEntity = ({ applicationId }: Props) => {
             ...data,
             displayName,
             name,
-            pluralDisplayName,
             app: { connect: { id: applicationId } },
           },
         },

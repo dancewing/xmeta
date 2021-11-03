@@ -148,7 +148,6 @@ export const GET_ENTITY_VERSION = gql`
         versionNumber
         name
         displayName
-        pluralDisplayName
         description
         table
         permissions {

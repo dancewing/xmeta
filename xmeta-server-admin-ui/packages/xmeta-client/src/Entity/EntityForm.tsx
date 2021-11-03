@@ -10,7 +10,6 @@ import NameField from "../Components/NameField";
 import { Form } from "../Components/Form";
 import { USER_ENTITY } from "./constants";
 import { validate } from "../util/formikValidateJsonSchema";
-import { isEqual } from "../util/customValidations";
 import {Button, EnumButtonStyle} from "../Components/Button";
 import {CROSS_OS_CTRL_ENTER} from "../util/hotkeys";
 import {GlobalHotKeys} from "react-hotkeys";
@@ -36,7 +35,7 @@ const NON_INPUT_GRAPHQL_PROPERTIES = [
 ];
 
 const FORM_SCHEMA = {
-  required: ["name", "displayName", "pluralDisplayName"],
+  required: ["name", "displayName"],
   properties: {
     displayName: {
       type: "string",
@@ -46,15 +45,8 @@ const FORM_SCHEMA = {
       type: "string",
       minLength: 2,
     },
-    pluralDisplayName: {
-      type: "string",
-      minLength: 2,
-    },
   },
 };
-
-const EQUAL_PLURAL_DISPLAY_NAME_AND_NAME_TEXT =
-  "Name and plural display names cannot be equal. The ‘plural display name’ field must be in a plural form and ‘name’ field must be in a singular form";
 
 const CLASS_NAME = "entity-form";
 
@@ -78,11 +70,6 @@ const EntityForm = React.memo(({ entity, applicationId, onSubmit }: Props) => {
       <Formik
         initialValues={initialValues}
         validate={(values) => {
-          if (isEqual(values.name, values.pluralDisplayName)) {
-            return {
-              pluralDisplayName: EQUAL_PLURAL_DISPLAY_NAME_AND_NAME_TEXT,
-            };
-          }
           return validate(values, FORM_SCHEMA);
         }}
         enableReinitialize
@@ -102,10 +89,6 @@ const EntityForm = React.memo(({ entity, applicationId, onSubmit }: Props) => {
                     capitalized
                 />
                 <DisplayNameField name="displayName" label="Display Name" />
-                <TextField
-                    name="pluralDisplayName"
-                    label="Plural Display Name"
-                />
                 <TextField
                     name="table"
                     label="Table"

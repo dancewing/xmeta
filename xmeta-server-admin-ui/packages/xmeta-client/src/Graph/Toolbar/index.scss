@@ -1,10 +1,10 @@
-@import "../../../style/index.scss";
+@import "../../style/index.scss";
 .handler {
   position: absolute;
   left: var(--double-spacing);
   top: 40px;
   z-index: 99;
-  width: 200px;
+  width: 400px;
   margin: 0;
   padding: 8px 0;
   color: rgba(0, 0, 0, 0.45);
@@ -15,13 +15,18 @@
   border-radius: 3px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.01);
 
+  .seperator {
+    color: var(--black80);
+    margin: 0 20px;
+  }
+
   .item {
     text-align: center;
     cursor: pointer;
 
-    &:hover {
-      color: #000;
-      background-color: #e0e0e0;
-    }
+    //&:hover {
+    //  color: #000;
+    //  background-color: #e0e0e0;
+    //}
   }
 }

@@ -19,17 +19,17 @@ import java.util.function.Function;
 
 public class JdbcMetaLoaderService implements MetaDatabaseLoaderService {
 
-    private static final String ENTITY_COLUMN_NAMES = "id, name, displayName, pluralDisplayName, table_, description";
+    private static final String ENTITY_COLUMN_NAMES = "id, name, displayName, table_, description";
     private static final String ENTITY_TABLE_NAME = "xmeta_entity";
     private static final String LOAD_ALL_ENTITY_SQL = "SELECT " + ENTITY_COLUMN_NAMES
             + " FROM " + ENTITY_TABLE_NAME;
 
     private static final String UPDATE_ENTITY_SQL = "UPDATE " + ENTITY_TABLE_NAME +
-            " SET lastSyncTime=?, name=?, displayName=?, pluralDisplayName=?, table_= ?, description= ? " +
+            " SET lastSyncTime=?, name=?, displayName=?, table_= ?, description= ? " +
             "WHERE id= ?";
     private static final String INSERT_ENTITY_SQL = "INSERT INTO " + ENTITY_TABLE_NAME +
-            " (lastSyncTime, name, displayName, pluralDisplayName, table_, description, id) " +
-            "VALUES(?, ?, ?, ?, ?, ?, ?);";
+            " (lastSyncTime, name, displayName, table_, description, id) " +
+            "VALUES(?, ?, ?, ?, ?, ?);";
 
     private static final String ENTITY_FIELD_COLUMN_NAMES = "id, name, displayName, column_, dataType, javaType, required, unique_, searchable, description, properties, entity_id";
     private static final String ENTITY_FIELD_TABLE_NAME = "xmeta_entity_field";
@@ -172,7 +172,6 @@ public class JdbcMetaLoaderService implements MetaDatabaseLoaderService {
             entity.setId(rs.getString("id"));
             entity.setName(rs.getString("name"));
             entity.setDisplayName(rs.getString("displayName"));
-            entity.setPluralDisplayName(rs.getString("pluralDisplayName"));
             entity.setTable(rs.getString("table_"));
             entity.setDescription(rs.getString("description"));
             return entity;
@@ -218,10 +217,8 @@ public class JdbcMetaLoaderService implements MetaDatabaseLoaderService {
         @Override
         public List<SqlParameterValue> apply(Entity entity) {
             List<SqlParameterValue> parameterValues = new ArrayList<>();
-            //id, name, displayName, pluralDisplayName, table_, description
             parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getName()));
             parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getDisplayName()));
-            parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getPluralDisplayName()));
             parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getTable()));
             parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getDescription()));
             parameterValues.add(new SqlParameterValue(Types.VARCHAR, entity.getId()));

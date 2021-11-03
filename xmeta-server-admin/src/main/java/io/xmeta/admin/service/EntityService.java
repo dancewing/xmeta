@@ -160,7 +160,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityEntity.setName(data.getName());
         entityEntity.setTable(table);
         entityEntity.setDisplayName(data.getDisplayName());
-        entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription("");
         entityEntity.setLockedByUser(user);
         entityEntity.setLockedAt(ZonedDateTime.now());
@@ -178,8 +177,7 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         entityVersionEntity.setVersionNumber(0);
         entityVersionEntity.setName(data.getName());
         entityVersionEntity.setDisplayName(data.getDisplayName());
-        entityVersionEntity.setPluralDisplayName(data.getPluralDisplayName());
-        entityVersionEntity.setDescription("");
+        entityVersionEntity.setDescription(null);
         entityVersionEntity.setCommit(null);
         entityVersionEntity.setDeleted(null);
         entityVersionEntity.setTable(table);
@@ -264,7 +262,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             if (action == EnumPendingChangeAction.Delete) {
                 entity.setName(SoftDelete.revertDeletedItemName(entity.getName(), entity.getId()));
                 entity.setDisplayName(SoftDelete.revertDeletedItemName(entity.getDisplayName(), entity.getId()));
-                entity.setPluralDisplayName(SoftDelete.revertDeletedItemName(entity.getPluralDisplayName(), entity.getId()));
             }
 
             PendingChange pendingChange = new PendingChange();
@@ -308,7 +305,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             if (action == EnumPendingChangeAction.Delete) {
                 entity.setName(changedVersion.getName());
                 entity.setDisplayName(changedVersion.getDisplayName());
-                entity.setPluralDisplayName(changedVersion.getPluralDisplayName());
             }
 
             PendingChange pendingChange = new PendingChange();
@@ -333,7 +329,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         EntityEntity entityEntity = this.lockService.acquireEntityLock(where.getId());
         entityEntity.setName(data.getName());
         entityEntity.setDisplayName(data.getDisplayName());
-        entityEntity.setPluralDisplayName(data.getPluralDisplayName());
         entityEntity.setDescription(data.getDescription());
         entityEntity.setTable(data.getTable());
 
@@ -345,7 +340,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
         } else {
             versionEntity.setName(data.getName());
             versionEntity.setDisplayName(data.getDisplayName());
-            versionEntity.setPluralDisplayName(data.getPluralDisplayName());
             versionEntity.setDescription(data.getDescription());
             versionEntity.setTable(data.getTable());
             this.entityVersionRepository.save(versionEntity);
@@ -359,7 +353,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
 
         entityEntity.setName(SoftDelete.prepareDeletedItemName(entityEntity.getName(), entityEntity.getId()));
         entityEntity.setDisplayName(SoftDelete.prepareDeletedItemName(entityEntity.getDisplayName(), entityEntity.getId()));
-        entityEntity.setPluralDisplayName(SoftDelete.prepareDeletedItemName(entityEntity.getPluralDisplayName(), entityEntity.getId()));
 
         this.entityRepository.save(entityEntity);
 
@@ -386,7 +379,6 @@ public class EntityService extends BaseService<EntityRepository, EntityEntity, S
             entityDomain.setTable(entity.getTable());
             entityDomain.setName(entity.getName());
             entityDomain.setDisplayName(entity.getDisplayName());
-            entityDomain.setPluralDisplayName(entity.getPluralDisplayName());
             Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("versionNumber")));
             Page<EntityVersionEntity> page = this.entityVersionRepository.findEntityVersions(entity.getId(),
                     pageable);

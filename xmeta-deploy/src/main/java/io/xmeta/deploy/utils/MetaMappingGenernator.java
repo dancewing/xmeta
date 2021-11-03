@@ -30,17 +30,9 @@ public final class MetaMappingGenernator {
         column = new TableColumn(table);
         column.setName("displayName");
         column.setLength(500);
-        column.setNullable(true);
+        column.setNullable(false);
         column.setType(JdbcUtil.sqlTypeFor(String.class));
         table.getColumnsMap().put(column.getName(), column);
-
-        column = new TableColumn(table);
-        column.setName("pluralDisplayName");
-        column.setLength(500);
-        column.setNullable(true);
-        column.setType(JdbcUtil.sqlTypeFor(String.class));
-        table.getColumnsMap().put(column.getName(), column);
-
 
         column = new TableColumn(table);
         column.setName("table_");

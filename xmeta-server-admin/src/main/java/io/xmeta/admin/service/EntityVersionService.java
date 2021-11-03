@@ -133,7 +133,6 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         newEntityVersion.setVersionNumber(nextVersionNumber);
         newEntityVersion.setName(firstEntityVersion.getName());
         newEntityVersion.setDisplayName(firstEntityVersion.getDisplayName());
-        newEntityVersion.setPluralDisplayName(firstEntityVersion.getPluralDisplayName());
         newEntityVersion.setDescription(firstEntityVersion.getDescription());
         newEntityVersion.setTable(firstEntityVersion.getTable());
 
@@ -168,7 +167,6 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
         //update the target version with its fields, and the its parent entity
         targetVersion.setName(sourceVersion.getName());
         targetVersion.setDisplayName(sourceVersion.getDisplayName());
-        targetVersion.setPluralDisplayName(sourceVersion.getPluralDisplayName());
         targetVersion.setDescription(sourceVersion.getDescription());
         this.entityVersionRepository.save(targetVersion);
 
@@ -204,7 +202,6 @@ public class EntityVersionService extends BaseService<EntityVersionRepository, E
             EntityEntity entityEntity = targetVersion.getEntity();
             entityEntity.setName(sourceVersion.getName());
             entityEntity.setDisplayName(sourceVersion.getDisplayName());
-            entityEntity.setPluralDisplayName(sourceVersion.getPluralDisplayName());
             entityEntity.setDescription(sourceVersion.getDescription());
             entityEntity.setDeletedAt(null);
             this.entityRepository.save(entityEntity);

@@ -15,8 +15,6 @@ public class Entity implements java.io.Serializable {
     @javax.validation.constraints.NotNull
     private String displayName;
     @javax.validation.constraints.NotNull
-    private String pluralDisplayName;
-    @javax.validation.constraints.NotNull
     private String table;
     private String description;
     private List<EntityField> fields = new ArrayList<>();
@@ -25,11 +23,10 @@ public class Entity implements java.io.Serializable {
     public Entity() {
     }
 
-    public Entity(String id, String name, String displayName, String pluralDisplayName, String table, String description, List<EntityField> fields) {
+    public Entity(String id, String name, String displayName, String table, String description, List<EntityField> fields) {
         this.id = id;
         this.name = name;
         this.displayName = displayName;
-        this.pluralDisplayName = pluralDisplayName;
         this.table = table;
         this.description = description;
         this.fields = fields;
@@ -57,14 +54,6 @@ public class Entity implements java.io.Serializable {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
-    }
-
-    public String getPluralDisplayName() {
-        return pluralDisplayName;
-    }
-
-    public void setPluralDisplayName(String pluralDisplayName) {
-        this.pluralDisplayName = pluralDisplayName;
     }
 
     public String getTable() {
@@ -108,7 +97,6 @@ public class Entity implements java.io.Serializable {
         private String id;
         private String name;
         private String displayName;
-        private String pluralDisplayName;
         private String table;
         private String description;
         private List<EntityField> fields;
@@ -131,11 +119,6 @@ public class Entity implements java.io.Serializable {
             return this;
         }
 
-        public Builder setPluralDisplayName(String pluralDisplayName) {
-            this.pluralDisplayName = pluralDisplayName;
-            return this;
-        }
-
         public Builder setTable(String table) {
             this.table = table;
             return this;
@@ -152,7 +135,7 @@ public class Entity implements java.io.Serializable {
         }
 
         public Entity build() {
-            return new Entity(id, name, displayName, pluralDisplayName, table, description, fields);
+            return new Entity(id, name, displayName, table, description, fields);
         }
     }
 

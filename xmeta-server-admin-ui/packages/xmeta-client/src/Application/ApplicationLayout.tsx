@@ -34,6 +34,8 @@ import Environments from "../Environment/Environments";
 import {EntityDiagram} from "../Entity/EntityDiagram";
 import Diagram  from "../Graph";
 import NavigationTabs from "../Layout/NavigationTabs";
+import { ReactComponent as EnvironmentOutline } from "../assets/icons/environment.svg";
+import { ReactComponent as PartitionOutline } from "../assets/icons/partition.svg";
 
 enum EnumFixedPanelKeys {
   None = "None",
@@ -231,13 +233,15 @@ function ApplicationLayout({ match }: Props) {
           <MenuItem
               title="Environment"
               to={`/${application}/environments`}
-              icon="server"
-          />
+          >
+            <i><EnvironmentOutline /></i>
+          </MenuItem>
           <MenuItem
               title="Diagram"
               to={`/${application}/diagram`}
-              icon="server"
-          />
+          >
+            <i><PartitionOutline /></i>
+          </MenuItem>
         </MainLayout.Menu>
         <MainLayout.Content>
           <div className={`${CLASS_NAME}__app-container`}>

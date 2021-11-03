@@ -561,7 +561,6 @@ type Entity {
   appId: String!
   name: String!
   displayName: String!
-  pluralDisplayName: String!
   table: String
   description: String
   versions(where: EntityVersionWhereInput, orderBy: EntityVersionOrderByInput, skip: Int, take: Int): [EntityVersion!]
@@ -582,7 +581,6 @@ input EntityCreateInput {
   name: String!
   table: String
   displayName: String!
-  pluralDisplayName: String!
   description: String
   app: WhereParentIdInput!
 }
@@ -682,7 +680,6 @@ input EntityOrderByInput {
   updatedAt: SortOrder
   name: SortOrder
   displayName: SortOrder
-  pluralDisplayName: SortOrder
   description: SortOrder
 }
 
@@ -817,7 +814,6 @@ input EntityUpdateInput {
   name: String
   table: String
   displayName: String
-  pluralDisplayName: String
   description: String
 }
 
@@ -849,7 +845,6 @@ type EntityVersion {
   name: String!
   table: String!
   displayName: String!
-  pluralDisplayName: String!
   description: String
   commit: Commit
   fields(where: EntityFieldWhereInput, orderBy: EntityFieldOrderByInput, skip: Int, take: Int): [EntityField!]!
@@ -863,7 +858,6 @@ input EntityVersionOrderByInput {
   versionNumber: SortOrder
   name: SortOrder
   displayName: SortOrder
-  pluralDisplayName: SortOrder
   description: SortOrder
   label: SortOrder
 }
@@ -876,7 +870,6 @@ input EntityVersionWhereInput {
   name: StringFilter
   table: StringFilter
   displayName: StringFilter
-  pluralDisplayName: StringFilter
   description: StringFilter
   label: StringFilter
   entity: WhereUniqueInput
@@ -888,7 +881,6 @@ input EntityWhereInput {
   updatedAt: DateTimeFilter
   name: StringFilter
   displayName: StringFilter
-  pluralDisplayName: StringFilter
   description: StringFilter
   fields: EntityFieldFilter
   app: WhereUniqueInput

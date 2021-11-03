@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {gql, useQuery} from "@apollo/client";
 import {match } from "react-router-dom";
 import {Snackbar} from "@rmwc/snackbar";
@@ -7,6 +7,7 @@ import {formatError} from "../util/error";
 import "./EntityDiagram.scss";
 import ERGraphPage from "../Graph";
 import useNavigationTabs from "../Layout/UseNavigationTabs";
+import ThemeContext from "../Layout/ThemeContext";
 
 type TData = {
   entities: models.Entity[];
@@ -23,6 +24,8 @@ export const EntityDiagram= ({ match }: Props) => {
   const { application } = match.params;
 
   useNavigationTabs(application, "Diagram", match.url, "Diagram");
+
+  const themeContext = useContext(ThemeContext);
 
   const {
     data,
@@ -43,7 +46,7 @@ export const EntityDiagram= ({ match }: Props) => {
     <div className={CLASS_NAME}>
       <div className={`${CLASS_NAME}__layout`}>
         {!loading && data ?  (
-          <ERGraphPage entities={data.entities} />
+          <ERGraphPage entities={data.entities} theme={themeContext.theme} />
         ): null}
         <Snackbar
           open={Boolean(error)}

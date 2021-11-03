@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
 /**
@@ -17,8 +18,7 @@ import java.time.ZonedDateTime;
 @Setter
 @Table(name = "Entity", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"app_id", "display_name"}),
-        @UniqueConstraint(columnNames = {"app_id", "name"}),
-        @UniqueConstraint(columnNames = {"app_id", "plural_display_name"})
+        @UniqueConstraint(columnNames = {"app_id", "name"})
 })
 public class EntityEntity extends BaseEntity {
 
@@ -36,17 +36,16 @@ public class EntityEntity extends BaseEntity {
     @ManyToOne
     private AppEntity app;
 
+    @NotNull
     @Column(name = "name")
     private String name;
 
     @Column(name = "table_")
     private String table;
 
+    @NotNull
     @Column(name = "display_Name")
     private String displayName;
-
-    @Column(name = "plural_display_name")
-    private String pluralDisplayName;
 
     @Column(name = "description")
     private String description;

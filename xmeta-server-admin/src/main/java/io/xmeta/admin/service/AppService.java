@@ -177,7 +177,6 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
             //第一步创建数据模型，添加普通字段
             entities.forEach(appEntityInput -> {
                 String displayName = StringUtils.trim(appEntityInput.getName());
-                String pluralDisplayName = Inflector.getInstance().pluralize(displayName);
                 String singularDisplayName = Inflector.getInstance().singularize(displayName);
                 String name = Inflector.getInstance().upperCamelCase(singularDisplayName, ' ');
 
@@ -190,7 +189,6 @@ public class AppService extends BaseService<AppRepository, AppEntity, String> {
                 builder.setName(name);
                 builder.setDisplayName(displayName);
                 builder.setTable(table);
-                builder.setPluralDisplayName(pluralDisplayName);
                 Entity newEntity = this.entityService.createOneEntity(builder.build());
                 newEntities.put(appEntityInput.getName(), newEntity);
 

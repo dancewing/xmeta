@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,17 +44,16 @@ public class EntityVersionEntity extends BaseEntity {
     @Column(name = "version_Number")
     private Integer versionNumber;
 
+    @NotNull
     @Column(name = "name")
     private String name;
 
     @Column(name = "table_")
     private String table;
 
+    @NotNull
     @Column(name = "display_Name")
     private String displayName;
-
-    @Column(name = "plural_Display_Name")
-    private String pluralDisplayName;
 
     @Column(name = "description")
     private String description;

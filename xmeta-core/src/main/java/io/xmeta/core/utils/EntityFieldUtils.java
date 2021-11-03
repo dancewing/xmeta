@@ -44,11 +44,6 @@ public final class EntityFieldUtils {
         }
     }
 
-    public static boolean allowMultipleSelection(RelationType relationType) {
-        Assert.notNull(relationType, "relationType can not be null");
-        return (relationType == RelationType.OneToMany || relationType == RelationType.ManyToMany);
-    }
-
     public static Optional<EntityField> findPK(Entity entity) {
         return entity.getFields().stream().filter(entityField -> DataType.Id == entityField.getDataType()).findFirst();
     }

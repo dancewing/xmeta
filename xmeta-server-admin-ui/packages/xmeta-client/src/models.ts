@@ -630,7 +630,6 @@ export type Entity = {
   appId: Scalars["String"];
   name: Scalars["String"];
   displayName: Scalars["String"];
-  pluralDisplayName: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   versions?: Maybe<Array<EntityVersion>>;
   fields?: Maybe<Array<EntityField>>;
@@ -663,7 +662,6 @@ export type EntityAddPermissionFieldInput = {
 export type EntityCreateInput = {
   name: Scalars["String"];
   displayName: Scalars["String"];
-  pluralDisplayName: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   app: WhereParentIdInput;
 };
@@ -758,7 +756,6 @@ export type EntityOrderByInput = {
   updatedAt?: Maybe<SortOrder>;
   name?: Maybe<SortOrder>;
   displayName?: Maybe<SortOrder>;
-  pluralDisplayName?: Maybe<SortOrder>;
   description?: Maybe<SortOrder>;
 };
 
@@ -898,7 +895,6 @@ export type EntityPermissionRole = {
 export type EntityUpdateInput = {
   name?: Maybe<Scalars["String"]>;
   displayName?: Maybe<Scalars["String"]>;
-  pluralDisplayName?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
 };
 
@@ -930,7 +926,6 @@ export type EntityVersion = {
   versionNumber: Scalars["Int"];
   name: Scalars["String"];
   displayName: Scalars["String"];
-  pluralDisplayName: Scalars["String"];
   description?: Maybe<Scalars["String"]>;
   commit?: Maybe<Commit>;
   fields: Array<EntityField>;
@@ -951,7 +946,6 @@ export type EntityVersionOrderByInput = {
   versionNumber?: Maybe<SortOrder>;
   name?: Maybe<SortOrder>;
   displayName?: Maybe<SortOrder>;
-  pluralDisplayName?: Maybe<SortOrder>;
   description?: Maybe<SortOrder>;
   label?: Maybe<SortOrder>;
 };
@@ -963,7 +957,6 @@ export type EntityVersionWhereInput = {
   versionNumber?: Maybe<IntFilter>;
   name?: Maybe<StringFilter>;
   displayName?: Maybe<StringFilter>;
-  pluralDisplayName?: Maybe<StringFilter>;
   description?: Maybe<StringFilter>;
   label?: Maybe<StringFilter>;
   entity?: Maybe<WhereUniqueInput>;
@@ -975,7 +968,6 @@ export type EntityWhereInput = {
   updatedAt?: Maybe<DateTimeFilter>;
   name?: Maybe<StringFilter>;
   displayName?: Maybe<StringFilter>;
-  pluralDisplayName?: Maybe<StringFilter>;
   description?: Maybe<StringFilter>;
   fields?: Maybe<EntityFieldFilter>;
   app?: Maybe<WhereUniqueInput>;

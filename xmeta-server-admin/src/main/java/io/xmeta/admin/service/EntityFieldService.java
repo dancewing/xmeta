@@ -225,15 +225,10 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
         RelationType relationType = EntityFieldUtils.getRelationType(createInput.getProperties());
         if (createInput.getDataType() == EnumDataType.Lookup && relationType!=null && relationType != RelationType.OneWay) {
 
-            boolean allowMultipleSelection = EntityFieldUtils.allowMultipleSelection(relationType);
-
-            relatedFieldName = Inflector.getInstance().lowerCamelCase(
-                    !allowMultipleSelection ? entityEntity.getPluralDisplayName() : entityEntity.getName()
+            relatedFieldName = Inflector.getInstance().lowerCamelCase(entityEntity.getName()
                     , ' ');
 
-            relatedFieldDisplayName = !allowMultipleSelection
-                    ? entityEntity.getPluralDisplayName()
-                    : entityEntity.getDisplayName();
+            relatedFieldDisplayName = entityEntity.getDisplayName();
         }
         return this.createEntityField(createInput, relatedFieldName, relatedFieldDisplayName);
     }
@@ -288,17 +283,12 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
                 EntityEntity relatedEntity = entities.get(0);
                 // The created field would be multiple selection if its name is equal to
                 // the related entity's plural display name
-                boolean allowMultipleSelection = StringUtils.equals(relatedEntity.getPluralDisplayName(), lowerCaseName);
 
                 // The related field allow multiple selection should be the opposite of
                 // the field's
-                boolean relatedFieldAllowMultipleSelection = !allowMultipleSelection;
 
                 // The related field name should resemble the name of the field's entity
-                String relatedFieldName = Inflector.getInstance().lowerCamelCase(
-                        relatedFieldAllowMultipleSelection
-                                ? entity.getName()
-                                : entity.getPluralDisplayName(), ' ');
+                String relatedFieldName = Inflector.getInstance().lowerCamelCase(entity.getName(), ' ');
                 if (isFieldNameAvailable(relatedFieldName, relatedEntity.getId())) {
                     //TODO relation 类型需要重新处理
                     Map<String, Object> properties = data.getProperties();
@@ -409,6 +399,9 @@ public class EntityFieldService extends BaseService<EntityFieldRepository, Entit
 
             return query.where(predicates.toArray(new Predicate[predicates.size()])).getRestriction();
         };
+        if (orderBy == null) {
+            orderBy = EntityFieldOrderByInput.builder().setCreatedAt(SortOrder.Asc).build();
+        }
         specification = specification.and(condition);
         Sort sort = createSort(orderBy);
         List<EntityFieldEntity> result = null;

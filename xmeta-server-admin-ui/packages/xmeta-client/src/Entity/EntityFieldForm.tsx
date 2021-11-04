@@ -3,7 +3,7 @@ import { Formik, FormikErrors } from "formik";
 import omit from "lodash.omit";
 import { isEmpty } from "lodash";
 import { getSchemaForDataType } from "@xmeta/data";
-import { ToggleField, TextField, Panel } from "@xmeta/design-system";
+import { ToggleField, TextField } from "@xmeta/design-system";
 import * as models from "../models";
 import { DisplayNameField } from "../Components/DisplayNameField";
 import { Form } from "../Components/Form";
@@ -14,7 +14,6 @@ import DataTypeSelectField from "./DataTypeSelectField";
 import { SchemaFields } from "./SchemaFields";
 import {Button, EnumButtonStyle} from "../Components/Button";
 import {Grid, GridCell, GridRow} from "@rmwc/grid";
-import {TabBar, Tab} from "@rmwc/tabs";
 import EnumSelectField from "../Components/EnumSelectField";
 import {useIntl} from "react-intl";
 
@@ -77,7 +76,6 @@ const EntityFieldForm = ({
   entityId,
   entityDisplayName,
 }: Props) => {
-  const [activeTab, setActiveTab] = React.useState(0);
   const intl = useIntl();
   const initialValues = useMemo(() => {
     const sanitizedDefaultValues = omit(
@@ -176,37 +174,22 @@ const EntityFieldForm = ({
               </GridRow>
               <GridRow>
                 <GridCell span={12}>
-                  <Panel style={{padding: "12px 0", margin: 0}} className="options-panel">
-                    <TabBar
-                            activeTabIndex={activeTab}
-                            onActivate={evt => setActiveTab(evt.detail.index)}
-                    >
-                      <Tab>Data Type</Tab>
-                      <Tab>Input Type</Tab>
-                    </TabBar>
-                    <div style={{paddingTop:12}}>
-                      <div style={{display: activeTab===0?'block':'none'}}>
-                        {!SYSTEM_DATA_TYPES.has(formik.values.dataType) && (
-                            <DataTypeSelectField label="DataType" disabled={isDisabled || formik.values.properties?.dominant} />
-                        )}
-                        <SchemaFields
-                            schema={schema}
-                            isDisabled={isDisabled || formik.values.properties?.dominant}
-                            applicationId={applicationId}
-                            entityId={entityId}
-                            entityDisplayName={entityDisplayName}
-                        />
-                      </div>
-                      <div style={{display: activeTab===1?'block':'none'}}>
-                        <EnumSelectField
-                            label=""
-                            name="inputType"
-                            disabled={isDisabled}
-                            options={[]}
-                        />
-                      </div>
-                    </div>
-                  </Panel>
+                  {!SYSTEM_DATA_TYPES.has(formik.values.dataType) && (
+                      <DataTypeSelectField label="DataType" disabled={isDisabled || formik.values.properties?.dominant} />
+                  )}
+                  <SchemaFields
+                      schema={schema}
+                      isDisabled={isDisabled || formik.values.properties?.dominant}
+                      applicationId={applicationId}
+                      entityId={entityId}
+                      entityDisplayName={entityDisplayName}
+                  />
+                  <EnumSelectField
+                      label="InputType"
+                      name="inputType"
+                      disabled={isDisabled}
+                      options={[]}
+                  />
                 </GridCell>
               </GridRow>
             </Grid>

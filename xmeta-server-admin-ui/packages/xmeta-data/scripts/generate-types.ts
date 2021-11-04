@@ -25,22 +25,44 @@ async function generateTypes() {
   }
   await fs.promises.mkdir(TYPES_DIRECTORY, { recursive: true });
   await Promise.all(
-    schemaFiles.map(async ({ name, path: filePath }) =>
-      generateTypeFile(filePath, name)
-    )
+      schemaFiles.map( ({ name, path: filePath }) =>
+          generateTypeFile(filePath, name)
+      )
   );
-  const code = schemaFiles
-    .map(({ name }) => `export * from "./${name.replace(".json", "")}"`)
-    .join("\n");
-  const indexPath = path.join(TYPES_DIRECTORY, "index.ts");
-  await fs.promises.writeFile(indexPath, code);
+
+  const folderAsStructure = new Map<string, string[]>();
+
+  schemaFiles.forEach(({name, path})=>{
+     const subFolder = getSubFolder(path, name);
+     if (!folderAsStructure.has(subFolder)){
+       folderAsStructure.set(subFolder, []);
+     }
+     folderAsStructure.get(subFolder).push(name);
+  })
+
+  folderAsStructure.forEach((value, key)=>{
+    const code = value
+        .map(( name ) => `export * from "./${name.replace(".json", "")}"`)
+        .join("\n");
+    const indexPath = path.join(TYPES_DIRECTORY, key, "index.ts");
+    fs.promises.writeFile(indexPath, code);
+  })
   console.info(
-    `Successfully written to ${path.relative(process.cwd(), TYPES_DIRECTORY)}`
+      `Successfully written to ${path.relative(process.cwd(), TYPES_DIRECTORY)}`
   );
 }
 
 async function generateTypeFile(filePath: string, name: string) {
   const code = await compileFromFile(filePath);
-  const tsPath = path.join(TYPES_DIRECTORY, name.replace(".json", ".ts"));
+  const relativePath = filePath.substr(filePath.indexOf(SCHEMAS_DIRECTORY) + SCHEMAS_DIRECTORY.length+1);
+  const subFolder = relativePath.replace(name, "");
+  await fs.promises.mkdir(path.join(TYPES_DIRECTORY, getSubFolder(filePath, name)), { recursive: true });
+  const tsPath = path.join(TYPES_DIRECTORY, subFolder, name.replace(".json", ".ts"));
   await fs.promises.writeFile(tsPath, code);
+}
+
+function getSubFolder(filePath: string, name: string):string {
+  const relativePath = filePath.substr(filePath.indexOf(SCHEMAS_DIRECTORY) + SCHEMAS_DIRECTORY.length+1);
+  const subFolder = relativePath.replace(name, "");
+  return subFolder;
 }

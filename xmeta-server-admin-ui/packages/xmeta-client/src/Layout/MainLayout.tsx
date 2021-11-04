@@ -104,7 +104,7 @@ const Menu = ({ children }: MenuProps) => {
                 onClick={handleSupportClick}
               />
             </Popover>
-            <MenuItem icon="plus" hideTooltip>
+            <MenuItem icon="plus" title={""} hideTooltip>
               <UserBadge />
             </MenuItem>
             <MenuItem

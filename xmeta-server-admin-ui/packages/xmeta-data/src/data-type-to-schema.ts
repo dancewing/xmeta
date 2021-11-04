@@ -1,5 +1,5 @@
 import * as models from "./models";
-import * as schemas from "./schemas";
+import * as schemas from "./schemas/data-type";
 
 export const DATA_TYPE_TO_SCHEMA: { [dataType in models.EnumDataType]: any } = {
   [models.EnumDataType.Id]: schemas.id,

@@ -302,7 +302,43 @@ module.exports = function (webpackEnv) {
       // https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
       splitChunks: {
         chunks: 'all',
-        name: isEnvDevelopment,
+        //name: isEnvDevelopment,
+        name(module, chunks, cacheGroupKey) {
+          const moduleFileName = module.identifier().split('/').reduceRight(item => item);
+          const allChunksNames = chunks.map((item) => item.name).join('~');
+          return `${cacheGroupKey}-${allChunksNames}-${moduleFileName}`;
+        },
+        cacheGroups: {
+          reactBase: {
+            name: 'react-base',
+            test: (module) => {
+              return /react|redux|prop-types/.test(module.context);
+            },
+            chunks: 'initial',
+            priority: 10,
+          },
+          xlsx: {
+            name: 'xlsx',
+            test: (module) => {
+              return /xlsx/.test(module.context);
+            },
+            chunks: 'initial',
+            priority: 8,
+          },
+          common: {
+            name: 'common',
+            chunks: 'initial',
+            priority: 2,
+            minChunks: 1,
+          },
+          styles: {
+            name: 'styles',
+            test: /\.css$/,
+            chunks: 'all',
+            enforce: true,
+            priority: 20,
+          }
+        }
       },
       // Keep the runtime chunk separated to enable long term caching
       // https://twitter.com/wSokra/status/969679223278505985
@@ -561,6 +597,7 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      new webpack.ProgressPlugin(),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(

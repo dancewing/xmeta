@@ -138,7 +138,7 @@ const Entity = ({ match }: Props) => {
               entityId={entityId}
               applicationId={application}
               availableActions={ENTITY_ACTIONS}
-              objectDisplayName={data.entity.pluralDisplayName}
+              objectDisplayName={data.entity.displayName}
             />
           </RouteWithAnalytics>
           <RouteWithAnalytics path="/:application/entities/:entityId/fields/:fieldId">

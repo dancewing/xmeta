@@ -17,6 +17,7 @@ import useNavigationTabs from "../Layout/UseNavigationTabs";
 import { useTracking, track } from "../util/analytics";
 import InnerTabLink from "../Layout/InnerTabLink";
 import RouteWithAnalytics from "../Layout/RouteWithAnalytics";
+import { SHOW_ROLE_PERMISSIONS } from "../feature-flags";
 
 import "./Entity.scss";
 
@@ -105,12 +106,14 @@ const Entity = ({ match }: Props) => {
             >
               General Settings
             </InnerTabLink>
-            <InnerTabLink
-              to={`/${application}/entities/${data.entity.id}/permissions`}
-              icon="lock"
-            >
-              Permissions
-            </InnerTabLink>
+            { SHOW_ROLE_PERMISSIONS && (
+                <InnerTabLink
+                    to={`/${application}/entities/${data.entity.id}/permissions`}
+                    icon="lock"
+                >
+                  Permissions
+                </InnerTabLink>
+            )}
             <InnerTabLink
               to={`/${application}/entities/${data.entity.id}/fields`}
               icon="option_set"

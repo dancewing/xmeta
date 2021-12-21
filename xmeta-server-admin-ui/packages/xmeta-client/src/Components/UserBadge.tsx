@@ -1,14 +1,10 @@
 import React, {useEffect} from "react";
-import {Tooltip} from "@primer/components";
-
 import * as models from "../models";
 import useApi from '../api';
 import {UserAvatar} from "@xmeta/design-system";
 
 import "./UserBadge.scss";
 import {identity} from "../util/analytics";
-
-const TOOLTIP_DIRECTION = "e";
 
 function UserBadge() {
   //const authenticated = useAuthenticated();
@@ -24,17 +20,10 @@ function UserBadge() {
   }, [data]);
 
   return data ? (
-    <Tooltip
-      direction={TOOLTIP_DIRECTION}
-      noDelay
-      wrap
-      aria-label={`${data.account?.firstName} ${data.account?.lastName}`}
-    >
       <UserAvatar
-        firstName={data.account?.firstName}
-        lastName={data.account?.lastName}
+          firstName={data.account?.firstName}
+          lastName={data.account?.lastName}
       />
-    </Tooltip>
   ) : null;
 }
 

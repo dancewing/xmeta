@@ -9,20 +9,15 @@ import { formatError } from "../util/error";
 import PageContent from "../Layout/PageContent";
 import { CircleBadge } from "@xmeta/design-system";
 import ApplicationForm from "./ApplicationForm";
-import SyncWithGithubPage from "../Settings/SyncWithGithubPage";
 import "./ApplicationHome.scss";
-import SyncWithGithubTile from "./SyncWithGithubTile";
 import EntitiesTile from "./EntitiesTile";
 import NewVersionTile from "./NewVersionTile";
 import RolesTile from "./RolesTile";
 import { COLOR_TO_NAME } from "./constants";
 import useNavigationTabs from "../Layout/UseNavigationTabs";
 import InnerTabLink from "../Layout/InnerTabLink";
-import { ApiTokenList } from "../Settings/ApiTokenList";
 import RouteWithAnalytics from "../Layout/RouteWithAnalytics";
-import ApplicationDatabaseSettingsForms from "./ApplicationDatabaseSettingsForms";
-import ApplicationAuthSettingForm from "./ApplicationAuthSettingForm";
-
+import { SHOW_ROLE_PERMISSIONS } from "../feature-flags";
 type Props = {
   match: match<{ application: string }>;
 };
@@ -57,46 +52,18 @@ function ApplicationHome({ match }: Props) {
         <>
           <div>
             <InnerTabLink to={`/${applicationId}/`} icon="home">
-              Overview
+              概览
             </InnerTabLink>
           </div>
           <div>
             <InnerTabLink to={`/${applicationId}/update`} icon="settings">
-              App Settings
-            </InnerTabLink>
-          </div>
-          <div>
-            <InnerTabLink to={`/${applicationId}/db/update`} icon="settings">
-              DB Settings
-            </InnerTabLink>
-          </div>
-          <div>
-            <InnerTabLink to={`/${applicationId}/auth/update`} icon="settings">
-              Auth Settings
-            </InnerTabLink>
-          </div>
-          <div>
-            <InnerTabLink to={`/${applicationId}/github`} icon="github_outline">
-              Sync with GitHub
-            </InnerTabLink>
-          </div>
-          <div>
-            <InnerTabLink to={`/${applicationId}/api-tokens`} icon="id">
-              API Tokens
+              应用设置
             </InnerTabLink>
           </div>
         </>
       }
     >
       <Switch>
-        <RouteWithAnalytics
-          path="/:application/api-tokens"
-          component={ApiTokenList}
-        />
-        <RouteWithAnalytics
-          path="/:application/github"
-          component={SyncWithGithubPage}
-        />
         <Route
           path="/:application/"
           render={() => (
@@ -121,22 +88,15 @@ function ApplicationHome({ match }: Props) {
                     <div className={`${CLASS_NAME}__tiles`}>
                       <NewVersionTile applicationId={applicationId} />
                       <EntitiesTile applicationId={applicationId} />
-                      <RolesTile applicationId={applicationId} />
-                      <SyncWithGithubTile applicationId={applicationId} />
+                      { SHOW_ROLE_PERMISSIONS && (
+                          <RolesTile applicationId={applicationId} />
+                      )}
                     </div>
                   )}
                 />
                 <RouteWithAnalytics
                   path="/:application/update"
                   component={ApplicationForm}
-                />
-                <RouteWithAnalytics
-                  path="/:application/db/update"
-                  component={ApplicationDatabaseSettingsForms}
-                />
-                <RouteWithAnalytics
-                  path="/:application/auth/update"
-                  component={ApplicationAuthSettingForm}
                 />
               </Switch>
             </>

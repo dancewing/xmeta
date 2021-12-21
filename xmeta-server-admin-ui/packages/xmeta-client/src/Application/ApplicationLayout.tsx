@@ -26,13 +26,12 @@ import PendingChangesContext, {
   PendingChangeItem,
 } from "../VersionControl/PendingChangesContext";
 import { track } from "../util/analytics";
-import { SHOW_UI_ELEMENTS } from "../feature-flags";
+import { SHOW_UI_ELEMENTS, SHOW_ROLE_PERMISSIONS } from "../feature-flags";
 import ScreenResolutionMessage from "../Layout/ScreenResolutionMessage";
 import PendingChangesMenuItem from "../VersionControl/PendingChangesMenuItem";
 import Commits from "../VersionControl/Commits";
 import Environments from "../Environment/Environments";
 import {EntityDiagram} from "../Entity/EntityDiagram";
-import Diagram  from "../Graph";
 import NavigationTabs from "../Layout/NavigationTabs";
 import { ReactComponent as EnvironmentOutline } from "../assets/icons/environment.svg";
 import { ReactComponent as PartitionOutline } from "../assets/icons/partition.svg";
@@ -220,11 +219,13 @@ function ApplicationLayout({ match }: Props) {
           {SHOW_UI_ELEMENTS && (
             <MenuItem title="Pages" to={`/${application}/pages`} icon="pages" />
           )}
-          <MenuItem
-            title="Roles"
-            to={`/${application}/roles`}
-            icon="roles_outline"
-          />
+          {SHOW_ROLE_PERMISSIONS && (
+              <MenuItem
+                  title="Roles"
+                  to={`/${application}/roles`}
+                  icon="roles_outline"
+              />
+          )}
           <MenuItem
             title="Commits"
             to={`/${application}/commits`}
@@ -272,15 +273,15 @@ function ApplicationLayout({ match }: Props) {
                 path="/:application/builds/:buildId"
                 component={BuildPage}
               />
-
-              <RouteWithAnalytics
-                path="/:application/roles"
-                component={RolesPage}
-              />
+              { SHOW_ROLE_PERMISSIONS && (
+                  <RouteWithAnalytics
+                      path="/:application/roles"
+                      component={RolesPage}
+                  />
+              )}
               <Route path="/:application/commits" component={Commits} />
               <Route path="/:application/environments" component={Environments} />
               <Route path="/:application/diagram" component={EntityDiagram} />
-              <Route path="/:application/diagram2" component={Diagram} />
               <RouteWithAnalytics
                 path="/:application/fix-related-entities"
                 component={RelatedFieldsMigrationFix}

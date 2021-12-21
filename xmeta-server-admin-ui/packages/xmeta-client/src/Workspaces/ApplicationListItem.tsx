@@ -98,7 +98,7 @@ function ApplicationListItem({ app, onDelete }: Props) {
               <div className={`${CLASS_NAME}__recently-used`}>
                 <Icon icon="clock" />
                 <Tooltip
-                  aria-label={`Last build: ${format(
+                  aria-label={`最后一次构建: ${format(
                     lastBuildDate,
                     DATE_FORMAT
                   )}`}

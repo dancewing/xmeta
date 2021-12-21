@@ -16,6 +16,8 @@ import {Button, EnumButtonStyle} from "../Components/Button";
 import {Grid, GridCell, GridRow} from "@rmwc/grid";
 import EnumSelectField from "../Components/EnumSelectField";
 import {useIntl} from "react-intl";
+import {CROSS_OS_CTRL_ENTER} from "../util/hotkeys";
+import {GlobalHotKeys} from "react-hotkeys";
 
 export type Values = {
   id: string; //the id field is required in the form context to be used in "DataTypeSelectField"
@@ -67,6 +69,11 @@ export const INITIAL_VALUES: Values = {
   description: "",
   properties: {},
 };
+
+const keyMap = {
+  SUBMIT: CROSS_OS_CTRL_ENTER,
+};
+
 
 const EntityFieldForm = ({
   onSubmit,
@@ -123,10 +130,13 @@ const EntityFieldForm = ({
     >
       {(formik) => {
         const schema = getSchemaForDataType(formik.values.dataType);
-
+        const handlers = {
+          SUBMIT: formik.submitForm,
+        };
         return (
           <Form childrenAsBlocks onKeyDown={onKeyDown}>
             {/*{!isDisabled && <FormikAutoSave debounceMS={1000} />}*/}
+            <GlobalHotKeys keyMap={keyMap} handlers={handlers} />
             <Grid>
               <GridRow>
                 <GridCell span={6}>

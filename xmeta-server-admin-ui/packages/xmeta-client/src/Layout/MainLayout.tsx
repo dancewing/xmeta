@@ -16,6 +16,7 @@ import UserBadge from "../Components/UserBadge";
 import { MenuFixedPanel } from "../util/teleporter";
 import { Popover } from "@xmeta/design-system";
 import SupportMenu from "./SupportMenu";
+import UserMenu from "./UserMenu";
 import { useTracking } from "../util/analytics";
 import DarkModeToggle from "./DarkModeToggle";
 import "./MainLayout.scss";
@@ -47,6 +48,7 @@ type MenuProps = {
 const Menu = ({ children }: MenuProps) => {
   const history = useHistory();
   const [supportMenuOpen, setSupportMenuOpen] = React.useState(false);
+  const [userMenuOpen, setUserMenuOpen] = React.useState(false);
   const { trackEvent } = useTracking();
 
   const apolloClient = useApolloClient();
@@ -65,6 +67,13 @@ const Menu = ({ children }: MenuProps) => {
     });
     setSupportMenuOpen(!supportMenuOpen);
   }, [setSupportMenuOpen, supportMenuOpen, trackEvent]);
+
+  const handleUserClick = useCallback(() => {
+    trackEvent({
+      eventName: "userButtonClick",
+    });
+    setUserMenuOpen(!userMenuOpen);
+  }, [setUserMenuOpen, userMenuOpen, trackEvent]);
 
   return (
     <Drawer className={classNames("main-layout__side")}>
@@ -92,21 +101,28 @@ const Menu = ({ children }: MenuProps) => {
           <div className="bottom-menu-container">
             <DarkModeToggle />
             <Popover
-              className="main-layout__side__popover"
-              content={<SupportMenu />}
-              open={supportMenuOpen}
-              align={"right"}
+                className="main-layout__side__popover"
+                content={<SupportMenu />}
+                open={supportMenuOpen}
+                align={"right"}
             >
               <MenuItem
-                icon="help_outline"
-                hideTooltip
-                title="Help and support"
-                onClick={handleSupportClick}
+                  icon="help_outline"
+                  hideTooltip
+                  title="Help and support"
+                  onClick={handleSupportClick}
               />
             </Popover>
-            <MenuItem icon="plus" title={""} hideTooltip>
-              <UserBadge />
-            </MenuItem>
+            <Popover
+                className="main-layout__side__popover"
+                content={<UserMenu />}
+                open={userMenuOpen}
+                align={"right"}
+            >
+              <MenuItem icon="plus" title={""} hideTooltip onClick={handleUserClick}>
+                <UserBadge />
+              </MenuItem>
+            </Popover>
             <MenuItem
               title="Sign Out"
               icon="log_out_outline"
